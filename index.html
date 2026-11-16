@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ИЧ — исполнительный чертёж телефонной канализации</title>
+<style>
+:root{--paper:#eeeff0;--panel:#fff;--ink:#1d1e20;--muted:#5f6368;--line:#d6d8db;--deep:#2a2b2e;--blue:#1f3a93;--warn:#8a5a00;--warn-bg:#fff4d6;--ok-bg:#e7f3ea;--ok:#1f5a35;
+--head:Bahnschrift,"DIN Condensed","DIN Alternate","Arial Narrow","Segoe UI",system-ui,sans-serif;--body:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{font:14px/1.45 var(--body);color:var(--ink);background:var(--paper);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--head);font-stretch:80%;margin:0;font-weight:600;letter-spacing:.01em}
+button,input,select{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#app{display:flex;flex-direction:column;height:100%}
+.top{display:flex;align-items:center;gap:18px;padding:10px 18px;background:#fff;border-bottom:3px solid var(--ink)}
+.brand{display:flex;align-items:center;gap:10px}.mark{font:700 30px/1 var(--head);font-stretch:75%;letter-spacing:.02em}.brand .sep{width:1px;height:28px;background:var(--line)}.brand .sub{font-size:12px;line-height:1.2;color:var(--muted)}
+.top-info{color:var(--muted);font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 13px;cursor:pointer;line-height:1.2}.btn:hover:not(:disabled){border-color:#9aa0a6}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}.btn.primary:hover:not(:disabled){filter:brightness(1.35)}
+.btn.ghost{background:transparent}.btn.small{padding:4px 9px;font-size:12.5px}.btn.danger{color:#9b1c1c}.btn:disabled,.seg:disabled,.chip:disabled{opacity:.45;cursor:not-allowed}
+.work{flex:1;min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr) 470px}
+.side,.card{background:var(--panel);overflow:auto;padding:14px}.side{border-right:1px solid var(--line)}.card{border-left:1px solid var(--line)}
+.side h2,.card h2{font-size:17px;margin-bottom:10px}.card-head h2{font-size:22px}
+.card h3,.side h3.sh{font-size:15px;margin:18px 0 8px;padding-top:12px;border-top:1px solid var(--line);color:var(--deep)}
+.files{list-style:none;margin:0;padding:0;font-size:13px}.files li{padding:3px 0;border-bottom:1px dashed var(--line);word-break:break-all}.files .gen{font-weight:700}
+.objs{display:flex;flex-direction:column;gap:6px}
+.obj{position:relative;display:grid;gap:1px;text-align:left;border:1px solid var(--line);border-left:4px solid transparent;background:#fff;border-radius:6px;padding:8px 34px 8px 10px;cursor:pointer}.obj:hover{border-left-color:var(--ink);background:#f4f5f6}
+.obj-no{font:600 17px/1.2 var(--head);font-stretch:85%}.obj-net{color:var(--muted);font-size:12.5px}.obj-meta{font-size:12.5px}.obj-meta i{color:var(--muted);font-style:normal}
+.flag,.ok{position:absolute;right:9px;top:9px;min-width:20px;height:20px;border-radius:10px;font-size:12px;display:grid;place-items:center;padding:0 5px}.flag{background:var(--warn-bg);color:var(--warn);font-weight:700}.ok{color:#2c7a4b}
+.issues{margin:6px 0}.issue{margin:0 0 6px;padding:7px 10px;background:var(--warn-bg);color:#5c3d00;border-left:3px solid #e0a100;border-radius:0 5px 5px 0;font-size:13px}.fine{margin:6px 0;color:var(--muted);font-size:13px}
+.pts{margin-top:10px;border:1px solid var(--line);border-radius:6px;padding:8px 10px}.pts summary{cursor:pointer;font-weight:600;font-size:13px}
+.desk{min-width:0;display:flex;flex-direction:column;background-color:#e4e5e7;background-image:linear-gradient(#d0d2d5 1px,transparent 1px),linear-gradient(90deg,#d0d2d5 1px,transparent 1px);background-size:100px 100px}
+.tabs{display:flex;gap:4px;padding:10px 14px 0;flex-wrap:wrap;align-items:flex-end}.tab{border:1px solid var(--line);border-bottom:0;background:#f3f4f5;border-radius:6px 6px 0 0;padding:6px 12px;cursor:pointer;font-size:13px}.tab.on{background:#fff;font-weight:600;box-shadow:inset 0 3px 0 var(--ink)}
+.cnt{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:var(--warn-bg);color:var(--warn);font-size:11.5px;font-weight:700}
+.zoombar{margin-left:auto;display:flex;gap:4px;padding-bottom:4px}
+.desk-scroll{flex:1;min-height:0;overflow:auto;margin:0 14px;background:#fff;box-shadow:0 1px 2px rgba(27,36,32,.25),0 8px 24px rgba(27,36,32,.12)}
+#vp{overflow:hidden}svg.draw{display:block;width:100%;height:100%;cursor:grab;touch-action:none;user-select:none;font-family:Arial,sans-serif}svg.draw.grab{cursor:grabbing}
+svg.draw polyline,svg.draw polygon,svg.draw circle{vector-effect:non-scaling-stroke;stroke-width:1}
+.desk-hint{margin:0;padding:6px 14px 10px;font-size:12.5px;color:var(--muted)}.pad{padding:14px}
+.sum{width:100%;border-collapse:collapse;font-size:13px}.sum th,.sum td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}.sum .num{text-align:right;white-space:nowrap}
+.ctab tr.k-fit td{background:#eef3fb}.ctab tr.k-diff td{background:var(--warn-bg)}.ctab tr.k-bad td{background:#fdecec}.ctab tr.k-none td,.ctab tr.k-info td{color:var(--muted)}
+.segs{display:flex;align-items:center;font-size:13px;margin:4px 0 10px}.segs span{color:var(--muted);margin-right:8px}.seg{border:1px solid var(--line);background:#fff;padding:6px 12px;cursor:pointer}.seg:first-of-type{border-radius:6px 0 0 6px}.seg:last-of-type{border-radius:0 6px 6px 0;border-left:0}.seg.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.tolrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-bottom:6px}.tolrow.off{opacity:.55}.chips{display:flex;gap:4px}.chip{border:1px solid var(--line);background:#fff;border-radius:14px;padding:5px 10px;cursor:pointer;font-size:12.5px}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fld{display:grid;gap:3px;font-size:12px;color:var(--muted);margin:6px 0}.fld input,.fld select{width:100%;border:1px solid var(--line);border-radius:5px;padding:6px 8px;background:#fff;font-size:14px;color:var(--ink)}
+.chk-l,.chk{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:14px}.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.hint{color:var(--muted);font-size:12.5px;margin:4px 0}
+.ptwrap{overflow-x:auto}.ptab{width:100%;border-collapse:collapse;margin:6px 0 12px;font-size:12px}.ptab th{text-align:left;color:var(--muted);font-weight:500;padding:2px 3px;white-space:nowrap}.ptab td{padding:1px 2px}
+.ptab input{width:100%;min-width:50px;border:1px solid var(--line);border-radius:4px;padding:4px 5px;font-size:12.5px;background:#fff}.ptab td.rn{color:var(--muted);font-size:11.5px;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.empty{flex:1;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:center;padding:6vh 6vw;max-width:1200px;margin:0 auto;width:100%}
+.drop{border:2px dashed #9a9da2;border-radius:10px;background:#f9f9fa;padding:56px 40px;cursor:pointer}.drop:hover,body.drag .drop{border-color:var(--ink);background:#fff}
+.drop h1{font-size:34px;line-height:1.1;margin-bottom:14px}.drop p{color:var(--muted);max-width:52ch;margin:0 0 22px}
+.steps{margin:0;padding-left:22px;display:grid;gap:16px;color:var(--muted);max-width:46ch}.steps b{color:var(--ink)}
+body.drag .work{outline:3px dashed var(--ink);outline-offset:-8px}
+.cheat{font-size:13px;background:#f7f8f9;border:1px solid var(--line);border-radius:6px;padding:10px 12px}.cheat p{margin:0 0 6px}.cheat p:last-child{margin:0;color:var(--muted)}
+.veil{position:fixed;inset:0;background:rgba(27,36,32,.45);display:grid;place-items:center;padding:20px;z-index:20}
+.modal{background:#fff;border-radius:10px;width:min(860px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}.modal-body{padding:6px 18px 18px;overflow:auto}.help h3{font-size:16px;margin:14px 0 6px}.help p{margin:0 0 8px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--deep);color:#fff;padding:10px 16px;border-radius:6px;opacity:0;pointer-events:none;transition:.2s;z-index:40;max-width:90vw}#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:1150px){.work{grid-template-columns:220px minmax(0,1fr)}.card{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}#app{height:auto;min-height:100%}.desk{min-height:70vh}}
+@media (max-width:720px){.work{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.objs{flex-direction:row;overflow:auto}.obj{min-width:160px}.empty{grid-template-columns:1fr;padding:24px 16px}.drop{padding:32px 20px}.drop h1{font-size:26px}.top{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+.ptab td:nth-child(2) input{min-width:64px}.ptab td:nth-child(3) input{min-width:68px}
+</style></head>
+<body><div id="app"></div><input id="picker" type="file" multiple hidden><div id="toast" role="status"></div>
+<script>window.ICH_SKEL={"skel": "  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1015\n  9\n$ACADMAINTVER\n 70\n6\n  9\n$DWGCODEPAGE\n  3\nANSI_1251\n  9\n$INSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$EXTMIN\n 10\n{{EXMINX}}\n 20\n{{EXMINY}}\n 30\n0.0\n  9\n$EXTMAX\n 10\n{{EXMAXX}}\n 20\n{{EXMAXY}}\n 30\n0.0\n  9\n$LIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$LIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$ORTHOMODE\n 70\n0\n  9\n$REGENMODE\n 70\n1\n  9\n$FILLMODE\n 70\n1\n  9\n$QTEXTMODE\n 70\n0\n  9\n$MIRRTEXT\n 70\n1\n  9\n$LTSCALE\n 40\n{{LTSCALE}}\n  9\n$ATTMODE\n 70\n1\n  9\n$TEXTSIZE\n 40\n2.5\n  9\n$TRACEWID\n 40\n1.0\n  9\n$TEXTSTYLE\n  7\nStandard\n  9\n$CLAYER\n  8\n0\n  9\n$CELTYPE\n  6\nByLayer\n  9\n$CECOLOR\n 62\n256\n  9\n$CELTSCALE\n 40\n1.0\n  9\n$DISPSILH\n 70\n0\n  9\n$DIMSCALE\n 40\n1.0\n  9\n$DIMASZ\n 40\n2.5\n  9\n$DIMEXO\n 40\n0.625\n  9\n$DIMDLI\n 40\n3.75\n  9\n$DIMRND\n 40\n0.0\n  9\n$DIMDLE\n 40\n0.0\n  9\n$DIMEXE\n 40\n1.25\n  9\n$DIMTP\n 40\n0.0\n  9\n$DIMTM\n 40\n0.0\n  9\n$DIMTXT\n 40\n2.5\n  9\n$DIMCEN\n 40\n2.5\n  9\n$DIMTSZ\n 40\n0.0\n  9\n$DIMTOL\n 70\n0\n  9\n$DIMLIM\n 70\n0\n  9\n$DIMTIH\n 70\n0\n  9\n$DIMTOH\n 70\n0\n  9\n$DIMSE1\n 70\n0\n  9\n$DIMSE2\n 70\n0\n  9\n$DIMTAD\n 70\n1\n  9\n$DIMZIN\n 70\n8\n  9\n$DIMBLK\n  1\n\n  9\n$DIMASO\n 70\n1\n  9\n$DIMSHO\n 70\n1\n  9\n$DIMPOST\n  1\n\n  9\n$DIMAPOST\n  1\n\n  9\n$DIMALT\n 70\n0\n  9\n$DIMALTD\n 70\n3\n  9\n$DIMALTF\n 40\n0.03937007874\n  9\n$DIMLFAC\n 40\n1.0\n  9\n$DIMTOFL\n 70\n1\n  9\n$DIMTVP\n 40\n0.0\n  9\n$DIMTIX\n 70\n0\n  9\n$DIMSOXD\n 70\n0\n  9\n$DIMSAH\n 70\n0\n  9\n$DIMBLK1\n  1\n\n  9\n$DIMBLK2\n  1\n\n  9\n$DIMSTYLE\n  2\nISO-25\n  9\n$DIMCLRD\n 70\n0\n  9\n$DIMCLRE\n 70\n0\n  9\n$DIMCLRT\n 70\n0\n  9\n$DIMTFAC\n 40\n1.0\n  9\n$DIMGAP\n 40\n0.625\n  9\n$DIMJUST\n 70\n0\n  9\n$DIMSD1\n 70\n0\n  9\n$DIMSD2\n 70\n0\n  9\n$DIMTOLJ\n 70\n0\n  9\n$DIMTZIN\n 70\n8\n  9\n$DIMALTZ\n 70\n0\n  9\n$DIMALTTZ\n 70\n0\n  9\n$DIMUPT\n 70\n0\n  9\n$DIMDEC\n 70\n2\n  9\n$DIMTDEC\n 70\n2\n  9\n$DIMALTU\n 70\n2\n  9\n$DIMALTTD\n 70\n3\n  9\n$DIMTXSTY\n  7\nStandard\n  9\n$DIMAUNIT\n 70\n0\n  9\n$DIMADEC\n 70\n0\n  9\n$DIMALTRND\n 40\n0.0\n  9\n$DIMAZIN\n 70\n0\n  9\n$DIMDSEP\n 70\n44\n  9\n$DIMATFIT\n 70\n3\n  9\n$DIMFRAC\n 70\n0\n  9\n$DIMLDRBLK\n  1\n\n  9\n$DIMLUNIT\n 70\n2\n  9\n$DIMLWD\n 70\n-2\n  9\n$DIMLWE\n 70\n-2\n  9\n$DIMTMOVE\n 70\n0\n  9\n$LUNITS\n 70\n2\n  9\n$LUPREC\n 70\n4\n  9\n$SKETCHINC\n 40\n1.0\n  9\n$FILLETRAD\n 40\n10.0\n  9\n$AUNITS\n 70\n0\n  9\n$AUPREC\n 70\n2\n  9\n$MENU\n  1\n.\n  9\n$ELEVATION\n 40\n0.0\n  9\n$PELEVATION\n 40\n0.0\n  9\n$THICKNESS\n 40\n0.0\n  9\n$LIMCHECK\n 70\n0\n  9\n$CHAMFERA\n 40\n0.0\n  9\n$CHAMFERB\n 40\n0.0\n  9\n$CHAMFERC\n 40\n0.0\n  9\n$CHAMFERD\n 40\n0.0\n  9\n$SKPOLY\n 70\n0\n  9\n$TDCREATE\n 40\n2461313.7136921296\n  9\n$TDUCREATE\n 40\n2458532.153996898\n  9\n$TDUPDATE\n 40\n2461313.7136921296\n  9\n$TDUUPDATE\n 40\n2458532.1544311\n  9\n$TDINDWG\n 40\n0.0\n  9\n$TDUSRTIMER\n 40\n0.0\n  9\n$USRTIMER\n 70\n1\n  9\n$ANGBASE\n 50\n0.0\n  9\n$ANGDIR\n 70\n0\n  9\n$PDMODE\n 70\n35\n  9\n$PDSIZE\n 40\n{{PDSIZE}}\n  9\n$PLINEWID\n 40\n0.0\n  9\n$SPLFRAME\n 70\n0\n  9\n$SPLINETYPE\n 70\n6\n  9\n$SPLINESEGS\n 70\n8\n  9\n$HANDSEED\n  5\n{{HANDSEED}}\n  9\n$SURFTAB1\n 70\n6\n  9\n$SURFTAB2\n 70\n6\n  9\n$SURFTYPE\n 70\n6\n  9\n$SURFU\n 70\n6\n  9\n$SURFV\n 70\n6\n  9\n$UCSBASE\n  2\n\n  9\n$UCSNAME\n  2\n\n  9\n$UCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$UCSORTHOREF\n  2\n\n  9\n$UCSORTHOVIEW\n 70\n0\n  9\n$UCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSBASE\n  2\n\n  9\n$PUCSNAME\n  2\n\n  9\n$PUCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$PUCSORTHOREF\n  2\n\n  9\n$PUCSORTHOVIEW\n 70\n0\n  9\n$PUCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$USERI1\n 70\n0\n  9\n$USERI2\n 70\n0\n  9\n$USERI3\n 70\n0\n  9\n$USERI4\n 70\n0\n  9\n$USERI5\n 70\n0\n  9\n$USERR1\n 40\n0.0\n  9\n$USERR2\n 40\n0.0\n  9\n$USERR3\n 40\n0.0\n  9\n$USERR4\n 40\n0.0\n  9\n$USERR5\n 40\n0.0\n  9\n$WORLDVIEW\n 70\n1\n  9\n$SHADEDGE\n 70\n3\n  9\n$SHADEDIF\n 70\n70\n  9\n$TILEMODE\n 70\n1\n  9\n$MAXACTVP\n 70\n64\n  9\n$PINSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PLIMCHECK\n 70\n0\n  9\n$PEXTMIN\n 10\n1e+20\n 20\n1e+20\n 30\n1e+20\n  9\n$PEXTMAX\n 10\n-1e+20\n 20\n-1e+20\n 30\n-1e+20\n  9\n$PLIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$PLIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$UNITMODE\n 70\n0\n  9\n$VISRETAIN\n 70\n1\n  9\n$PLINEGEN\n 70\n0\n  9\n$PSLTSCALE\n 70\n1\n  9\n$TREEDEPTH\n 70\n3020\n  9\n$CMLSTYLE\n  2\nStandard\n  9\n$CMLJUST\n 70\n0\n  9\n$CMLSCALE\n 40\n20.0\n  9\n$PROXYGRAPHICS\n 70\n1\n  9\n$MEASUREMENT\n 70\n1\n  9\n$CELWEIGHT\n370\n-1\n  9\n$ENDCAPS\n280\n0\n  9\n$JOINSTYLE\n280\n0\n  9\n$LWDISPLAY\n290\n0\n  9\n$INSUNITS\n 70\n6\n  9\n$HYPERLINKBASE\n  1\n\n  9\n$STYLESHEET\n  1\n\n  9\n$XEDIT\n290\n1\n  9\n$CEPSNTYPE\n380\n0\n  9\n$PSTYLEMODE\n290\n1\n  9\n$FINGERPRINTGUID\n  2\n{83AAAAEA-91C6-4B45-A960-A1CEF3310842}\n  9\n$VERSIONGUID\n  2\n{D81DBDA3-241D-4286-9503-0B4CF4FEC05F}\n  9\n$EXTNAMES\n290\n1\n  9\n$PSVPSCALE\n 40\n0.0\n  9\n$OLESTARTUP\n290\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nCLASSES\n  0\nCLASS\n  1\nACDBDICTIONARYWDFLT\n  2\nAcDbDictionaryWithDefault\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nSUN\n  2\nAcDbSun\n  3\nSCENEOE\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nVISUALSTYLE\n  2\nAcDbVisualStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMATERIAL\n  2\nAcDbMaterial\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nSCALE\n  2\nAcDbScale\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nTABLESTYLE\n  2\nAcDbTableStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMLEADERSTYLE\n  2\nAcDbMLeaderStyle\n  3\nACDB_MLEADERSTYLE_CLASS\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nDICTIONARYVAR\n  2\nAcDbDictionaryVar\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nCELLSTYLEMAP\n  2\nAcDbCellStyleMap\n  3\nObjectDBX Classes\n 90\n1152\n280\n0\n281\n0\n  0\nCLASS\n  1\nMENTALRAYRENDERSETTINGS\n  2\nAcDbMentalRayRenderSettings\n  3\nSCENEOE\n 90\n1024\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBDETAILVIEWSTYLE\n  2\nAcDbDetailViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBSECTIONVIEWSTYLE\n  2\nAcDbSectionViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nRASTERVARIABLES\n  2\nAcDbRasterVariables\n  3\nISM\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBPLACEHOLDER\n  2\nAcDbPlaceHolder\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nLAYOUT\n  2\nAcDbLayout\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nVPORT\n  5\n8\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nVPORT\n  5\n23\n330\n8\n100\nAcDbSymbolTableRecord\n100\nAcDbViewportTableRecord\n  2\n*Active\n 70\n0\n 10\n0.0\n 20\n0.0\n 11\n1.0\n 21\n1.0\n 12\n0.0\n 22\n0.0\n 13\n0.0\n 23\n0.0\n 14\n0.5\n 24\n0.5\n 15\n0.5\n 25\n0.5\n 16\n0.0\n 26\n0.0\n 36\n1.0\n 17\n0.0\n 27\n0.0\n 37\n0.0\n 40\n1000.0\n 41\n1.34\n 42\n50.0\n 43\n0.0\n 44\n0.0\n 50\n0.0\n 51\n0.0\n 71\n0\n 72\n1000\n 73\n1\n 74\n3\n 75\n0\n 76\n0\n 77\n0\n 78\n0\n281\n0\n 65\n0\n146\n0.0\n  0\nENDTAB\n  0\nTABLE\n  2\nLTYPE\n  5\n2\n330\n0\n100\nAcDbSymbolTable\n 70\n4\n  0\nLTYPE\n  5\n24\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByBlock\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n25\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByLayer\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n26\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nContinuous\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n35\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nDASHED\n 70\n0\n  3\n\n 72\n65\n 73\n2\n 40\n1.0\n 49\n0.6\n 74\n0\n 49\n-0.4\n 74\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nLAYER\n  5\n1\n330\n0\n100\nAcDbSymbolTable\n 70\n{{NLAYERS}}\n  0\nLAYER\n  5\n27\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\n0\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n28\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDefpoints\n 70\n0\n 62\n7\n  6\nContinuous\n290\n0\n370\n-3\n390\n13\n  0\nLAYER\n  5\n2F\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nPOINT\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n30\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nName\n 70\n0\n 62\n1\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n31\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nELEVATION\n 70\n0\n 62\n5\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n32\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDeskription\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n33\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHV\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n34\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHI\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n{{LAYERS}}  0\nENDTAB\n  0\nTABLE\n  2\nSTYLE\n  5\n5\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nSTYLE\n  5\n29\n330\n5\n100\nAcDbSymbolTableRecord\n100\nAcDbTextStyleTableRecord\n  2\nStandard\n 70\n0\n 40\n0.0\n 41\n1.0\n 50\n0.0\n 71\n0\n 42\n2.5\n  3\narial.ttf\n  4\n\n  0\nENDTAB\n  0\nTABLE\n  2\nVIEW\n  5\n7\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nUCS\n  5\n6\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nAPPID\n  5\n3\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nAPPID\n  5\n2A\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nACAD\n 70\n0\n  0\nAPPID\n  5\n3F\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nHATCHBACKGROUNDCOLOR\n 70\n0\n  0\nAPPID\n  5\n40\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nEZDXF\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nDIMSTYLE\n  5\n4\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n100\nAcDbDimStyleTable\n  0\nDIMSTYLE\n105\n2B\n330\n4\n100\nAcDbSymbolTableRecord\n100\nAcDbDimStyleTableRecord\n  2\nStandard\n 70\n0\n  3\n\n  4\n\n 40\n1.0\n 41\n2.5\n 42\n0.625\n 43\n3.75\n 44\n1.25\n 45\n0.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n140\n2.5\n141\n2.5\n142\n0.0\n143\n0.03937007874\n144\n1.0\n145\n0.0\n146\n1.0\n147\n0.625\n148\n0.0\n 71\n0\n 72\n0\n 73\n0\n 74\n0\n 75\n0\n 76\n0\n 77\n1\n 78\n8\n 79\n3\n170\n0\n171\n3\n172\n1\n173\n0\n174\n0\n175\n0\n176\n0\n177\n0\n178\n0\n179\n2\n271\n2\n272\n2\n273\n2\n274\n3\n275\n0\n276\n0\n277\n2\n278\n44\n279\n0\n280\n0\n281\n0\n282\n0\n283\n0\n284\n8\n285\n0\n286\n0\n288\n0\n289\n3\n371\n-2\n372\n-2\n  0\nENDTAB\n  0\nTABLE\n  2\nBLOCK_RECORD\n  5\n9\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nBLOCK_RECORD\n  5\n17\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Model_Space\n340\n1A\n  0\nBLOCK_RECORD\n  5\n1B\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Paper_Space\n340\n1E\n  0\nBLOCK_RECORD\n  5\n36\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n_block2\n340\n0\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nBLOCKS\n  0\nBLOCK\n  5\n18\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Model_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Model_Space\n  1\n\n  0\nENDBLK\n  5\n19\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n1C\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Paper_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Paper_Space\n  1\n\n  0\nENDBLK\n  5\n1D\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n37\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n_block2\n 70\n2\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n_block2\n  1\n\n  0\nCIRCLE\n  5\n39\n330\n36\n100\nAcDbEntity\n  8\nPOINT\n100\nAcDbCircle\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 40\n0.0762\n  0\nATTDEF\n  5\n3A\n330\n36\n100\nAcDbEntity\n  8\nName\n 62\n250\n100\nAcDbText\n 10\n0.096\n 20\n0.178\n 30\n0.0\n 40\n0.2\n  1\n1\n100\nAcDbAttributeDefinition\n  3\nНОМЕР\n  2\n№\n 70\n0\n  0\nATTDEF\n  5\n3B\n330\n36\n100\nAcDbEntity\n  8\nELEVATION\n100\nAcDbText\n 10\n0.096\n 20\n-0.08\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОТМЕТКА\n  2\nH\n 70\n0\n  0\nATTDEF\n  5\n3C\n330\n36\n100\nAcDbEntity\n  8\nDeskription\n100\nAcDbText\n 10\n0.096\n 20\n-0.357\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОписание\n  2\nTXT\n 70\n0\n  0\nATTDEF\n  5\n3D\n330\n36\n100\nAcDbEntity\n  8\nHV\n100\nAcDbText\n 10\n0.151\n 20\n-0.622\n 30\n0.0\n 40\n0.2\n  1\n2.500\n100\nAcDbAttributeDefinition\n  3\nвысота вехи\n  2\nHV\n 70\n0\n  0\nATTDEF\n  5\n3E\n330\n36\n100\nAcDbEntity\n  8\nHI\n100\nAcDbText\n 10\n-0.866\n 20\n-0.084\n 30\n0.0\n 40\n0.2\n  1\n1.600\n100\nAcDbAttributeDefinition\n  3\nвысота инструмента\n  2\nHI\n 70\n0\n  0\nENDBLK\n  5\n38\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n{{ENTITIES}}  0\nENDSEC\n  0\nSECTION\n  2\nOBJECTS\n  0\nDICTIONARY\n  5\nA\n330\n0\n100\nAcDbDictionary\n281\n1\n  3\nACAD_COLOR\n350\nB\n  3\nACAD_GROUP\n350\nC\n  3\nACAD_LAYOUT\n350\nD\n  3\nACAD_MATERIAL\n350\nE\n  3\nACAD_MLEADERSTYLE\n350\nF\n  3\nACAD_MLINESTYLE\n350\n10\n  3\nACAD_PLOTSETTINGS\n350\n11\n  3\nACAD_PLOTSTYLENAME\n350\n12\n  3\nACAD_SCALELIST\n350\n14\n  3\nACAD_TABLESTYLE\n350\n15\n  3\nACAD_VISUALSTYLE\n350\n16\n  3\nEZDXF_META\n350\n2D\n  0\nDICTIONARY\n  5\nB\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nC\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nD\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nModel\n350\n1A\n  3\nLayout1\n350\n1E\n  0\nDICTIONARY\n  5\nE\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nByBlock\n350\n1F\n  3\nByLayer\n350\n20\n  3\nGlobal\n350\n21\n  0\nDICTIONARY\n  5\nF\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n2C\n  0\nDICTIONARY\n  5\n10\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n22\n  0\nDICTIONARY\n  5\n11\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nACDBDICTIONARYWDFLT\n  5\n12\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nNormal\n350\n13\n100\nAcDbDictionaryWithDefault\n340\n13\n  0\nACDBPLACEHOLDER\n  5\n13\n330\n12\n  0\nDICTIONARY\n  5\n14\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n15\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n16\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nLAYOUT\n  5\n1A\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n1024\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nModel\n 70\n1\n 71\n0\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n17\n  0\nLAYOUT\n  5\n1E\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n0\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nLayout1\n 70\n1\n 71\n1\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n1B\n  0\nMATERIAL\n  5\n1F\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByBlock\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n20\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByLayer\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n21\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nGlobal\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMLINESTYLE\n  5\n22\n102\n{ACAD_REACTORS\n330\n10\n102\n}\n330\n10\n100\nAcDbMlineStyle\n  2\nStandard\n 70\n0\n  3\n\n 62\n256\n 51\n90.0\n 52\n90.0\n 71\n2\n 49\n0.5\n 62\n256\n  6\nBYLAYER\n 49\n-0.5\n 62\n256\n  6\nBYLAYER\n  0\nMLEADERSTYLE\n  5\n2C\n102\n{ACAD_REACTORS\n330\nF\n102\n}\n330\nF\n100\nAcDbMLeaderStyle\n179\n2\n170\n2\n171\n1\n172\n0\n 90\n2\n 40\n0.0\n 41\n0.0\n173\n1\n 91\n-1056964608\n 92\n-2\n290\n1\n 42\n2.0\n291\n1\n 43\n8.0\n  3\nStandard\n 44\n4.0\n300\n\n342\n29\n174\n1\n175\n1\n176\n0\n178\n1\n 93\n-1056964608\n 45\n4.0\n292\n0\n297\n0\n 46\n4.0\n 94\n-1056964608\n 47\n1.0\n 49\n1.0\n140\n1.0\n294\n1\n141\n0.0\n177\n0\n142\n1.0\n295\n0\n296\n0\n143\n3.75\n271\n0\n272\n9\n273\n9\n  0\nDICTIONARY\n  5\n2D\n330\nA\n100\nAcDbDictionary\n280\n1\n281\n1\n  3\nCREATED_BY_EZDXF\n350\n2E\n  3\nWRITTEN_BY_EZDXF\n350\n41\n  0\nDICTIONARYVAR\n  5\n2E\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.984563+00:00\n  0\nDICTIONARYVAR\n  5\n41\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.986194+00:00\n  0\nENDSEC\n  0\nEOF\n", "msOwner": "17", "layerOwner": "1", "handleStart": 82};</script>
+<script>
+/* ИЧ — исполнительный чертёж телефонной канализации по съёмке.
+   Вся работа идёт в браузере: файлы никуда не отправляются. */
+(function () {
+'use strict';
+
+// ---------------- справочники ----------------
+const WELL_TYPES = { 'kks-2': ['ККСр-2', 1.35, 1.07], 'kks-3': ['ККС-3', 1.95, 1.16] };
+const PIPE_MARK = d => 'Труба ПНД ПЭ 80 SDR 13,6 d=' + d + 'мм';
+const CASING_WALL = { 325: 0.007, 273: 0.007, 820: 0.010 };
+const R_WELL = 2.0, KX = 2.0, KY = 10.0;
+const L = { route: 'ТК_пркл', cas: 'НС_Футляры', txt: 'Текст связь пр', prof: '260_НС_НСС_Профиль',
+  net: '265_НС_НСС_Сеть на профиле', otm: 'Пр.отм.', val: 'S_NET_PROFILE_TABLE', tab: 'Текст и таблицы' };
+
+// округление «5 вверх», как в ведомостях
+const rnd = (v, n) => { const k = Math.pow(10, n === undefined ? 2 : n); return Math.sign(v || 0) * Math.floor(Math.abs(v) * k + 0.5 + 1e-7) / k; };
+const fnum = (v, n) => rnd(v, n === undefined ? 2 : n).toFixed(n === undefined ? 2 : n).replace('.', ',');
+const sgn = v => (v >= 0 ? '+' : '−') + Math.abs(rnd(v)).toFixed(2).replace('.', ',');
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const num = v => { if (v === '' || v == null) return null; const x = parseFloat(String(v).replace(',', '.')); return isFinite(x) ? x : null; };
+
+// ---------------- чтение файлов ----------------
+function decode(bytes, isDXF) {
+  const ascii = new TextDecoder('latin1').decode(bytes.subarray(0, 4000));
+  let enc = 'utf-8';
+  if (isDXF) {
+    const ver = (/\$ACADVER\s*\r?\n\s*1\s*\r?\n\s*(AC\d+)/.exec(ascii) || [])[1] || 'AC1032';
+    if (ver < 'AC1021') enc = 'windows-1251';
+  } else {
+    try { new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch (e) { enc = 'windows-1251'; }
+  }
+  let s = new TextDecoder(enc).decode(bytes);
+  if (isDXF) s = s.replace(/\\U\+([0-9A-Fa-f]{4})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
+  return s;
+}
+function readDXF(text) {
+  const ln = text.split(/\r?\n/), T = [];
+  for (let i = 0; i + 1 < ln.length; i += 2) T.push([parseInt(ln[i], 10), ln[i + 1]]);
+  let a = T.findIndex((t, i) => t[0] === 0 && t[1] === 'SECTION' && T[i + 1] && T[i + 1][1] === 'ENTITIES');
+  if (a < 0) throw new Error('в файле нет раздела ENTITIES — это точно DXF?');
+  const pts = []; let cur = null, ent = null;
+  const flush = () => {
+    if (!ent) return;
+    if (ent.type === 'INSERT') { cur = { blk: ent.g[2], x: +ent.g[10], y: +ent.g[20], att: {} }; if (cur.blk === '_block2') pts.push(cur); else cur = null; }
+    else if (ent.type === 'ATTRIB' && cur) cur.att[ent.g[2]] = ent.g[1] == null ? '' : ent.g[1];
+    else if (ent.type === 'SEQEND') cur = null;
+  };
+  for (let i = a + 2; i < T.length; i++) {
+    const [c, v] = T[i];
+    if (c === 0) { flush(); if (v === 'ENDSEC') break; ent = { type: v, g: {} }; }
+    else if (ent && !(c in ent.g)) ent.g[c] = v;
+  }
+  return pts.map(p => ({ num: String(p.att['№'] || '').trim(), txt: String(p.att.TXT || '').trim(), H: num(p.att.H), x: p.x, y: p.y })).filter(p => p.H != null);
+}
+function readARE(text) {   // .are / .pco: 5 — номер, 4 — код, 37 — X (север), 38 — Y (восток), 39 — H
+  const pts = []; let cur = null;
+  text.replace(/\x1a/g, 'x').split(/\r?\n/).forEach(l => {
+    const i = l.indexOf('='); if (i < 0) return;
+    const k = l.slice(0, i).trim(), v = l.slice(i + 1).trim();
+    if (k === '5') { cur = { num: v, txt: '', H: null, x: null, y: null }; pts.push(cur); }
+    else if (cur && k === '4') cur.txt = v;
+    else if (cur && k === '37') cur.y = num(v);
+    else if (cur && k === '38') cur.x = num(v);
+    else if (cur && k === '39') cur.H = num(v);
+  });
+  return pts.filter(p => p.x != null && p.y != null && p.H != null);
+}
+const CODE_RE = /^(\d+)(\.\.[\d,]*)?(?:_(.*))?$/;
+function parsePoints(raw) {
+  const out = [], skipped = [];
+  raw.forEach(p => {
+    const t = p.txt.replace(/[хХ]/g, 'x').replace(/\s+/g, ''), m = CODE_RE.exec(t);
+    if (!m || !/^\d+$/.test(p.num)) { skipped.push(p.num + ' ' + p.txt); return; }
+    out.push(Object.assign({}, p, { n: +p.num, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+  });
+  out.sort((a, b) => a.n - b.n);
+  return { pts: out, skipped };
+}
+
+// ---------------- модель трассы ----------------
+function build(P0, startN, names) {
+  const P = P0.map(p => Object.assign({}, p)), by = {}; P.forEach(p => by[p.n] = p);
+  const warn = [];
+  const wells = P.filter(p => p.code === '476').map(p => {
+    const near = code => P.filter(q => q.code === code && dist(q, p) < R_WELL).sort((a, b) => dist(a, p) - dist(b, p))[0];
+    const w = { c: p, top: p.H, suf: p.suf }, q47 = near('47'), q99 = near('99');
+    w.plate = q47 && ('_' + q47.suf).indexOf('_vp') < 0 ? q47.H : null;
+    w.bottom = q99 ? q99.H : null;
+    if (WELL_TYPES[w.suf]) { [w.type, w.L, w.W] = WELL_TYPES[w.suf]; }
+    else { const m = /(\d+[.,]\d+)x(\d+[.,]\d+)/.exec(w.suf); w.type = m ? 'камера' : (w.suf || '?'); w.L = m ? num(m[1]) : 1.35; w.W = m ? num(m[2]) : 1.07; }
+    return w;
+  });
+  if (wells.length < 2) throw new Error('В съёмке меньше двух колодцев (код 476). Найдено: ' + wells.length + '.');
+  const pipe = P.filter(p => p.code === '478' || p.code === '4028'), adj = new Map(pipe.map(p => [p.n, new Set()]));
+  pipe.forEach((p, i) => {
+    if (!p.link) return;
+    let refs = p.link.slice(2).split(',').filter(Boolean).map(Number);
+    if (!refs.length && i) refs = [pipe[i - 1].n];
+    refs.forEach(r => { if (adj.has(r)) { adj.get(p.n).add(r); adj.get(r).add(p.n); } });
+  });
+  const seen = new Set(), chains = [];
+  adj.forEach((nb, n) => {
+    if (seen.has(n) || nb.size > 1) return;
+    const ch = [n]; let prev = null, cur = n; seen.add(n);
+    for (;;) { const nx = [...adj.get(cur)].filter(v => v !== prev); if (!nx.length) break; prev = cur; cur = nx[0]; ch.push(cur); seen.add(cur); }
+    chains.push(ch.map(v => by[v]));
+  });
+  const spans = [];
+  chains.forEach(ch => {
+    const ends = [ch[0], ch[ch.length - 1]].map(e => { const w = wells.slice().sort((a, b) => dist(a.c, e) - dist(b.c, e))[0]; return dist(w.c, e) < R_WELL ? w : null; });
+    if (!ends[0] || !ends[1] || ends[0] === ends[1]) { warn.push('Трубы т.' + ch[0].n + '…т.' + ch[ch.length - 1].n + ' не доходят до двух колодцев (ближе ' + R_WELL + ' м) — участок пропущен.'); return; }
+    spans.push({ a: ends[0], b: ends[1], pts: ch });
+  });
+  const deg = new Map(wells.map(w => [w, spans.filter(s => s.a === w || s.b === w)]));
+  const branch = wells.filter(w => deg.get(w).length > 2);
+  if (branch.length) throw new Error('Трасса ветвится в колодце т.' + branch.map(w => w.c.n).join(', т.') + '. Ответвления пока не поддерживаются.');
+  const lonely = wells.filter(w => !deg.get(w).length);
+  lonely.forEach(w => warn.push('Колодец т.' + w.c.n + ' не соединён трубами — в ИЧ не попал.'));
+  const endw = wells.filter(w => deg.get(w).length === 1);
+  if (!endw.length) throw new Error('Не найдено начало трассы: проверьте связи труб (..) в кодах.');
+  let cur = endw.find(w => startN && w.c.n === startN) || endw[0];
+  const route = [], used = new Set();
+  for (;;) {
+    const s = deg.get(cur).find(q => !used.has(q)); if (!s) break; used.add(s);
+    if (s.b === cur) { [s.a, s.b] = [s.b, s.a]; s.pts = s.pts.slice().reverse(); }
+    route.push(s); cur = s.b;
+  }
+  if (route.length < spans.length) warn.push('Трасса разорвана: в ИЧ вошли только ' + route.length + ' из ' + spans.length + ' пролётов. Постройте части отдельно.');
+  const order = [route[0].a].concat(route.map(s => s.b));
+  order.forEach((w, i) => { w.name = names && names[i] ? names[i] : 'К-' + (i + 1); });
+  let st = 0;
+  route.forEach(s => {
+    s.a.st = st;
+    const poly = [s.a.c].concat(s.pts, [s.b.c]);
+    s.pts = s.pts.map(p => Object.assign({}, p));
+    for (let i = 1; i < poly.length; i++) { st += dist(poly[i - 1], poly[i]); if (i < poly.length - 1) s.pts[i - 1].st = st; }
+    s.len = st - s.a.st; s.b.st = st;
+    const m = s.pts.filter(p => p.code === '478' && p.suf).map(p => /(\d+)[dx](\d+)/.exec(p.suf)).find(Boolean);
+    s.n = m ? +m[1] : 1; s.d = m ? +m[2] : 110;
+    if (!m) warn.push('Пролёт ' + s.a.name + ' – ' + s.b.name + ': в кодах труб нет состава (_1d110) — принято 1×d110.');
+    const cas = s.pts.filter(p => p.code === '4028');
+    s.cas = null; s.drop = 0;
+    if (cas.length >= 2) {
+      const mc = /(\d+)[dx](\d+)/.exec(cas[0].suf), D = mc ? +mc[2] : 0;
+      s.cas = { pts: cas, D, L: cas[cas.length - 1].st - cas[0].st };
+      s.drop = s.n === 1 ? D / 1000 - (CASING_WALL[D] || 0.007) - s.d / 1000 : 0;
+    }
+    s.pts.forEach(p => { p.top = p.H - (s.cas && p.code === '4028' ? s.drop : 0); p.wall = false; });
+    s.pts[0].wall = s.pts[s.pts.length - 1].wall = true;
+  });
+  return { order, route, warn, ends: endw.map(w => w.c.n) };
+}
+
+// ---------------- сверка с проектом ----------------
+function compare(order, route, proj, tol) {
+  const rows = [];
+  const add = (el, par, pv, fv, d, used, note, kind) => rows.push({ el, par, pv, fv, d, used, note, kind });
+  const nm = (el, par, pv, fv) => {
+    if (pv == null || fv == null) { add(el, par, pv == null ? '—' : fnum(pv), fv == null ? '—' : fnum(fv), '', fv == null ? '—' : fnum(fv), pv == null ? 'нет в проекте' : 'нет в съёмке', 'none'); return fv; }
+    fv = rnd(fv); const d = rnd(fv - pv); let used = fv, note, kind;
+    if (Math.abs(d) < 0.005) { note = 'совпадает'; kind = 'ok'; }
+    else if (tol != null && Math.abs(d) <= tol + 1e-9) { used = pv; note = 'принято по проекту'; kind = 'fit'; }
+    else { note = 'по факту' + (tol != null ? ', больше допуска' : ''); kind = 'diff'; }
+    add(el, par, fnum(pv), fnum(fv), sgn(d), fnum(used), note, kind); return used;
+  };
+  const tx = (el, par, pv, fv) => add(el, par, String(pv), String(fv), '', String(fv), String(pv) === String(fv) ? 'совпадает' : 'ОТЛИЧАЕТСЯ, на ИЧ по факту', String(pv) === String(fv) ? 'ok' : 'bad');
+  const PW = proj.wells || [], PS = proj.spans || [];
+  if (PW.length !== order.length) add('Трасса', 'Число колодцев', PW.length, order.length, '', order.length, 'ОТЛИЧАЕТСЯ — сверка по порядку, проверьте вручную', 'bad');
+  order.forEach((w, i) => {
+    const pw = PW[i]; if (!pw) return; const el = pw.name || w.name;
+    if (pw.type) tx(el, 'Тип колодца', pw.type, w.type);
+    const fin = i > 0 ? route[i - 1].pts[route[i - 1].pts.length - 1] : null, fout = i < route.length ? route[i].pts[0] : null;
+    const fneck = w.plate != null ? w.top - w.plate : null;
+    const top = nm(el, 'Обечайка', pw.top, w.top), bot = nm(el, 'Дно', pw.bottom, w.bottom), neck = nm(el, 'Горловина (Нг.)', pw.neck, fneck);
+    if (pw.top != null && pw.bottom != null && w.bottom != null) add(el, 'Глубина (обечайка − дно)', fnum(pw.top - pw.bottom), fnum(rnd(w.top) - rnd(w.bottom)), sgn(rnd(w.top) - rnd(w.bottom) - (pw.top - pw.bottom)), fnum(top - bot), 'производная', 'info');
+    if (fin) fin.top = nm(el, 'Верх трубы, вход', pw.pipe_in, fin.top);
+    if (fout) fout.top = nm(el, 'Верх трубы, выход', pw.pipe_out, fout.top);
+    w.top = top; w.bottom = bot; w.plate = neck != null ? top - neck : null;
+  });
+  const lens = [];
+  route.forEach((s, i) => {
+    const ps = PS[i]; if (!ps) { lens.push(s.len); return; }
+    const el = s.a.name + ' – ' + s.b.name;
+    if (ps.n && ps.d) tx(el, 'Трубы', ps.n + '×d' + ps.d, s.n + '×d' + s.d);
+    lens.push(nm(el, 'Длина пролёта', ps.len, s.len));
+    const pc = ps.casing && ps.casing.D ? ps.casing : null, fc = s.cas;
+    if (pc || fc) { tx(el, 'Футляр', pc ? 'd' + pc.D : 'нет', fc ? 'd' + fc.D : 'нет'); if (pc && fc) fc.L = nm(el, 'Длина футляра', pc.L, fc.L); }
+  });
+  const ptot = PS.reduce((t, p) => t + (p.len || 0), 0), ftot = route.reduce((t, s) => t + rnd(s.len), 0);
+  if (ptot) add('Трасса', 'Общая длина', fnum(ptot), fnum(ftot), sgn(ftot - ptot), fnum(lens.reduce((t, v) => t + v, 0)), 'производная', 'info');
+  let cur = 0;
+  route.forEach((s, i) => { const f = lens[i] / s.len, a0 = s.a.st; s.pts.forEach(p => { p.st = cur + (p.st - a0) * f; }); s.a.st = cur; cur += lens[i]; s.len = lens[i]; });
+  route[route.length - 1].b.st = cur;
+  return rows;
+}
+
+// ---------------- примитивы чертежа ----------------
+function Dwg() { this.e = []; this.box = {}; }
+Dwg.prototype.line = function (l, x1, y1, x2, y2, c) { this.e.push({ t: 'L', l, c, p: [[x1, y1], [x2, y2]] }); };
+Dwg.prototype.poly = function (l, p, c, closed) { this.e.push({ t: 'P', l, c, p, closed: !!closed }); };
+Dwg.prototype.circle = function (l, x, y, r, c) { this.e.push({ t: 'C', l, c, x, y, r }); };
+Dwg.prototype.text = function (l, s, x, y, h, ang, al, c) { this.e.push({ t: 'T', l, c, s: String(s), x, y, h: h || 2.5, ang: ang || 0, al: al == null ? 1 : al }); };
+Dwg.prototype.mark = function (name, from) { // запомнить рамку части чертежа для вкладок
+  const xs = [], ys = [];
+  this.e.slice(from).forEach(e => { if (e.p) e.p.forEach(q => { xs.push(q[0]); ys.push(q[1]); }); else { xs.push(e.x); ys.push(e.y); } });
+  if (xs.length) this.box[name] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+};
+const unit = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
+
+function drawPlan(D, order, route) {
+  const xy = p => [p.x, p.y], dirs = new Map();
+  const add = (w, u) => { if (!dirs.has(w)) dirs.set(w, []); dirs.get(w).push(u); };
+  route.forEach(s => {
+    const poly = [xy(s.a.c)].concat(s.pts.map(xy), [xy(s.b.c)]);
+    D.poly(L.route, poly, 7);
+    add(s.a, poly.length > 3 ? unit(poly[1], poly[2]) : unit(poly[0], poly[poly.length - 1]));
+    add(s.b, poly.length > 3 ? unit(poly[poly.length - 3], poly[poly.length - 2]) : unit(poly[0], poly[poly.length - 1]));
+    let half = s.len / 2, acc = 0, mx = poly[0][0], my = poly[0][1], u = [1, 0];
+    for (let i = 1; i < poly.length; i++) {
+      const d = Math.hypot(poly[i][0] - poly[i - 1][0], poly[i][1] - poly[i - 1][1]);
+      if (acc + d >= half) { u = unit(poly[i - 1], poly[i]); const k = half - acc; mx = poly[i - 1][0] + u[0] * k; my = poly[i - 1][1] + u[1] * k; break; }
+      acc += d;
+    }
+    let nx = u[1], ny = -u[0];
+    if ((Math.abs(u[1]) > Math.abs(u[0]) && nx < 0) || (Math.abs(u[1]) <= Math.abs(u[0]) && ny > 0)) { nx = -nx; ny = -ny; }
+    const lx = mx + nx * 4, ly = my + ny * 4, up = ly >= my;
+    D.line(L.txt, mx, my, lx, ly, 7); D.line(L.txt, lx - 2.2, ly, lx + 2.2, ly, 7);
+    D.text(L.txt, String(s.n), lx, ly + (up ? 2.3 : -0.8), 1.0, 0, 1, 7);
+    D.text(L.txt, fnum(s.len), lx, ly + (up ? 0.8 : -2.3), 1.0, 0, 1, 7);
+    if (s.cas) {
+      const c = s.cas.pts.map(xy), hw = 0.4, left = [], right = [];
+      c.forEach((p, i) => { const q = unit(c[Math.max(i - 1, 0)], c[Math.min(i + 1, c.length - 1)]); left.push([p[0] - q[1] * hw, p[1] + q[0] * hw]); right.push([p[0] + q[1] * hw, p[1] - q[0] * hw]); });
+      D.poly(L.cas, left.concat(right.reverse()), 5, true);
+      const m = c[Math.floor(c.length / 2)], q = unit(c[0], c[c.length - 1]), n = q[0] > 0 ? [-q[1], q[0]] : [q[1], -q[0]];
+      const fx = m[0] + n[0] * 5, fy = m[1] + n[1] * 5;
+      D.line(L.txt, m[0], m[1], fx, fy, 5);
+      D.text(L.txt, 'ф-р d=' + s.cas.D + ' мм, L=' + fnum(s.cas.L), fx, fy + 0.9, 1.0, 0, 1, 5);
+    }
+  });
+  order.forEach(w => {
+    const dd = dirs.get(w) || [[1, 0]]; let ux = 0, uy = 0; dd.forEach(d => { ux += d[0]; uy += d[1]; });
+    const u = Math.abs(ux) + Math.abs(uy) > 1e-6 ? unit([0, 0], [ux, uy]) : dd[0];
+    let n = [-u[1], u[0]]; const cx = w.c.x, cy = w.c.y, a = w.L / 2, b = w.W / 2;
+    D.poly(L.route, [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([i, j]) => [cx + u[0] * i * a + n[0] * j * b, cy + u[1] * i * a + n[1] * j * b]), 7, true);
+    D.circle(L.route, cx, cy, 0.45, 7); D.circle(L.route, cx, cy, 0.35, 7);
+    if (n[1] < 0) n = [-n[0], -n[1]];
+    const lx = cx + n[0] * 7, ly = cy + n[1] * 7;
+    D.line(L.txt, cx, cy, lx, ly, 7); D.line(L.txt, lx - 3.5, ly, lx + 3.5, ly, 7);
+    D.text(L.txt, w.name, lx, ly + 2.3, 1.0, 0, 1, 7); D.text(L.txt, w.type, lx, ly + 0.8, 1.0, 0, 1, 7);
+  });
+}
+
+const ROWS = [['Отметки обечаек колодцев', 15], ['Отметки верха трубопровода', 15], ['Отметки дна колодцев', 15], ['Покрытие', 10],
+  ['Сечение блока кабельной|канализации', 10], ['Обозначение трубы, материал,|диаметр', 10], ['Расстояние', 10], ['План трассы', 20]];
+function drawProfile(D, order, route, X0, YB) {
+  const hs = order.map(w => w.top).concat(order.filter(w => w.bottom != null).map(w => w.bottom), ...route.map(s => s.pts.map(p => p.top - s.d / 1000)));
+  const H0 = Math.floor(Math.min(...hs) - 1), H1 = Math.ceil(Math.max(...hs) + 1);
+  const X = st => X0 + st * KX, Y = h => YB + (h - H0) * KY;
+  const Ltot = order[order.length - 1].st, xl = X0 - 75, xh = X0 - 15, xr = X(Ltot) + 15;
+  D.line(L.prof, xh, YB, xh, Y(H1), 7);
+  for (let h = H0; h <= H1; h++) { D.line(L.prof, xh - 2, Y(h), xh, Y(h), 7); D.text(L.prof, fnum(h), xh - 3, Y(h), 2.5, 0, 2, 7); }
+  D.text(L.prof, 'М 1:500 по горизонтали', xl, Y(H0) + 12, 2.5, 0, 0, 7);
+  D.text(L.prof, 'М 1:100 по вертикали', xl, Y(H0) + 7, 2.5, 0, 0, 7);
+  const ys = [YB]; ROWS.forEach(r => ys.push(ys[ys.length - 1] - r[1]));
+  ys.forEach(y => D.line(L.prof, xl, y, xr, y, 7));
+  [xl, xh, xr].forEach(x => D.line(L.prof, x, ys[0], x, ys[ys.length - 1], 7));
+  ROWS.forEach(([name], i) => { const parts = name.split('|'), ym = (ys[i] + ys[i + 1]) / 2; parts.forEach((part, k) => D.text(L.prof, part, xl + 2, ym + (parts.length - 1) * 2 - k * 4, 2.5, 0, 0, 7)); });
+  const mid = i => (ys[i] + ys[i + 1]) / 2;
+  const cols = [];
+  order.forEach((w, i) => { cols.push({ k: 'w', st: w.st, o: w }); if (i < route.length) route[i].pts.forEach(p => { if (!p.wall) cols.push({ k: 'p', st: p.st, o: p }); }); });
+  cols.forEach((c, i) => {
+    const x = X(c.st);
+    D.line(L.otm, x, Y(c.o.top), x, YB, c.k === 'w' ? 30 : 8);
+    D.line(L.prof, x, ys[0], x, ys[3], 7); D.line(L.prof, x, ys[6], x, ys[7], 7);
+    if (c.k === 'p') { const tight = (c.st - cols[i - 1].st) * KX < 7 && cols[i + 1] && (cols[i + 1].st - c.st) * KX >= 7; D.text(L.val, fnum(c.o.top), tight ? x + 1.9 : x - 1.6, mid(1), 2.5, 90, 1, 7); }
+  });
+  for (let i = 1; i < cols.length; i++) { const a = cols[i - 1], b = cols[i], w = (b.st - a.st) * KX; D.text(L.val, fnum(b.st - a.st), (X(a.st) + X(b.st)) / 2, mid(6), 2.0, w < 8 ? 90 : 0, 1, 7); }
+  order.forEach((w, i) => {
+    const x = X(w.st), a = w.L / 2 * KX, bot = w.bottom != null ? w.bottom : w.top - 2, plate = w.plate != null ? w.plate : w.top - 0.4;
+    D.poly(L.net, [[x - a, Y(bot)], [x + a, Y(bot)], [x + a, Y(plate)], [x - a, Y(plate)]], 7, true);
+    D.poly(L.net, [[x - 0.7, Y(plate)], [x - 0.7, Y(w.top)], [x + 0.7, Y(w.top)], [x + 0.7, Y(plate)]], 7);
+    D.text(L.net, w.name, x, Y(w.top) + 9, 2.5, 0, 1, 7); D.text(L.net, w.type, x, Y(w.top) + 5, 2.5, 0, 1, 7);
+    D.text(L.val, fnum(w.top), x - 1.6, mid(0), 2.5, 90, 1, 7);
+    if (w.bottom != null) D.text(L.val, fnum(w.bottom), x - 1.6, mid(2), 2.5, 90, 1, 7);
+    if (i > 0) { const p = route[i - 1].pts; D.text(L.val, fnum(p[p.length - 1].top), x - 1.6, mid(1), 2.5, 90, 1, 7); }
+    if (i < route.length) D.text(L.val, fnum(route[i].pts[0].top), x + 1.9, mid(1), 2.5, 90, 1, 7);
+    if (i === 0 || i === order.length - 1) D.line(L.prof, x, ys[3], x, ys[6], 7);
+    D.circle(L.prof, x, mid(7) - 3, 1.2, 7); D.text(L.prof, w.name, x, mid(7) + 4, 2.0, 0, 1, 7);
+  });
+  route.forEach(s => {
+    const d = s.d / 1000;
+    D.poly(L.otm, s.pts.map(p => [X(p.st), Y(p.top)]), 3);
+    D.poly(L.otm, s.pts.map(p => [X(p.st), Y(p.top - d)]), 3);
+    if (s.cas) {
+      const c = s.cas, Dm = c.D / 1000, f = c.pts[0], l = c.pts[c.pts.length - 1];
+      D.poly(L.cas, c.pts.map(p => [X(p.st), Y(p.H)]).concat(c.pts.slice().reverse().map(p => [X(p.st), Y(p.H - Dm)])), 5, true);
+      D.text(L.cas, 'Ст. футляр D' + c.D + ', L=' + fnum(c.L) + ' м', (X(f.st) + X(l.st)) / 2, Y(Math.max(...c.pts.map(p => p.H))) + 4, 2.5, 0, 1, 5);
+      D.poly(L.cas, [[X(f.st), mid(7) - 4], [X(l.st), mid(7) - 4], [X(l.st), mid(7) - 2], [X(f.st), mid(7) - 2]], 5, true);
+    }
+    const xa = X(s.a.st), xb = X(s.b.st);
+    D.line(L.prof, xa, mid(7) - 3, xb, mid(7) - 3, 7);
+    D.text(L.prof, s.n + ' / ' + fnum(s.len), (xa + xb) / 2, mid(7) - 7, 2.0, 0, 1, 7);
+  });
+  const groups = [];
+  route.forEach(s => { const g = groups[groups.length - 1]; if (g && g.n === s.n && g.d === s.d) g.b = s.b.st; else groups.push({ n: s.n, d: s.d, a: s.a.st, b: s.b.st }); });
+  groups.forEach(g => { const xm = (X(g.a) + X(g.b)) / 2; D.line(L.prof, X(g.b), ys[4], X(g.b), ys[6], 7); D.text(L.val, g.n + ' x d' + g.d, xm, mid(4), 2.5, 0, 1, 7); D.text(L.val, PIPE_MARK(g.d), xm, mid(5), 2.5, 0, 1, 7); });
+  return { xl, yb: ys[ys.length - 1] };
+}
+function drawWells(D, order, x0, y0) {
+  const heads = ['№', 'Колодец', 'Тип', 'Длина', 'Ширина', 'Обечайка', 'Низ плиты', 'Дно', 'Высота', 'Нг.', 'Глубина'];
+  const wd = [8, 30, 22, 16, 16, 22, 22, 22, 18, 16, 18], rh = 8;
+  D.text(L.tab, 'Ведомость колодцев (длина и ширина — по типу колодца)', x0, y0 + 5, 3.0, 0, 0, 7);
+  const f = v => v != null ? fnum(v) : '—', dif = (a, b) => a != null && b != null ? fnum(a - b) : '—';
+  const rows = [heads].concat(order.map((w, i) => [String(i + 1), w.name, w.type, fnum(w.L), fnum(w.W), f(w.top), f(w.plate), f(w.bottom), dif(w.plate, w.bottom), dif(w.top, w.plate), dif(w.top, w.bottom)]));
+  const xs = [x0]; wd.forEach(v => xs.push(xs[xs.length - 1] + v));
+  for (let r = 0; r <= rows.length; r++) D.line(L.tab, xs[0], y0 - r * rh, xs[xs.length - 1], y0 - r * rh, 7);
+  xs.forEach(x => D.line(L.tab, x, y0, x, y0 - rows.length * rh, 7));
+  rows.forEach((row, r) => row.forEach((v, c) => D.text(L.tab, v, (xs[c] + xs[c + 1]) / 2, y0 - r * rh - rh / 2, 2.5, 0, 1, 7)));
+}
+
+// ---------------- запись DXF (AutoCAD 2000, Windows-1251) ----------------
+function cp1251(str) {
+  const out = new Uint8Array(str.length * 2); let k = 0;
+  for (const ch of str) { const c = ch.codePointAt(0); let b;
+    if (c < 0x80) b = c; else if (c >= 0x410 && c <= 0x44F) b = c - 0x410 + 0xC0; else if (c === 0x401) b = 0xA8; else if (c === 0x451) b = 0xB8; else if (c === 0x2116) b = 0xB9;
+    else if (c === 0xB0) b = 0xB0; else if (c === 0xD7) b = 0x78; else if (c === 0x2014) b = 0x97; else if (c === 0x2013) b = 0x96; else if (c === 0x2212) b = 0x2D; else if (c === 0xAB) b = 0xAB; else if (c === 0xBB) b = 0xBB; else b = 0x3F;
+    out[k++] = b; }
+  return out.subarray(0, k);
+}
+function toDXF(D) {
+  const T = window.ICH_SKEL, SKEL_LAYERS = ['0', 'Defpoints', 'POINT', 'Name', 'ELEVATION', 'Deskription', 'HV', 'HI'];
+  const E = [], n3 = v => (Math.round(v * 1000) / 1000).toFixed(3); let hs = T.handleStart;
+  const hex = () => (hs++).toString(16).toUpperCase(), w = (c, v) => E.push(String(c).padStart(3, ' '), String(v));
+  const layers = new Map(), lay = nm => { const t = String(nm).replace(/[<>\/\\":;?*|,=`]/g, '_'); if (!layers.has(t) && !SKEL_LAYERS.includes(t)) layers.set(t, 7); return t; };
+  const head = (type, e) => { w(0, type); w(5, hex()); w(330, T.msOwner); w(100, 'AcDbEntity'); w(8, lay(e.l)); if (e.c != null) w(62, e.c); };
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; const ext = (x, y) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); };
+  D.e.forEach(e => {
+    if (e.t === 'L') { head('LINE', e); w(100, 'AcDbLine'); w(10, n3(e.p[0][0])); w(20, n3(e.p[0][1])); w(30, '0.0'); w(11, n3(e.p[1][0])); w(21, n3(e.p[1][1])); w(31, '0.0'); e.p.forEach(q => ext(q[0], q[1])); }
+    else if (e.t === 'P') { head('LWPOLYLINE', e); w(100, 'AcDbPolyline'); w(90, e.p.length); w(70, e.closed ? 1 : 0); e.p.forEach(q => { w(10, n3(q[0])); w(20, n3(q[1])); ext(q[0], q[1]); }); }
+    else if (e.t === 'C') { head('CIRCLE', e); w(100, 'AcDbCircle'); w(10, n3(e.x)); w(20, n3(e.y)); w(30, '0.0'); w(40, n3(e.r)); ext(e.x, e.y); }
+    else if (e.t === 'T') { head('TEXT', e); w(100, 'AcDbText'); w(10, n3(e.x)); w(20, n3(e.y)); w(30, '0.0'); w(40, n3(e.h)); w(1, e.s); if (e.ang) w(50, n3(e.ang)); w(72, e.al); w(11, n3(e.x)); w(21, n3(e.y)); w(31, '0.0'); w(100, 'AcDbText'); w(73, 2); ext(e.x, e.y); }
+  });
+  const LY = [], lw = (c, v) => LY.push(String(c).padStart(3, ' '), String(v));
+  layers.forEach((col, nm) => { lw(0, 'LAYER'); lw(5, hex()); lw(330, T.layerOwner); lw(100, 'AcDbSymbolTableRecord'); lw(100, 'AcDbLayerTableRecord'); lw(2, nm); lw(70, 0); lw(62, col); lw(6, 'Continuous'); lw(370, -3); lw(390, '13'); });
+  if (!isFinite(x0)) x0 = y0 = x1 = y1 = 0;
+  const out = T.skel.replace('{{ENTITIES}}', E.join('\n') + (E.length ? '\n' : '')).replace('{{LAYERS}}', LY.join('\n') + (LY.length ? '\n' : ''))
+    .replace('{{NLAYERS}}', String(SKEL_LAYERS.length + layers.size)).replace('{{HANDSEED}}', (hs + 1).toString(16).toUpperCase())
+    .replace('{{PDSIZE}}', '0.5').replace('{{LTSCALE}}', '1.0').replace('{{EXMINX}}', n3(x0)).replace('{{EXMINY}}', n3(y0)).replace('{{EXMAXX}}', n3(x1)).replace('{{EXMAXY}}', n3(y1));
+  return cp1251(out.replace(/\n/g, '\r\n'));
+}
+
+// ---------------- SVG-просмотр ----------------
+const COL = { 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a00', 8: '#9aa0a6' };
+function toSVG(D) {
+  const o = [];
+  D.e.forEach(e => {
+    const c = COL[e.c] || COL[7];
+    if (e.t === 'L' || e.t === 'P') { const pts = e.p.map(q => q[0].toFixed(3) + ',' + (-q[1]).toFixed(3)).join(' '); o.push('<' + (e.t === 'P' && e.closed ? 'polygon' : 'polyline') + ' points="' + pts + '" stroke="' + c + '"/>'); }
+    else if (e.t === 'C') o.push('<circle cx="' + e.x.toFixed(3) + '" cy="' + (-e.y).toFixed(3) + '" r="' + e.r + '" stroke="' + c + '"/>');
+    else if (e.t === 'T') o.push('<text x="' + e.x.toFixed(3) + '" y="' + (-e.y).toFixed(3) + '" font-size="' + (e.h * 1.4).toFixed(2) + '" fill="' + c + '" text-anchor="' + ['start', 'middle', 'end'][e.al] + '"' + (e.ang ? ' transform="rotate(' + (-e.ang) + ' ' + e.x.toFixed(3) + ' ' + (-e.y).toFixed(3) + ')"' : '') + '>' + esc(e.s) + '</text>');
+  });
+  return o.join('');
+}
+
+// ---------------- пример (условные данные) ----------------
+function demo() {
+  const P = [], add = (n, code, H, x, y) => P.push({ num: String(n), txt: code, H, x, y });
+  let n = 1;
+  const well = (x, y, top, bot, type) => { add(n++, '476_' + type, top, x, y); add(n++, '47_np', top - 0.42, x + 0.1, y + 0.12); add(n++, '99', bot, x + 0.15, y - 0.1); };
+  well(1000, 500, 150.20, 148.40, 'kks-2');
+  add(n++, '478_1d110', 149.35, 1000.7, 500.1); add(n++, '478.._1d110', 149.10, 1020, 503); add(n++, '478.._1d110', 148.95, 1038.9, 506.2);
+  well(1039.6, 506.4, 150.05, 148.25, 'kks-2');
+  add(n++, '478_1d110', 149.05, 1040.3, 506.6); add(n++, '4028.._1d325', 149.15, 1046, 508.5); add(n++, '4028.._1d325', 149.05, 1060, 513); add(n++, '4028.._1d325', 148.95, 1068, 515.8); add(n++, '478.._1d110', 148.80, 1075.6, 518.3);
+  well(1076.3, 518.5, 149.90, 147.95, 'kks-3');
+  add(n++, '478_1d110', 148.75, 1077, 518.3); add(n++, '478.._1d110', 148.60, 1095, 512); add(n++, '478.._1d110', 148.50, 1110.4, 507.1);
+  well(1111.0, 506.9, 149.70, 147.85, 'kks-2');
+  return P;
+}
+const DEMO_PROJECT = { object: 'Пример (условные данные)', wells: [
+  { name: 'НК-1', type: 'ККСр-2', top: 150.20, bottom: 148.40, neck: 0.40, pipe_in: null, pipe_out: 149.30 },
+  { name: 'НК-2', type: 'ККСр-2', top: 150.00, bottom: 148.30, neck: 0.45, pipe_in: 148.90, pipe_out: 149.05 },
+  { name: 'НК-3', type: 'ККС-3', top: 149.95, bottom: 147.95, neck: 0.40, pipe_in: 148.80, pipe_out: 148.70 },
+  { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
+  spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
+
+window.ICH = { decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+})();
+</script>
+<script>
+/* ИЧ — интерфейс: меню, настройки, просмотр, скачивание. */
+(function () {
+'use strict';
+const I = window.ICH, $ = s => document.querySelector(s), esc = I.esc, fnum = I.fnum, num = I.num;
+const KEY = 'ich.v1';
+const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'plan', view: null,
+  set: { mode: 'fact', tol: 10, profile: true, start: 'auto' }, proj: { object: '', wells: [], spans: [] } };
+try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; } } catch (e) { /* хранилище недоступно — работаем без него */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
+
+// ---------- уведомления ----------
+let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
+function download(bytes, name, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+const baseName = () => (S.file || 'ИЧ').replace(/\.[^.]+$/, '');
+
+// ---------- расчёт ----------
+function hasProject() { return S.proj.wells.some(w => w.name || w.top != null) || S.proj.spans.some(s => s.len != null); }
+function compute() {
+  S.res = null; S.err = null;
+  if (!S.parsed) return;
+  try {
+    const P = S.parsed.pts, proj = hasProject() ? S.proj : null;
+    const names = proj ? proj.wells.map(w => w.name) : null;
+    const startN = S.set.start === 'auto' ? null : +S.set.start;
+    let m = I.build(P, startN, names);
+    if (proj && !startN && m.order.length === proj.wells.length) {     // направление — по лучшему совпадению с проектом
+      const sc = seq => seq.reduce((t, w, i) => t + (proj.wells[i].top != null ? Math.abs(w.top - proj.wells[i].top) : 0), 0);
+      if (sc(m.order.slice().reverse()) < sc(m.order)) m = I.build(P, m.order[m.order.length - 1].c.n, names);
+    }
+    const fit = proj && S.set.mode === 'fit', tol = fit ? (num(S.set.tol) || 0) / 100 : null;
+    let mode = fit ? 'подогнано под проект, допуск ' + (num(S.set.tol) || 0) + ' см' : 'по фактической съёмке';
+    const rows = proj ? I.compare(m.order, m.route, proj, tol) : null;
+    const D = new I.Dwg();
+    let k = D.e.length; I.drawPlan(D, m.order, m.route); D.mark('plan', k);
+    const xs = P.map(p => p.x), ys = P.map(p => p.y);
+    let xl, yb;
+    if (S.set.profile) {
+      const H1 = Math.ceil(Math.max(...m.order.map(w => w.top)) + 1), H0 = Math.floor(Math.min(...m.order.map(w => w.bottom != null ? w.bottom : w.top - 2)) - 1);
+      k = D.e.length; ({ xl, yb } = I.drawProfile(D, m.order, m.route, Math.min(...xs) + 75, Math.min(...ys) - 40 - (H1 - H0) * 10)); D.mark('profile', k);
+    } else { xl = Math.min(...xs); yb = Math.min(...ys) - 20; }
+    mode += S.set.profile ? ', с профилем' : ', без профиля';
+    k = D.e.length;
+    I.drawWells(D, m.order, xl, yb - 20);
+    D.text('Текст и таблицы', 'ИЧ построена: ' + mode, xl, yb - 8, 3.0, 0, 0, fit ? 1 : 7);
+    D.mark('table', k); D.mark('all', 0);
+    S.res = { D, order: m.order, route: m.route, warn: m.warn, ends: m.ends, rows, mode, fit };
+  } catch (e) { S.err = e.message || String(e); }
+}
+
+// ---------- открытие файлов ----------
+async function openFile(f) {
+  try {
+    const bytes = new Uint8Array(await f.arrayBuffer()), ext = (f.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+    let raw;
+    if (ext === '.json') { loadProject(JSON.parse(new TextDecoder().decode(bytes))); return; }
+    if (ext === '.dxf') raw = I.readDXF(I.decode(bytes, true));
+    else if (ext === '.are' || ext === '.pco') raw = I.readARE(I.decode(bytes, false));
+    else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
+    if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
+    if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
+    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.view = null; S.tab = 'plan';
+    compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
+  } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
+}
+function loadProject(p) {
+  if (!p || !Array.isArray(p.wells)) { toast('Это не файл проекта ИЧ (нет списка колодцев).'); return; }
+  S.demoProj = false;
+  S.proj = { object: p.object || '', wells: p.wells.map(w => Object.assign({ name: '', type: '', top: null, bottom: null, neck: null, pipe_in: null, pipe_out: null }, w)),
+    spans: (p.spans || []).map(s => Object.assign({ n: null, d: null, len: null, casing: null }, s)) };
+  if (S.set.mode === 'fact' && S.parsed) toast('Проект загружен. Чтобы подогнать ИЧ, выберите «Под проект».'); else toast('Проект загружен.');
+  save(); compute(); render();
+}
+function fillRows() {
+  if (!S.res) { toast('Сначала откройте съёмку.'); return; }
+  const o = S.res.order, r = S.res.route, W = S.proj.wells, P = S.proj.spans;
+  S.proj.wells = o.map((w, i) => W[i] || { name: 'К-' + (i + 1), type: w.type, top: null, bottom: null, neck: null, pipe_in: null, pipe_out: null });
+  S.proj.spans = r.map((s, i) => P[i] || { n: s.n, d: s.d, len: null, casing: s.cas ? { D: s.cas.D, L: null } : null });
+  save(); compute(); render(); toast('Строки проекта: ' + o.length + ' колодцев, ' + r.length + ' пролётов. Впишите или вставьте из Excel проектные значения.');
+}
+
+// ---------- отрисовка ----------
+const COLS_W = [['name', 'Имя', 't'], ['type', 'Тип', 't'], ['top', 'Обеч.'], ['bottom', 'Дно'], ['neck', 'Нг.'], ['pipe_in', 'Тр. вх.'], ['pipe_out', 'Тр. вых.']];
+const COLS_S = [['n', 'Труб'], ['d', 'd, мм'], ['len', 'Длина'], ['cD', 'Ф-р D'], ['cL', 'Ф-р L']];
+function cellVal(v) { return v == null ? '' : String(v).replace('.', ','); }
+function projTables() {
+  const W = S.proj.wells, P = S.proj.spans, names = S.res ? S.res.order.map(w => w.name) : [];
+  let h = '<table class="ptab"><thead><tr><th>№</th>' + COLS_W.map(c => '<th>' + c[1] + '</th>').join('') + '</tr></thead><tbody>';
+  W.forEach((w, i) => { h += '<tr><td class="rn">' + (i + 1) + '</td>' + COLS_W.map((c, j) => '<td><input data-t="w" data-r="' + i + '" data-c="' + j + '" value="' + esc(cellVal(w[c[0]])) + '"' + (c[2] ? '' : ' inputmode="decimal"') + '></td>').join('') + '</tr>'; });
+  h += '</tbody></table>';
+  h += '<table class="ptab"><thead><tr><th>Пролёт</th>' + COLS_S.map(c => '<th>' + c[1] + '</th>').join('') + '</tr></thead><tbody>';
+  P.forEach((s, i) => {
+    const v = { n: s.n, d: s.d, len: s.len, cD: s.casing ? s.casing.D : null, cL: s.casing ? s.casing.L : null };
+    const lab = (W[i] && W[i].name || names[i] || i + 1) + '–' + (W[i + 1] && W[i + 1].name || names[i + 1] || i + 2);
+    h += '<tr><td class="rn" title="' + esc(lab) + '">' + esc(lab) + '</td>' + COLS_S.map((c, j) => '<td><input data-t="s" data-r="' + i + '" data-c="' + j + '" value="' + esc(cellVal(v[c[0]])) + '" inputmode="decimal"></td>').join('') + '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+function setCell(t, r, c, val) {
+  if (t === 'w') { const row = S.proj.wells[r]; if (!row) return; const k = COLS_W[c][0]; row[k] = COLS_W[c][2] ? val.trim() : num(val); }
+  else { const row = S.proj.spans[r]; if (!row) return; const k = COLS_S[c][0], v = num(val);
+    if (k === 'cD' || k === 'cL') { row.casing = row.casing || { D: null, L: null }; row.casing[k === 'cD' ? 'D' : 'L'] = v; if (row.casing.D == null && row.casing.L == null) row.casing = null; }
+    else row[k] = k === 'len' ? v : (v == null ? null : Math.round(v)); }
+}
+function wellFlags(name) { if (!S.res || !S.res.rows) return null; const r = S.res.rows.filter(x => x.el === name); return { diff: r.filter(x => x.kind === 'diff' || x.kind === 'bad').length, fit: r.filter(x => x.kind === 'fit').length }; }
+
+function render() {
+  const app = $('#app');
+  if (!S.parsed) { app.innerHTML = topBar() + emptyView(); bindTop(); bindEmpty(); return; }
+  const r = S.res, proj = hasProject();
+  const fit = S.set.mode === 'fit' && proj;
+  let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек с кодами: ' + S.parsed.pts.length + (S.parsed.skipped.length ? ', без кода или с буквенным номером: ' + S.parsed.skipped.length : '') + '</li>';
+  if (r) side += '<li>колодцев по ходу: ' + r.order.length + ', пролётов: ' + r.route.length + '</li><li>длина трассы: ' + fnum(r.order[r.order.length - 1].st) + ' м</li>';
+  side += '</ul>';
+  if (r) {
+    side += '<h3 class="sh">Колодцы по ходу</h3><div class="objs">' + r.order.map((w, i) => {
+      const f = wellFlags(w.name);
+      return '<button class="obj" data-well="' + i + '"><span class="obj-no">' + esc(w.name) + '</span><span class="obj-net">' + esc(w.type) + ' · т.' + w.c.n + '</span><span class="obj-meta"><i>об.</i> ' + fnum(w.top) + ' <i>дно</i> ' + (w.bottom != null ? fnum(w.bottom) : '—') + '</span>'
+        + (f ? (f.diff ? '<span class="flag" title="расхождений больше допуска">' + f.diff + '</span>' : '<span class="ok" title="сходится с проектом">✓</span>') : '') + '</button>';
+    }).join('') + '</div>';
+  }
+  const issues = (S.err ? ['<b>ИЧ не построена.</b> ' + esc(S.err)] : []).concat(r ? r.warn.map(esc) : []);
+  if (issues.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + issues.map(t => '<p class="issue">' + t + '</p>').join('') + '</div>';
+  if (S.parsed.skipped.length) side += '<details class="pts"><summary>Не вошли в расчёт (' + S.parsed.skipped.length + ')</summary><p class="fine">' + S.parsed.skipped.map(esc).join('<br>') + '</p></details>';
+
+  const tabs = [['plan', 'План'], ['profile', 'Профиль'], ['table', 'Ведомость'], ['check', 'Сверка с проектом']].filter(t => t[0] !== 'profile' || S.set.profile);
+  if (!tabs.some(t => t[0] === S.tab)) S.tab = 'plan';
+  let desk = '<div class="tabs">' + tabs.map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + (t[0] === 'check' && r && r.rows ? ' <span class="cnt">' + r.rows.filter(x => x.kind === 'diff' || x.kind === 'bad').length + '</span>' : '') + '</button>').join('')
+    + (S.tab !== 'check' ? '<div class="zoombar"><button class="btn small" id="zout" title="Отдалить (−)">−</button><button class="btn small" id="zin" title="Приблизить (+)">+</button><button class="btn small" id="zfit" title="Показать целиком (0)">Целиком</button></div>' : '') + '</div>';
+  if (S.tab === 'check') desk += '<div class="desk-scroll"><div class="sheet pad">' + checkTable() + '</div></div>';
+  else desk += '<div class="desk-scroll" id="vp">' + (r ? '<svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke-width="1" vector-effect="non-scaling-stroke">' + I.toSVG(r.D) + '</g></svg>' : '<p class="fine pad">Нечего показать.</p>') + '</div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>';
+
+  const startOpts = '<option value="auto">автоматически' + (proj ? ' (по проекту)' : '') + '</option>' + (r ? r.ends.map(n => '<option value="' + n + '"' + (String(S.set.start) === String(n) ? ' selected' : '') + '>от колодца т.' + n + '</option>').join('') : '');
+  let card = '<div class="card-head"><h2>Построение</h2></div>'
+    + '<div class="segs"><span>ИЧ</span><button class="seg' + (!fit ? ' on' : '') + '" data-mode="fact">по факту</button><button class="seg' + (fit ? ' on' : '') + '" data-mode="fit"' + (proj ? '' : ' disabled title="Сначала заполните проект ниже"') + '>под проект</button></div>'
+    + '<div class="tolrow' + (fit ? '' : ' off') + '"><label class="fld">Подгонять, если расхождение не больше, см<input id="tol" inputmode="decimal" value="' + esc(String(S.set.tol).replace('.', ',')) + '"' + (fit ? '' : ' disabled') + '></label><div class="chips">' + [5, 10, 30, 60].map(v => '<button class="chip' + (+S.set.tol === v ? ' on' : '') + '" data-tol="' + v + '"' + (fit ? '' : ' disabled') + '>' + v + '</button>').join('') + '</div></div>'
+    + '<label class="chk"><input type="checkbox" id="prof"' + (S.set.profile ? ' checked' : '') + '> Строить профиль</label>'
+    + '<label class="fld">Начало хода<select id="start">' + startOpts + '</select></label>'
+    + '<div class="row"><button class="btn primary" id="dxf"' + (r ? '' : ' disabled') + '>Скачать ИЧ (DXF)</button><button class="btn" id="csv"' + (r && r.rows ? '' : ' disabled title="Нужен проект"') + '>Расхождения (CSV)</button></div>'
+    + (r ? '<p class="fine">Режим: ' + esc(r.mode) + '.' + (r.rows ? ' ' + summary(r.rows) : '') + '</p>' : '')
+    + '<h3>Проект</h3><p class="hint">Имена, типы и проектные значения колодцев и пролётов. Можно вставить столбцы из Excel: встаньте в ячейку и нажмите Ctrl+V.</p>'
+    + '<div class="row"><button class="btn small" id="fill">Заполнить строки по съёмке</button><button class="btn small" id="pload">Открыть проект…</button><button class="btn small" id="psave"' + (proj ? '' : ' disabled') + '>Сохранить проект</button><button class="btn small danger" id="pclear"' + (S.proj.wells.length || S.proj.spans.length ? '' : ' disabled') + '>Очистить</button></div>'
+    + (S.proj.wells.length || S.proj.spans.length ? '<div class="ptwrap">' + projTables() + '</div>' : '<p class="fine">Проекта нет — ИЧ строится по съёмке, колодцы называются К-1, К-2…</p>');
+
+  app.innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  bindTop(); bindWork();
+}
+function summary(rows) { const c = k => rows.filter(x => x.kind === k).length; return 'Сверка: совпадает ' + c('ok') + ', принято по проекту ' + c('fit') + ', по факту ' + c('diff') + ', отличий состава ' + c('bad') + '.'; }
+function checkTable() {
+  const r = S.res;
+  if (!r) return '<p class="fine">ИЧ не построена.</p>';
+  if (!r.rows) return '<div class="cheat"><p><b>Проекта нет.</b> Справа нажмите «Заполнить строки по съёмке», впишите или вставьте проектные значения — здесь появится сверка: что совпало, что расходится и на сколько.</p><p>Список расхождений строится в обоих режимах — и по факту, и под проект.</p></div>';
+  return '<p class="fine">Режим: ' + esc(r.mode) + '. ' + summary(r.rows) + '</p><table class="sum ctab"><thead><tr><th>Элемент</th><th>Параметр</th><th class="num">Проект</th><th class="num">Съёмка</th><th class="num">Разница, м</th><th class="num">На ИЧ</th><th>Примечание</th></tr></thead><tbody>'
+    + r.rows.map(x => '<tr class="k-' + x.kind + '"><td>' + esc(x.el) + '</td><td>' + esc(x.par) + '</td><td class="num">' + esc(x.pv) + '</td><td class="num">' + esc(x.fv) + '</td><td class="num">' + esc(x.d) + '</td><td class="num"><b>' + esc(x.used) + '</b></td><td>' + esc(x.note) + '</td></tr>').join('') + '</tbody></table>';
+}
+function topBar() {
+  return '<header class="top"><div class="brand"><span class="mark">ИЧ</span><span class="sep"></span><span class="sub">исполнительный чертёж<br>телефонной канализации</span></div>'
+    + '<div class="top-info">' + (S.file ? esc(S.file) : 'съёмка → план, профиль, ведомость и сверка с проектом') + '</div>'
+    + '<div class="top-actions"><button class="btn" id="open">Открыть съёмку…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
+}
+function emptyView() {
+  return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Файл обрабатывается прямо в браузере и никуда не отправляется.</p><div class="row"><button class="btn primary" id="open2">Выбрать файл…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
+    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа найдёт колодцы (476, 47, 99), трубы (478) и футляры (4028), соберёт трассу и пролёты.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
+}
+
+// ---------- просмотр: масштаб и сдвиг ----------
+function fitView(name) {
+  const b = S.res && (S.res.D.box[name] || S.res.D.box.all); if (!b) return;
+  const pad = Math.max(b[2] - b[0], b[3] - b[1]) * 0.04 + 2;
+  S.view = [b[0] - pad, -b[3] - pad, b[2] - b[0] + 2 * pad, b[3] - b[1] + 2 * pad]; applyView();
+}
+function applyView() { const s = $('#svg'); if (s && S.view) s.setAttribute('viewBox', S.view.map(v => v.toFixed(3)).join(' ')); }
+function zoomAt(f, cx, cy) {
+  const s = $('#svg'); if (!s || !S.view) return; const r = s.getBoundingClientRect(), v = S.view;
+  const sc = Math.max(v[2] / r.width, v[3] / r.height), ox = v[0] + (v[2] - r.width * sc) / 2, oy = v[1] + (v[3] - r.height * sc) / 2;
+  const wx = ox + cx * sc, wy = oy + cy * sc;
+  S.view = [wx - (wx - v[0]) / f, wy - (wy - v[1]) / f, v[2] / f, v[3] / f]; applyView();
+}
+function bindView() {
+  const s = $('#svg'); if (!s) return;
+  if (!S.view) fitView(S.tab); else applyView();
+  s.addEventListener('wheel', e => { e.preventDefault(); const r = s.getBoundingClientRect(); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+  s.addEventListener('dblclick', e => { const r = s.getBoundingClientRect(); zoomAt(2, e.clientX - r.left, e.clientY - r.top); });
+  let drag = null;
+  s.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; s.setPointerCapture(e.pointerId); s.classList.add('grab'); });
+  s.addEventListener('pointermove', e => { if (!drag) return; const r = s.getBoundingClientRect(), v = S.view, sc = Math.max(v[2] / r.width, v[3] / r.height); v[0] -= (e.clientX - drag.x) * sc; v[1] -= (e.clientY - drag.y) * sc; drag = { x: e.clientX, y: e.clientY }; applyView(); });
+  const up = () => { drag = null; s.classList.remove('grab'); }; s.addEventListener('pointerup', up); s.addEventListener('pointercancel', up);
+  const c = () => { const r = s.getBoundingClientRect(); return [r.width / 2, r.height / 2]; };
+  $('#zin').onclick = () => zoomAt(1.5, ...c()); $('#zout').onclick = () => zoomAt(1 / 1.5, ...c()); $('#zfit').onclick = () => fitView(S.tab);
+}
+
+// ---------- события ----------
+function pick(accept) { const p = $('#picker'); p.accept = accept; p.value = ''; p.click(); }
+$('#picker').onchange = () => { [...$('#picker').files].forEach(openFile); };
+function bindTop() {
+  $('#open').onclick = () => pick('.dxf,.are,.pco');
+  $('#demo').onclick = openDemo; $('#help').onclick = showHelp;
+}
+function bindEmpty() {
+  $('#open2').onclick = () => pick('.dxf,.are,.pco'); $('#demo2').onclick = openDemo;
+  $('#drop').onclick = e => { if (e.target.id === 'drop' || e.target.tagName === 'H1' || e.target.tagName === 'P') pick('.dxf,.are,.pco'); };
+}
+function openDemo() {
+  const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.view = null; S.tab = 'plan';
+  if (!hasProject() || S.demoProj) { S.proj = JSON.parse(JSON.stringify(I.DEMO_PROJECT)); S.demoProj = true; }
+  compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
+}
+let deb; const later = () => { clearTimeout(deb); deb = setTimeout(() => {
+  const a = document.activeElement, key = a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
+  save(); compute(); render();
+  if (key) { const el = key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
+}, 500); };
+function bindWork() {
+  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
+  document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { if (b.disabled) return; S.set.mode = b.dataset.mode; save(); compute(); render(); });
+  document.querySelectorAll('[data-tol]').forEach(b => b.onclick = () => { S.set.tol = +b.dataset.tol; save(); compute(); render(); });
+  document.querySelectorAll('[data-well]').forEach(b => b.onclick = () => {
+    const w = S.res.order[+b.dataset.well]; S.tab = 'plan'; S.view = null; render();
+    S.view = [w.c.x - 15, -w.c.y - 10, 30, 20]; applyView();
+  });
+  const tol = $('#tol'); if (tol) tol.oninput = () => { S.set.tol = num(tol.value) || 0; later(); };
+  $('#prof').onchange = e => { S.set.profile = e.target.checked; S.view = null; save(); compute(); render(); };
+  $('#start').onchange = e => { S.set.start = e.target.value; save(); compute(); render(); };
+  $('#dxf').onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
+  $('#csv').onclick = () => {
+    if (!S.res || !S.res.rows) return;
+    const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const lines = [['Режим построения', S.res.mode], ['Элемент', 'Параметр', 'Проект', 'Съёмка', 'Расхождение, м', 'На ИЧ', 'Примечание']].concat(S.res.rows.map(x => [x.el, x.par, x.pv, x.fv, x.d.replace('−', '-'), x.used, x.note]));
+    download(new TextEncoder().encode('﻿' + lines.map(l => l.map(q).join(';')).join('\r\n')), baseName() + ' — расхождения.csv', 'text/csv');
+  };
+  $('#fill').onclick = fillRows;
+  $('#pload').onclick = () => pick('.json');
+  $('#psave').onclick = () => { const p = { object: S.proj.object || baseName(), wells: S.proj.wells, spans: S.proj.spans }; download(new TextEncoder().encode(JSON.stringify(p, null, 1)), baseName() + ' — проект.json', 'application/json'); };
+  $('#pclear').onclick = () => { if (!confirmClear()) return; S.proj = { object: '', wells: [], spans: [] }; S.set.mode = 'fact'; save(); compute(); render(); };
+  document.querySelectorAll('.ptab input').forEach(inp => {
+    inp.oninput = () => { S.demoProj = false; setCell(inp.dataset.t, +inp.dataset.r, +inp.dataset.c, inp.value); later(); };
+    inp.onpaste = e => {
+      const txt = (e.clipboardData || window.clipboardData).getData('text'); if (!/[\t\n]/.test(txt.trim())) return;
+      e.preventDefault(); const t = inp.dataset.t, r0 = +inp.dataset.r, c0 = +inp.dataset.c, ncol = t === 'w' ? COLS_W.length : COLS_S.length;
+      txt.replace(/\r/g, '').replace(/\n$/, '').split('\n').forEach((line, i) => line.split('\t').forEach((v, j) => { if (c0 + j < ncol) setCell(t, r0 + i, c0 + j, v); }));
+      save(); compute(); render(); toast('Вставлено из буфера.');
+    };
+  });
+  bindView();
+}
+let clearArmed = 0; function confirmClear() { if (Date.now() - clearArmed < 4000) return true; clearArmed = Date.now(); toast('Нажмите «Очистить» ещё раз, чтобы удалить проект.'); return false; }
+
+function showHelp() {
+  const v = document.createElement('div'); v.className = 'veil';
+  v.innerHTML = '<div class="modal wide"><div class="modal-head"><h2>Справка</h2><button class="btn small" id="hx">Закрыть</button></div><div class="modal-body help">'
+    + '<h3>Что делает программа</h3><p>По съёмке строит исполнительный чертёж телефонной канализации: план трассы с колодцами, пролётами и футлярами, профиль с таблицей и ведомость колодцев. Сверяет съёмку с проектом и показывает, что расходится. Всё считается в браузере, файлы никуда не уходят.</p>'
+    + '<h3>Какая нужна съёмка</h3><p>DXF с блоками точек <b>_block2</b> (атрибуты №, H, TXT) или полевой файл .are / .pco. Коды — по «Абрису»:</p>'
+    + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr></table>'
+    + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'
+    + '<h3>Проект и подгонка</h3><p>Колодцы проекта сопоставляются со съёмкой по порядку вдоль трассы; направление хода выбирается по лучшему совпадению отметок (или задайте «Начало хода»). В режиме «под проект» значения, отличающиеся не больше допуска, берутся из проекта, остальные — по съёмке. Подгоняются обечайки, дно, горловина, верх трубы на входе и выходе, длины пролётов и футляров. План и промежуточные точки трубы остаются по съёмке.</p>'
+    + '<p>Проект сохраняется в браузере автоматически; файлом (.json) его можно перенести на другой компьютер.</p>'
+    + '<h3>Что пока не умеет</h3><p>Ответвления трассы, развёртки колодцев, линию земли и пересечения с коммуникациями (нужна геоподоснова), рамку и штамп, чтение проекта прямо из ИД.</p>'
+    + '</div></div>';
+  document.body.appendChild(v); v.onclick = e => { if (e.target === v || e.target.id === 'hx') v.remove(); };
+}
+
+// ---------- перетаскивание файлов ----------
+document.addEventListener('dragover', e => { e.preventDefault(); document.body.classList.add('drag'); });
+document.addEventListener('dragleave', e => { if (!e.relatedTarget) document.body.classList.remove('drag'); });
+document.addEventListener('drop', e => { e.preventDefault(); document.body.classList.remove('drag'); [...e.dataTransfer.files].forEach(openFile); });
+document.addEventListener('keydown', e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) || !$('#svg')) return;
+  const s = $('#svg').getBoundingClientRect();
+  if (e.key === '+' || e.key === '=') zoomAt(1.5, s.width / 2, s.height / 2); else if (e.key === '-') zoomAt(1 / 1.5, s.width / 2, s.height / 2); else if (e.key === '0') fitView(S.tab);
+});
+render();
+})();
+</script>
+</body></html>
