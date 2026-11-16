@@ -56,6 +56,8 @@ body.drag .work{outline:3px dashed var(--ink);outline-offset:-8px}
 @media (max-width:720px){.work{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.objs{flex-direction:row;overflow:auto}.obj{min-width:160px}.empty{grid-template-columns:1fr;padding:24px 16px}.drop{padding:32px 20px}.drop h1{font-size:26px}.top{flex-wrap:wrap}}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
 .ptab td:nth-child(2) input{min-width:64px}.ptab td:nth-child(3) input{min-width:68px}
+.nets{display:flex;flex-direction:column;gap:5px}.net{display:grid;gap:1px;text-align:left;border:1px solid var(--line);border-left:4px solid transparent;background:#fff;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:13px}.net.on{border-left-color:var(--ink);background:#f4f5f6}.net span{color:var(--muted);font-size:12px}.net em{font-style:normal;font-size:12px}.net em.yes{color:#2c7a4b}.net em.no{color:var(--warn)}
+svg.draw text{stroke:none}
 </style></head>
 <body><div id="app"></div><input id="picker" type="file" multiple hidden><div id="toast" role="status"></div>
 <script>window.ICH_SKEL={"skel": "  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1015\n  9\n$ACADMAINTVER\n 70\n6\n  9\n$DWGCODEPAGE\n  3\nANSI_1251\n  9\n$INSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$EXTMIN\n 10\n{{EXMINX}}\n 20\n{{EXMINY}}\n 30\n0.0\n  9\n$EXTMAX\n 10\n{{EXMAXX}}\n 20\n{{EXMAXY}}\n 30\n0.0\n  9\n$LIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$LIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$ORTHOMODE\n 70\n0\n  9\n$REGENMODE\n 70\n1\n  9\n$FILLMODE\n 70\n1\n  9\n$QTEXTMODE\n 70\n0\n  9\n$MIRRTEXT\n 70\n1\n  9\n$LTSCALE\n 40\n{{LTSCALE}}\n  9\n$ATTMODE\n 70\n1\n  9\n$TEXTSIZE\n 40\n2.5\n  9\n$TRACEWID\n 40\n1.0\n  9\n$TEXTSTYLE\n  7\nStandard\n  9\n$CLAYER\n  8\n0\n  9\n$CELTYPE\n  6\nByLayer\n  9\n$CECOLOR\n 62\n256\n  9\n$CELTSCALE\n 40\n1.0\n  9\n$DISPSILH\n 70\n0\n  9\n$DIMSCALE\n 40\n1.0\n  9\n$DIMASZ\n 40\n2.5\n  9\n$DIMEXO\n 40\n0.625\n  9\n$DIMDLI\n 40\n3.75\n  9\n$DIMRND\n 40\n0.0\n  9\n$DIMDLE\n 40\n0.0\n  9\n$DIMEXE\n 40\n1.25\n  9\n$DIMTP\n 40\n0.0\n  9\n$DIMTM\n 40\n0.0\n  9\n$DIMTXT\n 40\n2.5\n  9\n$DIMCEN\n 40\n2.5\n  9\n$DIMTSZ\n 40\n0.0\n  9\n$DIMTOL\n 70\n0\n  9\n$DIMLIM\n 70\n0\n  9\n$DIMTIH\n 70\n0\n  9\n$DIMTOH\n 70\n0\n  9\n$DIMSE1\n 70\n0\n  9\n$DIMSE2\n 70\n0\n  9\n$DIMTAD\n 70\n1\n  9\n$DIMZIN\n 70\n8\n  9\n$DIMBLK\n  1\n\n  9\n$DIMASO\n 70\n1\n  9\n$DIMSHO\n 70\n1\n  9\n$DIMPOST\n  1\n\n  9\n$DIMAPOST\n  1\n\n  9\n$DIMALT\n 70\n0\n  9\n$DIMALTD\n 70\n3\n  9\n$DIMALTF\n 40\n0.03937007874\n  9\n$DIMLFAC\n 40\n1.0\n  9\n$DIMTOFL\n 70\n1\n  9\n$DIMTVP\n 40\n0.0\n  9\n$DIMTIX\n 70\n0\n  9\n$DIMSOXD\n 70\n0\n  9\n$DIMSAH\n 70\n0\n  9\n$DIMBLK1\n  1\n\n  9\n$DIMBLK2\n  1\n\n  9\n$DIMSTYLE\n  2\nISO-25\n  9\n$DIMCLRD\n 70\n0\n  9\n$DIMCLRE\n 70\n0\n  9\n$DIMCLRT\n 70\n0\n  9\n$DIMTFAC\n 40\n1.0\n  9\n$DIMGAP\n 40\n0.625\n  9\n$DIMJUST\n 70\n0\n  9\n$DIMSD1\n 70\n0\n  9\n$DIMSD2\n 70\n0\n  9\n$DIMTOLJ\n 70\n0\n  9\n$DIMTZIN\n 70\n8\n  9\n$DIMALTZ\n 70\n0\n  9\n$DIMALTTZ\n 70\n0\n  9\n$DIMUPT\n 70\n0\n  9\n$DIMDEC\n 70\n2\n  9\n$DIMTDEC\n 70\n2\n  9\n$DIMALTU\n 70\n2\n  9\n$DIMALTTD\n 70\n3\n  9\n$DIMTXSTY\n  7\nStandard\n  9\n$DIMAUNIT\n 70\n0\n  9\n$DIMADEC\n 70\n0\n  9\n$DIMALTRND\n 40\n0.0\n  9\n$DIMAZIN\n 70\n0\n  9\n$DIMDSEP\n 70\n44\n  9\n$DIMATFIT\n 70\n3\n  9\n$DIMFRAC\n 70\n0\n  9\n$DIMLDRBLK\n  1\n\n  9\n$DIMLUNIT\n 70\n2\n  9\n$DIMLWD\n 70\n-2\n  9\n$DIMLWE\n 70\n-2\n  9\n$DIMTMOVE\n 70\n0\n  9\n$LUNITS\n 70\n2\n  9\n$LUPREC\n 70\n4\n  9\n$SKETCHINC\n 40\n1.0\n  9\n$FILLETRAD\n 40\n10.0\n  9\n$AUNITS\n 70\n0\n  9\n$AUPREC\n 70\n2\n  9\n$MENU\n  1\n.\n  9\n$ELEVATION\n 40\n0.0\n  9\n$PELEVATION\n 40\n0.0\n  9\n$THICKNESS\n 40\n0.0\n  9\n$LIMCHECK\n 70\n0\n  9\n$CHAMFERA\n 40\n0.0\n  9\n$CHAMFERB\n 40\n0.0\n  9\n$CHAMFERC\n 40\n0.0\n  9\n$CHAMFERD\n 40\n0.0\n  9\n$SKPOLY\n 70\n0\n  9\n$TDCREATE\n 40\n2461313.7136921296\n  9\n$TDUCREATE\n 40\n2458532.153996898\n  9\n$TDUPDATE\n 40\n2461313.7136921296\n  9\n$TDUUPDATE\n 40\n2458532.1544311\n  9\n$TDINDWG\n 40\n0.0\n  9\n$TDUSRTIMER\n 40\n0.0\n  9\n$USRTIMER\n 70\n1\n  9\n$ANGBASE\n 50\n0.0\n  9\n$ANGDIR\n 70\n0\n  9\n$PDMODE\n 70\n35\n  9\n$PDSIZE\n 40\n{{PDSIZE}}\n  9\n$PLINEWID\n 40\n0.0\n  9\n$SPLFRAME\n 70\n0\n  9\n$SPLINETYPE\n 70\n6\n  9\n$SPLINESEGS\n 70\n8\n  9\n$HANDSEED\n  5\n{{HANDSEED}}\n  9\n$SURFTAB1\n 70\n6\n  9\n$SURFTAB2\n 70\n6\n  9\n$SURFTYPE\n 70\n6\n  9\n$SURFU\n 70\n6\n  9\n$SURFV\n 70\n6\n  9\n$UCSBASE\n  2\n\n  9\n$UCSNAME\n  2\n\n  9\n$UCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$UCSORTHOREF\n  2\n\n  9\n$UCSORTHOVIEW\n 70\n0\n  9\n$UCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSBASE\n  2\n\n  9\n$PUCSNAME\n  2\n\n  9\n$PUCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$PUCSORTHOREF\n  2\n\n  9\n$PUCSORTHOVIEW\n 70\n0\n  9\n$PUCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$USERI1\n 70\n0\n  9\n$USERI2\n 70\n0\n  9\n$USERI3\n 70\n0\n  9\n$USERI4\n 70\n0\n  9\n$USERI5\n 70\n0\n  9\n$USERR1\n 40\n0.0\n  9\n$USERR2\n 40\n0.0\n  9\n$USERR3\n 40\n0.0\n  9\n$USERR4\n 40\n0.0\n  9\n$USERR5\n 40\n0.0\n  9\n$WORLDVIEW\n 70\n1\n  9\n$SHADEDGE\n 70\n3\n  9\n$SHADEDIF\n 70\n70\n  9\n$TILEMODE\n 70\n1\n  9\n$MAXACTVP\n 70\n64\n  9\n$PINSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PLIMCHECK\n 70\n0\n  9\n$PEXTMIN\n 10\n1e+20\n 20\n1e+20\n 30\n1e+20\n  9\n$PEXTMAX\n 10\n-1e+20\n 20\n-1e+20\n 30\n-1e+20\n  9\n$PLIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$PLIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$UNITMODE\n 70\n0\n  9\n$VISRETAIN\n 70\n1\n  9\n$PLINEGEN\n 70\n0\n  9\n$PSLTSCALE\n 70\n1\n  9\n$TREEDEPTH\n 70\n3020\n  9\n$CMLSTYLE\n  2\nStandard\n  9\n$CMLJUST\n 70\n0\n  9\n$CMLSCALE\n 40\n20.0\n  9\n$PROXYGRAPHICS\n 70\n1\n  9\n$MEASUREMENT\n 70\n1\n  9\n$CELWEIGHT\n370\n-1\n  9\n$ENDCAPS\n280\n0\n  9\n$JOINSTYLE\n280\n0\n  9\n$LWDISPLAY\n290\n0\n  9\n$INSUNITS\n 70\n6\n  9\n$HYPERLINKBASE\n  1\n\n  9\n$STYLESHEET\n  1\n\n  9\n$XEDIT\n290\n1\n  9\n$CEPSNTYPE\n380\n0\n  9\n$PSTYLEMODE\n290\n1\n  9\n$FINGERPRINTGUID\n  2\n{83AAAAEA-91C6-4B45-A960-A1CEF3310842}\n  9\n$VERSIONGUID\n  2\n{D81DBDA3-241D-4286-9503-0B4CF4FEC05F}\n  9\n$EXTNAMES\n290\n1\n  9\n$PSVPSCALE\n 40\n0.0\n  9\n$OLESTARTUP\n290\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nCLASSES\n  0\nCLASS\n  1\nACDBDICTIONARYWDFLT\n  2\nAcDbDictionaryWithDefault\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nSUN\n  2\nAcDbSun\n  3\nSCENEOE\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nVISUALSTYLE\n  2\nAcDbVisualStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMATERIAL\n  2\nAcDbMaterial\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nSCALE\n  2\nAcDbScale\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nTABLESTYLE\n  2\nAcDbTableStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMLEADERSTYLE\n  2\nAcDbMLeaderStyle\n  3\nACDB_MLEADERSTYLE_CLASS\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nDICTIONARYVAR\n  2\nAcDbDictionaryVar\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nCELLSTYLEMAP\n  2\nAcDbCellStyleMap\n  3\nObjectDBX Classes\n 90\n1152\n280\n0\n281\n0\n  0\nCLASS\n  1\nMENTALRAYRENDERSETTINGS\n  2\nAcDbMentalRayRenderSettings\n  3\nSCENEOE\n 90\n1024\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBDETAILVIEWSTYLE\n  2\nAcDbDetailViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBSECTIONVIEWSTYLE\n  2\nAcDbSectionViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nRASTERVARIABLES\n  2\nAcDbRasterVariables\n  3\nISM\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBPLACEHOLDER\n  2\nAcDbPlaceHolder\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nLAYOUT\n  2\nAcDbLayout\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nVPORT\n  5\n8\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nVPORT\n  5\n23\n330\n8\n100\nAcDbSymbolTableRecord\n100\nAcDbViewportTableRecord\n  2\n*Active\n 70\n0\n 10\n0.0\n 20\n0.0\n 11\n1.0\n 21\n1.0\n 12\n0.0\n 22\n0.0\n 13\n0.0\n 23\n0.0\n 14\n0.5\n 24\n0.5\n 15\n0.5\n 25\n0.5\n 16\n0.0\n 26\n0.0\n 36\n1.0\n 17\n0.0\n 27\n0.0\n 37\n0.0\n 40\n1000.0\n 41\n1.34\n 42\n50.0\n 43\n0.0\n 44\n0.0\n 50\n0.0\n 51\n0.0\n 71\n0\n 72\n1000\n 73\n1\n 74\n3\n 75\n0\n 76\n0\n 77\n0\n 78\n0\n281\n0\n 65\n0\n146\n0.0\n  0\nENDTAB\n  0\nTABLE\n  2\nLTYPE\n  5\n2\n330\n0\n100\nAcDbSymbolTable\n 70\n4\n  0\nLTYPE\n  5\n24\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByBlock\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n25\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByLayer\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n26\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nContinuous\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n35\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nDASHED\n 70\n0\n  3\n\n 72\n65\n 73\n2\n 40\n1.0\n 49\n0.6\n 74\n0\n 49\n-0.4\n 74\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nLAYER\n  5\n1\n330\n0\n100\nAcDbSymbolTable\n 70\n{{NLAYERS}}\n  0\nLAYER\n  5\n27\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\n0\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n28\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDefpoints\n 70\n0\n 62\n7\n  6\nContinuous\n290\n0\n370\n-3\n390\n13\n  0\nLAYER\n  5\n2F\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nPOINT\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n30\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nName\n 70\n0\n 62\n1\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n31\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nELEVATION\n 70\n0\n 62\n5\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n32\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDeskription\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n33\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHV\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n34\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHI\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n{{LAYERS}}  0\nENDTAB\n  0\nTABLE\n  2\nSTYLE\n  5\n5\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nSTYLE\n  5\n29\n330\n5\n100\nAcDbSymbolTableRecord\n100\nAcDbTextStyleTableRecord\n  2\nStandard\n 70\n0\n 40\n0.0\n 41\n1.0\n 50\n0.0\n 71\n0\n 42\n2.5\n  3\narial.ttf\n  4\n\n  0\nENDTAB\n  0\nTABLE\n  2\nVIEW\n  5\n7\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nUCS\n  5\n6\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nAPPID\n  5\n3\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nAPPID\n  5\n2A\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nACAD\n 70\n0\n  0\nAPPID\n  5\n3F\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nHATCHBACKGROUNDCOLOR\n 70\n0\n  0\nAPPID\n  5\n40\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nEZDXF\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nDIMSTYLE\n  5\n4\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n100\nAcDbDimStyleTable\n  0\nDIMSTYLE\n105\n2B\n330\n4\n100\nAcDbSymbolTableRecord\n100\nAcDbDimStyleTableRecord\n  2\nStandard\n 70\n0\n  3\n\n  4\n\n 40\n1.0\n 41\n2.5\n 42\n0.625\n 43\n3.75\n 44\n1.25\n 45\n0.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n140\n2.5\n141\n2.5\n142\n0.0\n143\n0.03937007874\n144\n1.0\n145\n0.0\n146\n1.0\n147\n0.625\n148\n0.0\n 71\n0\n 72\n0\n 73\n0\n 74\n0\n 75\n0\n 76\n0\n 77\n1\n 78\n8\n 79\n3\n170\n0\n171\n3\n172\n1\n173\n0\n174\n0\n175\n0\n176\n0\n177\n0\n178\n0\n179\n2\n271\n2\n272\n2\n273\n2\n274\n3\n275\n0\n276\n0\n277\n2\n278\n44\n279\n0\n280\n0\n281\n0\n282\n0\n283\n0\n284\n8\n285\n0\n286\n0\n288\n0\n289\n3\n371\n-2\n372\n-2\n  0\nENDTAB\n  0\nTABLE\n  2\nBLOCK_RECORD\n  5\n9\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nBLOCK_RECORD\n  5\n17\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Model_Space\n340\n1A\n  0\nBLOCK_RECORD\n  5\n1B\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Paper_Space\n340\n1E\n  0\nBLOCK_RECORD\n  5\n36\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n_block2\n340\n0\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nBLOCKS\n  0\nBLOCK\n  5\n18\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Model_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Model_Space\n  1\n\n  0\nENDBLK\n  5\n19\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n1C\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Paper_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Paper_Space\n  1\n\n  0\nENDBLK\n  5\n1D\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n37\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n_block2\n 70\n2\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n_block2\n  1\n\n  0\nCIRCLE\n  5\n39\n330\n36\n100\nAcDbEntity\n  8\nPOINT\n100\nAcDbCircle\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 40\n0.0762\n  0\nATTDEF\n  5\n3A\n330\n36\n100\nAcDbEntity\n  8\nName\n 62\n250\n100\nAcDbText\n 10\n0.096\n 20\n0.178\n 30\n0.0\n 40\n0.2\n  1\n1\n100\nAcDbAttributeDefinition\n  3\nНОМЕР\n  2\n№\n 70\n0\n  0\nATTDEF\n  5\n3B\n330\n36\n100\nAcDbEntity\n  8\nELEVATION\n100\nAcDbText\n 10\n0.096\n 20\n-0.08\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОТМЕТКА\n  2\nH\n 70\n0\n  0\nATTDEF\n  5\n3C\n330\n36\n100\nAcDbEntity\n  8\nDeskription\n100\nAcDbText\n 10\n0.096\n 20\n-0.357\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОписание\n  2\nTXT\n 70\n0\n  0\nATTDEF\n  5\n3D\n330\n36\n100\nAcDbEntity\n  8\nHV\n100\nAcDbText\n 10\n0.151\n 20\n-0.622\n 30\n0.0\n 40\n0.2\n  1\n2.500\n100\nAcDbAttributeDefinition\n  3\nвысота вехи\n  2\nHV\n 70\n0\n  0\nATTDEF\n  5\n3E\n330\n36\n100\nAcDbEntity\n  8\nHI\n100\nAcDbText\n 10\n-0.866\n 20\n-0.084\n 30\n0.0\n 40\n0.2\n  1\n1.600\n100\nAcDbAttributeDefinition\n  3\nвысота инструмента\n  2\nHI\n 70\n0\n  0\nENDBLK\n  5\n38\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n{{ENTITIES}}  0\nENDSEC\n  0\nSECTION\n  2\nOBJECTS\n  0\nDICTIONARY\n  5\nA\n330\n0\n100\nAcDbDictionary\n281\n1\n  3\nACAD_COLOR\n350\nB\n  3\nACAD_GROUP\n350\nC\n  3\nACAD_LAYOUT\n350\nD\n  3\nACAD_MATERIAL\n350\nE\n  3\nACAD_MLEADERSTYLE\n350\nF\n  3\nACAD_MLINESTYLE\n350\n10\n  3\nACAD_PLOTSETTINGS\n350\n11\n  3\nACAD_PLOTSTYLENAME\n350\n12\n  3\nACAD_SCALELIST\n350\n14\n  3\nACAD_TABLESTYLE\n350\n15\n  3\nACAD_VISUALSTYLE\n350\n16\n  3\nEZDXF_META\n350\n2D\n  0\nDICTIONARY\n  5\nB\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nC\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nD\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nModel\n350\n1A\n  3\nLayout1\n350\n1E\n  0\nDICTIONARY\n  5\nE\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nByBlock\n350\n1F\n  3\nByLayer\n350\n20\n  3\nGlobal\n350\n21\n  0\nDICTIONARY\n  5\nF\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n2C\n  0\nDICTIONARY\n  5\n10\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n22\n  0\nDICTIONARY\n  5\n11\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nACDBDICTIONARYWDFLT\n  5\n12\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nNormal\n350\n13\n100\nAcDbDictionaryWithDefault\n340\n13\n  0\nACDBPLACEHOLDER\n  5\n13\n330\n12\n  0\nDICTIONARY\n  5\n14\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n15\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n16\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nLAYOUT\n  5\n1A\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n1024\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nModel\n 70\n1\n 71\n0\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n17\n  0\nLAYOUT\n  5\n1E\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n0\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nLayout1\n 70\n1\n 71\n1\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n1B\n  0\nMATERIAL\n  5\n1F\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByBlock\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n20\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByLayer\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n21\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nGlobal\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMLINESTYLE\n  5\n22\n102\n{ACAD_REACTORS\n330\n10\n102\n}\n330\n10\n100\nAcDbMlineStyle\n  2\nStandard\n 70\n0\n  3\n\n 62\n256\n 51\n90.0\n 52\n90.0\n 71\n2\n 49\n0.5\n 62\n256\n  6\nBYLAYER\n 49\n-0.5\n 62\n256\n  6\nBYLAYER\n  0\nMLEADERSTYLE\n  5\n2C\n102\n{ACAD_REACTORS\n330\nF\n102\n}\n330\nF\n100\nAcDbMLeaderStyle\n179\n2\n170\n2\n171\n1\n172\n0\n 90\n2\n 40\n0.0\n 41\n0.0\n173\n1\n 91\n-1056964608\n 92\n-2\n290\n1\n 42\n2.0\n291\n1\n 43\n8.0\n  3\nStandard\n 44\n4.0\n300\n\n342\n29\n174\n1\n175\n1\n176\n0\n178\n1\n 93\n-1056964608\n 45\n4.0\n292\n0\n297\n0\n 46\n4.0\n 94\n-1056964608\n 47\n1.0\n 49\n1.0\n140\n1.0\n294\n1\n141\n0.0\n177\n0\n142\n1.0\n295\n0\n296\n0\n143\n3.75\n271\n0\n272\n9\n273\n9\n  0\nDICTIONARY\n  5\n2D\n330\nA\n100\nAcDbDictionary\n280\n1\n281\n1\n  3\nCREATED_BY_EZDXF\n350\n2E\n  3\nWRITTEN_BY_EZDXF\n350\n41\n  0\nDICTIONARYVAR\n  5\n2E\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.984563+00:00\n  0\nDICTIONARYVAR\n  5\n41\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.986194+00:00\n  0\nENDSEC\n  0\nEOF\n", "msOwner": "17", "layerOwner": "1", "handleStart": 82};</script>
@@ -104,7 +106,7 @@ function readDXF(text) {
   const flush = () => {
     if (!ent) return;
     if (ent.type === 'INSERT') { cur = { blk: ent.g[2], x: +ent.g[10], y: +ent.g[20], att: {} }; if (cur.blk === '_block2') pts.push(cur); else cur = null; }
-    else if (ent.type === 'ATTRIB' && cur) cur.att[ent.g[2]] = ent.g[1] == null ? '' : ent.g[1];
+    else if (ent.type === 'ATTRIB' && cur) { const v = ent.g[1] == null ? '' : ent.g[1]; cur.att[ent.g[2]] = v; if (!cur.first) cur.first = { tag: ent.g[2], v }; }
     else if (ent.type === 'SEQEND') cur = null;
   };
   for (let i = a + 2; i < T.length; i++) {
@@ -112,7 +114,9 @@ function readDXF(text) {
     if (c === 0) { flush(); if (v === 'ENDSEC') break; ent = { type: v, g: {} }; }
     else if (ent && !(c in ent.g)) ent.g[c] = v;
   }
-  return pts.map(p => ({ num: String(p.att['№'] || '').trim(), txt: String(p.att.TXT || '').trim(), H: num(p.att.H), x: p.x, y: p.y })).filter(p => p.H != null);
+  // номер — атрибут «№»; если имя тега испорчено перекодировкой, берём первый атрибут блока
+  const numOf = p => p.att['№'] != null ? p.att['№'] : (p.first && !/^(H|TXT|HV|HI)$/.test(p.first.tag) ? p.first.v : '');
+  return pts.map(p => ({ num: String(numOf(p) || '').trim(), txt: String(p.att.TXT || '').trim(), H: num(p.att.H), x: p.x, y: p.y })).filter(p => p.H != null);
 }
 function readARE(text) {   // .are / .pco: 5 — номер, 4 — код, 37 — X (север), 38 — Y (восток), 39 — H
   const pts = []; let cur = null;
@@ -140,20 +144,21 @@ function parsePoints(raw) {
 }
 
 // ---------------- модель трассы ----------------
-function build(P0, startN, names) {
+function build(P0, startN, names, net) {
+  const N = net || NETS[0];
   const P = P0.map(p => Object.assign({}, p)), by = {}; P.forEach(p => by[p.n] = p);
   const warn = [];
-  const wells = P.filter(p => p.code === '476').map(p => {
+  const wells = P.filter(p => p.code === N.well).map(p => {
     const near = code => P.filter(q => q.code === code && dist(q, p) < R_WELL).sort((a, b) => dist(a, p) - dist(b, p))[0];
-    const w = { c: p, top: p.H, suf: p.suf }, q47 = near('47'), q99 = near('99');
+    const w = { c: p, top: p.H, suf: p.suf }, q47 = near(N.neck), q99 = near('99');
     w.plate = q47 && ('_' + q47.suf).indexOf('_vp') < 0 ? q47.H : null;
     w.bottom = q99 ? q99.H : null;
     if (WELL_TYPES[w.suf]) { [w.type, w.L, w.W] = WELL_TYPES[w.suf]; }
     else { const m = /(\d+[.,]\d+)x(\d+[.,]\d+)/.exec(w.suf); w.type = m ? 'камера' : (w.suf || '?'); w.L = m ? num(m[1]) : 1.35; w.W = m ? num(m[2]) : 1.07; }
     return w;
   });
-  if (wells.length < 2) throw new Error('В съёмке меньше двух колодцев (код 476). Найдено: ' + wells.length + '.');
-  const pipe = P.filter(p => p.code === '478' || p.code === '4028'), adj = new Map(pipe.map(p => [p.n, new Set()]));
+  if (wells.length < 2) throw new Error('В съёмке меньше двух колодцев (код ' + N.well + '). Найдено: ' + wells.length + '.');
+  const pipe = P.filter(p => p.code === N.pipe || p.code === N.cas), adj = new Map(pipe.map(p => [p.n, new Set()]));
   pipe.forEach((p, i) => {
     if (!p.link) return;
     let refs = p.link.slice(2).split(',').filter(Boolean).map(Number);
@@ -197,20 +202,175 @@ function build(P0, startN, names) {
     s.pts = s.pts.map(p => Object.assign({}, p));
     for (let i = 1; i < poly.length; i++) { st += dist(poly[i - 1], poly[i]); if (i < poly.length - 1) s.pts[i - 1].st = st; }
     s.len = st - s.a.st; s.b.st = st;
-    const m = s.pts.filter(p => p.code === '478' && p.suf).map(p => /(\d+)[dx](\d+)/.exec(p.suf)).find(Boolean);
+    const m = s.pts.filter(p => p.code === N.pipe && p.suf).map(p => /(\d+)[dx](\d+)/.exec(p.suf)).find(Boolean);
     s.n = m ? +m[1] : 1; s.d = m ? +m[2] : 110;
     if (!m) warn.push('Пролёт ' + s.a.name + ' – ' + s.b.name + ': в кодах труб нет состава (_1d110) — принято 1×d110.');
-    const cas = s.pts.filter(p => p.code === '4028');
+    const cas = s.pts.filter(p => p.code === N.cas);
     s.cas = null; s.drop = 0;
     if (cas.length >= 2) {
       const mc = /(\d+)[dx](\d+)/.exec(cas[0].suf), D = mc ? +mc[2] : 0;
       s.cas = { pts: cas, D, L: cas[cas.length - 1].st - cas[0].st };
       s.drop = s.n === 1 ? D / 1000 - (CASING_WALL[D] || 0.007) - s.d / 1000 : 0;
     }
-    s.pts.forEach(p => { p.top = p.H - (s.cas && p.code === '4028' ? s.drop : 0); p.wall = false; });
+    s.pts.forEach(p => { p.top = p.H - (s.cas && p.code === N.cas ? s.drop : 0); p.wall = false; });
     s.pts[0].wall = s.pts[s.pts.length - 1].wall = true;
   });
   return { order, route, warn, ends: endw.map(w => w.c.n) };
+}
+
+
+// ---------------- сети по кодам «Абриса» ----------------
+// kind: wells — колодцы и пролёты (план, профиль, сверка), line — линия с опорами (план, ведомость), null — пока не обучена
+const NETS = [
+  { id: 'tk', name: 'Телефонная канализация', well: '476', pipe: '478', cas: '4028', neck: '47', pole: '65', own: ['476', '478'], kind: 'wells' },
+  { id: 'kk', name: 'Кабельная канализация', well: '4026', pipe: '491', cas: '4028', neck: '46', pole: '65', own: ['4026'], kind: null },
+  { id: 'no', name: 'Кабель НО / ЭС', pipe: '491', cas: '4028', pole: '65', own: ['491', '65'], kind: 'line' },
+  { id: 'kl', name: 'Кабельная линия', pipe: '4021', cas: '4028', own: ['4021'], kind: null },
+  { id: 'vod', name: 'Водопровод', well: '4044', pipe: '4041', cas: '4043', chamber: '404', neck: '44', own: ['4044', '4041', '4043', '404', '44'], kind: null },
+  { id: 'tep', name: 'Теплосеть', well: '4074', pipe: '4071', cas: '4073', chamber: '407', neck: '47', own: ['4074', '4071', '4073', '407'], kind: null },
+  { id: 'kan', name: 'Канализация', well: '4054', pipe: '4051', cas: '4053', chamber: '405', neck: '45', own: ['4054', '4051', '4053', '405', '45'], kind: null },
+  { id: 'gaz', name: 'Газопровод', well: '4064', pipe: '4061', cas: '4063', chamber: '406', own: ['4064', '4061', '4063', '406'], kind: null },
+  { id: 'vst', name: 'Водосток', well: '4094', pipe: '4091', cas: '4093', chamber: '409', neck: '49', own: ['4094', '4091', '4093', '409', '49'], kind: null },
+];
+const isSitu = c => /^7\d{2,}$/.test(c);
+// какие сети есть в съёмке: по «своим» кодам; общие коды (4028, 65, 99) относятся к найденной сети
+function detectNets(P) {
+  const cnt = {}; P.forEach(p => { cnt[p.code] = (cnt[p.code] || 0) + 1; });
+  const found = [];
+  NETS.forEach(n => {
+    let own = n.own.filter(c => cnt[c]);
+    if (n.id === 'no' && (cnt['4026'] || !cnt['491'])) own = [];          // 491 с обечайками 4026 — это кабельная канализация
+    if (n.id === 'tep' && !cnt['4074'] && !cnt['4071'] && !cnt['4073'] && !cnt['407']) own = [];   // 47 одна — горловина ТК
+    if (!own.length) return;
+    const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+    found.push({ net: n, points: P.filter(p => codes.includes(p.code)).length, codes: own.map(c => c + ' ×' + cnt[c]).join(', ') });
+  });
+  const known = new Set([].concat(...NETS.map(n => [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber].filter(Boolean)), ['99']));
+  const situ = P.filter(p => isSitu(p.code)).length, unknown = [...new Set(P.filter(p => !known.has(p.code) && !isSitu(p.code)).map(p => p.code))];
+  return { found, situ, unknown };
+}
+
+// ---------------- линейная сеть с опорами (НО / ЭС) ----------------
+const compOf = suf => {   // _2x63, _2d63 — две трубы Ø63; _d63 или _63 — одна труба Ø63
+  const m = /(\d+)[dx](\d+)/.exec(suf || ''); if (m) return { n: +m[1], d: +m[2], t: m[1] + 'd' + m[2] };
+  const o = /^(?:d|lot)?(\d{2,4})(?:_|$)/.exec(suf || ''); return o ? { n: 1, d: +o[1], t: '1d' + o[1] } : null; };
+function buildLine(P0, net, names) {
+  const N = net, codes = [N.pipe, N.cas, N.pole], warn = [];
+  const all = P0.slice().sort((a, b) => a.n - b.n), P = all.filter(p => codes.includes(p.code)).map(p => Object.assign({}, p)), by = new Map(P.map(p => [p.n, p]));
+  if (!P.length) throw new Error('В съёмке нет точек сети ' + N.name + '.');
+  const idx = new Map(all.map((p, i) => [p.n, i])), edges = [], seen = new Set();
+  P.forEach(p => {
+    if (!p.link) return;
+    let refs = p.link.slice(2).split(',');
+    refs = refs.map((r, i) => r === '' ? (i === 0 ? 'prev' : null) : +r).filter(r => r !== null);
+    if (!refs.length) refs = ['prev'];
+    refs.forEach(r => {
+      let q;
+      if (r === 'prev') { const i = idx.get(p.n); q = i > 0 ? by.get(all[i - 1].n) : null; if (!q && i > 0) warn.push('т.' + p.n + ': «..» ведёт к т.' + all[i - 1].n + ', а это не точка сети — связь пропущена.'); }
+      else { q = by.get(r); if (!q) warn.push('т.' + p.n + ': связь с т.' + r + ' — такой точки сети нет.'); }
+      if (!q || q === p) return;
+      const key = Math.min(p.n, q.n) + '-' + Math.max(p.n, q.n); if (seen.has(key)) return; seen.add(key);
+      const cas = p.code === N.cas && q.code === N.cas;
+      // состав участка — из точки трубы со связью, иначе из второго конца
+      const comp = cas ? (compOf(p.suf) || compOf(q.suf)) : [p, q].filter(z => z.code === N.pipe).map(z => compOf(z.suf)).find(Boolean) || null;
+      edges.push({ a: q, b: p, cas, comp, len: dist(p, q) });
+    });
+  });
+  if (!edges.length) throw new Error('Точки сети не соединены: в кодах нет связей «..».');
+  // труба между концом футляра и опорой: состав берём у соседней трубы (через футляр или с другой стороны)
+  for (let pass = 0; pass < 3; pass++) edges.forEach(e => {
+    if (e.cas || e.comp) return;
+    const nb = edges.filter(f => f !== e && !f.cas && f.comp && (f.a === e.a || f.b === e.a || f.a === e.b || f.b === e.b));
+    if (nb.length) { e.comp = nb[0].comp; return; }
+    // за футляром: футляр → его другой конец → труба
+    for (const v of [e.a, e.b]) {
+      const fc = edges.find(f => f.cas && (f.a === v || f.b === v)); if (!fc) continue;
+      const w = fc.a === v ? fc.b : fc.a, pe = edges.find(f => f !== fc && !f.cas && f.comp && (f.a === w || f.b === w));
+      if (pe) { e.comp = pe.comp; return; }
+    }
+  });
+  const deg = new Map(P.map(p => [p, 0])); edges.forEach(e => { deg.set(e.a, deg.get(e.a) + 1); deg.set(e.b, deg.get(e.b) + 1); });
+  P.filter(p => deg.get(p) === 0 && p.code !== N.pole).forEach(p => warn.push('т.' + p.n + ' (' + p.code + ') ни с чем не соединена.'));
+  // участки: цепочки рёбер одного вида и состава через узлы степени 2 (опора — всегда граница)
+  const adj = new Map(P.map(p => [p, []])); edges.forEach(e => { adj.get(e.a).push(e); adj.get(e.b).push(e); });
+  const same = (e, f) => e.cas === f.cas && (e.comp && e.comp.t) === (f.comp && f.comp.t);
+  const used = new Set(), runs = [];
+  edges.forEach(e0 => {
+    if (used.has(e0)) return; used.add(e0);
+    let pts = [e0.a, e0.b], es = [e0];
+    const grow = (end, sign) => { for (;;) {
+      const v = sign > 0 ? pts[pts.length - 1] : pts[0];
+      if (v.code === N.pole || deg.get(v) !== 2) return;
+      const f = adj.get(v).find(x => !used.has(x)); if (!f || !same(f, e0)) return;
+      used.add(f); const w = f.a === v ? f.b : f.a;
+      if (sign > 0) { pts.push(w); es.push(f); } else { pts.unshift(w); es.unshift(f); }
+    } };
+    grow(null, 1); grow(null, -1);
+    runs.push({ pts, cas: e0.cas, comp: e0.comp, len: es.reduce((t, x) => t + x.len, 0) });
+  });
+  // разделы ведомости: от опоры (или развилки, или конца) до следующей — независимо от футляров
+  const usedS = new Set(), secs = [];
+  edges.forEach(e0 => {
+    if (usedS.has(e0)) return; usedS.add(e0);
+    const pts = [e0.a, e0.b], es = [e0];
+    for (const sign of [1, -1]) for (;;) {
+      const v = sign > 0 ? pts[pts.length - 1] : pts[0];
+      if (v.code === N.pole || deg.get(v) !== 2) break;
+      const f = adj.get(v).find(x => !usedS.has(x)); if (!f) break;
+      usedS.add(f); const w = f.a === v ? f.b : f.a;
+      if (sign > 0) { pts.push(w); es.push(f); } else { pts.unshift(w); es.unshift(f); }
+    }
+    const pipeT = [...new Set(es.filter(x => !x.cas).map(x => x.comp ? x.comp.t : '?'))], casT = [...new Set(es.filter(x => x.cas).map(x => x.comp ? x.comp.t : '?'))];
+    secs.push({ pts, len: es.reduce((t, x) => t + x.len, 0), casLen: es.filter(x => x.cas).reduce((t, x) => t + x.len, 0), pipeT, casT });
+  });
+  const poles = P.filter(p => p.code === N.pole);
+  poles.forEach((p, i) => { p.name = names && names[i] ? names[i] : 'оп.' + (i + 1); });
+  const label = p => p.code === N.pole ? p.name : 'т.' + p.n;
+  runs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
+  secs.forEach(r => { if (r.pts[0].code !== N.pole && r.pts[r.pts.length - 1].code === N.pole) { r.pts.reverse(); } r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
+  const ord = p => p.code === N.pole ? poles.indexOf(p) : 1e6 + p.n;
+  secs.sort((a, b) => ord(a.pts[0]) - ord(b.pts[0]) || ord(a.pts[a.pts.length - 1]) - ord(b.pts[b.pts.length - 1]));
+  // итоги по составу
+  const tot = {}; runs.forEach(r => { const k = (r.cas ? 'футляр ' : 'труба ') + (r.comp ? r.comp.t : 'без состава'); tot[k] = (tot[k] || 0) + r.len; });
+  if (runs.some(r => !r.comp)) warn.push('У части участков в кодах нет состава (_1d63) — подписаны «без состава».');
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn };
+}
+function drawLine(D, m, opt) {
+  const L2 = { pipe: 'ТРАССА', cas: 'ФУТЛЯР', pole: 'ОПОРЫ', txt: 'ПОДПИСИ', otm: 'ОТМЕТКИ' };
+  m.runs.forEach(r => {
+    const c = r.pts.map(p => [p.x, p.y]);
+    D.poly(L2.pipe, c, r.cas ? 5 : 7);
+    if (r.cas) {
+      const hw = 0.25, left = [], right = [];
+      c.forEach((p, i) => { const q = unit(c[Math.max(i - 1, 0)], c[Math.min(i + 1, c.length - 1)]); left.push([p[0] - q[1] * hw, p[1] + q[0] * hw]); right.push([p[0] + q[1] * hw, p[1] - q[0] * hw]); });
+      D.poly(L2.cas, left.concat(right.reverse()), 5, true);
+    }
+    // подпись участка — на самом длинном отрезке
+    let bi = 0, bl = -1; for (let i = 1; i < c.length; i++) { const l = Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]); if (l > bl) { bl = l; bi = i; } }
+    const a = c[bi - 1], b = c[bi]; let ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+    const u = unit(a, b), n = [-u[1], u[0]], off = r.cas ? 0.75 : 0.55, mx = (a[0] + b[0]) / 2 + n[0] * off, my = (a[1] + b[1]) / 2 + n[1] * off;
+    const t = (r.cas ? 'ф-р ' : '') + (r.comp ? r.comp.t : '?') + ' L=' + fnum(r.len);
+    if (bl >= t.length * 0.36) D.text(L2.txt, t, mx, my, 0.6, ang, 1, r.cas ? 5 : 7);
+  });
+  m.poles.forEach(p => { D.circle(L2.pole, p.x, p.y, 0.35, 1); D.text(L2.pole, p.name, p.x + 0.6, p.y + 0.6, 0.9, 0, 0, 1); });
+  if (opt.marks) m.points.forEach(p => { if (p.code !== m.net.pole) D.text(L2.otm, fnum(p.H), p.x + 0.25, p.y - 0.35, 0.4, 0, 0, 3); });
+}
+function drawLineTable(D, m, x0, y0) {
+  const heads = ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр'], wd = [8, 22, 22, 22, 18, 30], rh = 7, L3 = 'Текст и таблицы';
+  D.text(L3, 'Ведомость участков — ' + m.net.name, x0, y0 + 5, 3.0, 0, 0, 7);
+  const rows = [heads].concat(m.secs.map((r, i) => [String(i + 1), r.from, r.to, r.pipeT.join(', ') || '—', fnum(r.len), r.casLen ? fnum(r.casLen) + ' (' + r.casT.join(', ') + ')' : '—']));
+  const xs = [x0]; wd.forEach(v => xs.push(xs[xs.length - 1] + v));
+  for (let r = 0; r <= rows.length; r++) D.line(L3, xs[0], y0 - r * rh, xs[xs.length - 1], y0 - r * rh, 7);
+  xs.forEach(x => D.line(L3, x, y0, x, y0 - rows.length * rh, 7));
+  rows.forEach((row, r) => row.forEach((v, c) => D.text(L3, v, (xs[c] + xs[c + 1]) / 2, y0 - r * rh - rh / 2, 2.2, 0, 1, 7)));
+  // итоги
+  const x1 = xs[xs.length - 1] + 15; let y = y0;
+  D.text(L3, 'Итого по составу', x1, y + 5, 3.0, 0, 0, 7);
+  Object.keys(m.tot).sort().forEach(k => { D.text(L3, k + ' — ' + fnum(m.tot[k]) + ' м', x1, y - rh / 2, 2.5, 0, 0, 7); y -= rh; });
+  D.text(L3, 'Опор: ' + m.poles.length, x1, y - rh / 2, 2.5, 0, 0, 7);
+  // опоры
+  y -= rh * 2; D.text(L3, 'Опоры', x1, y + 2, 3.0, 0, 0, 7);
+  m.poles.forEach(p => { y -= rh * 0.8; D.text(L3, p.name + ' — т.' + p.n + ', отм. ' + fnum(p.H), x1, y, 2.2, 0, 0, 7); });
 }
 
 // ---------------- сверка с проектом ----------------
@@ -445,7 +605,7 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
-window.ICH = { decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+window.ICH = { NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
 })();
 </script>
 <script>
@@ -467,16 +627,23 @@ const baseName = () => (S.file || 'ИЧ').replace(/\.[^.]+$/, '');
 // ---------- расчёт ----------
 function hasProject() { return S.proj.wells.some(w => w.name || w.top != null) || S.proj.spans.some(s => s.len != null); }
 function compute() {
-  S.res = null; S.err = null;
+  S.res = null; S.err = null; S.det = null; S.netSel = null;
   if (!S.parsed) return;
   try {
-    const P = S.parsed.pts, proj = hasProject() ? S.proj : null;
+    const P = S.parsed.pts;
+    const det = S.det = I.detectNets(P);
+    const f = det.found.find(x => x.net.id === S.set.net) || det.found.find(x => x.net.kind) || det.found[0];
+    if (!f) throw new Error('В съёмке нет кодов известных сетей (476, 491, 4041…). Проверьте коды точек.');
+    const net = S.netSel = f.net;
+    if (!net.kind) throw new Error('Сеть «' + net.name + '» распознана, но ИЧ для неё программа пока не строит. Пришлите образец ИЧ этой сети — научим.');
+    if (net.kind === 'line') { computeLine(P, net); return; }
+    const proj = hasProject() ? S.proj : null;
     const names = proj ? proj.wells.map(w => w.name) : null;
     const startN = S.set.start === 'auto' ? null : +S.set.start;
-    let m = I.build(P, startN, names);
+    let m = I.build(P, startN, names, net);
     if (proj && !startN && m.order.length === proj.wells.length) {     // направление — по лучшему совпадению с проектом
       const sc = seq => seq.reduce((t, w, i) => t + (proj.wells[i].top != null ? Math.abs(w.top - proj.wells[i].top) : 0), 0);
-      if (sc(m.order.slice().reverse()) < sc(m.order)) m = I.build(P, m.order[m.order.length - 1].c.n, names);
+      if (sc(m.order.slice().reverse()) < sc(m.order)) m = I.build(P, m.order[m.order.length - 1].c.n, names, net);
     }
     const fit = proj && S.set.mode === 'fit', tol = fit ? (num(S.set.tol) || 0) / 100 : null;
     let mode = fit ? 'подогнано под проект, допуск ' + (num(S.set.tol) || 0) + ' см' : 'по фактической съёмке';
@@ -494,8 +661,17 @@ function compute() {
     I.drawWells(D, m.order, xl, yb - 20);
     D.text('Текст и таблицы', 'ИЧ построена: ' + mode, xl, yb - 8, 3.0, 0, 0, fit ? 1 : 7);
     D.mark('table', k); D.mark('all', 0);
-    S.res = { D, order: m.order, route: m.route, warn: m.warn, ends: m.ends, rows, mode, fit };
+    S.res = { kind: 'wells', D, order: m.order, route: m.route, warn: m.warn, ends: m.ends, rows, mode, fit };
   } catch (e) { S.err = e.message || String(e); }
+}
+
+function computeLine(P, net) {
+  const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
+  const m = I.buildLine(P, net, names), D = new I.Dwg();
+  let k = 0; I.drawLine(D, m, { marks: S.set.marks !== false }); D.mark('plan', k);
+  const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
+  k = D.e.length; I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15); D.mark('table', k); D.mark('all', 0);
+  S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
 }
 
 // ---------- открытие файлов ----------
@@ -509,7 +685,7 @@ async function openFile(f) {
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
     if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.view = null; S.tab = 'plan';
+    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
     compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
@@ -522,6 +698,7 @@ function loadProject(p) {
   save(); compute(); render();
 }
 function fillRows() {
+  if (S.res && S.res.kind === 'line') { const p = S.res.m.poles, old = S.proj.poles || []; S.proj.poles = p.map((q, i) => old[i] || q.name); save(); compute(); render(); toast('Опор: ' + p.length + '. Впишите имена из проекта или вставьте столбец из Excel.'); return; }
   if (!S.res) { toast('Сначала откройте съёмку.'); return; }
   const o = S.res.order, r = S.res.route, W = S.proj.wells, P = S.proj.spans;
   S.proj.wells = o.map((w, i) => W[i] || { name: 'К-' + (i + 1), type: w.type, top: null, bottom: null, neck: null, pipe_in: null, pipe_out: null });
@@ -554,14 +731,64 @@ function setCell(t, r, c, val) {
 }
 function wellFlags(name) { if (!S.res || !S.res.rows) return null; const r = S.res.rows.filter(x => x.el === name); return { diff: r.filter(x => x.kind === 'diff' || x.kind === 'bad').length, fit: r.filter(x => x.kind === 'fit').length }; }
 
+function netsBlock() {
+  const d = S.det; if (!d) return '';
+  let h = '<h3 class="sh">Сети в съёмке</h3>';
+  if (!d.found.length) h += '<p class="fine">Не распознано ни одной сети.</p>';
+  h += '<div class="nets">' + d.found.map(f => '<button class="net' + (S.netSel === f.net ? ' on' : '') + '" data-net="' + f.net.id + '"><b>' + esc(f.net.name) + '</b><span>' + esc(f.codes) + '</span><em class="' + (f.net.kind ? 'yes' : 'no') + '">' + (f.net.kind === 'wells' ? 'ИЧ: план, профиль, сверка' : f.net.kind === 'line' ? 'ИЧ: план и ведомость' : 'пока не обучена') + '</em></button>').join('') + '</div>';
+  if (d.situ) h += '<p class="fine">Ситуация (7…): ' + d.situ + ' т. — в ИЧ не входит.</p>';
+  if (d.unknown.length) h += '<p class="issue">Неизвестные коды: ' + esc(d.unknown.join(', ')) + '</p>';
+  return h;
+}
+function renderLine() {
+  const r = S.res, m = r.m;
+  let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li></ul>' + netsBlock();
+  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '</ul>';
+  if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
+  side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
+  if (!['plan', 'table'].includes(S.tab)) S.tab = 'plan';
+  let desk = '<div class="tabs">' + [['plan', 'План'], ['table', 'Ведомость']].map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
+    + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
+    + '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>';
+  const P = S.proj.poles || [];
+  let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': план с опорами, трубами и футлярами, ведомость участков. Профиль для сетей без колодцев пока не строится.</p>'
+    + '<label class="chk"><input type="checkbox" id="marks"' + (S.set.marks !== false ? ' checked' : '') + '> Отметки труб на плане</label>'
+    + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="csvl">Ведомость (CSV)</button></div>'
+    + '<h3>Имена опор</h3><p class="hint">По умолчанию оп.1, оп.2… в порядке номеров точек. Впишите имена из проекта или вставьте столбец из Excel (Ctrl+V).</p>'
+    + '<div class="row"><button class="btn small" id="fill">' + (P.length ? 'Обновить список' : 'Заполнить по съёмке') + '</button><button class="btn small danger" id="pclear"' + (P.length ? '' : ' disabled') + '>Очистить</button></div>'
+    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Точка</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">т.' + p.n + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '');
+  $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  bindTop(); bindCommon();
+  $('#marks').onchange = e => { S.set.marks = e.target.checked; save(); compute(); render(); };
+  $('#csvl').onclick = () => {
+    const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const lines = [['Сеть', m.net.name], ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр, м', 'Футляр', 'Точки']].concat(m.secs.map((x, i) => [i + 1, x.from, x.to, x.pipeT.join(', '), fnum(x.len), x.casLen ? fnum(x.casLen) : '', x.casT.join(', '), x.pts.map(p => p.n).join(' ')]), [[]], [['Итого по составу']], Object.keys(m.tot).sort().map(k => [k, fnum(m.tot[k])]));
+    download(new TextEncoder().encode('\ufeff' + lines.map(l => l.map(q).join(';')).join('\r\n')), baseName() + ' — ведомость.csv', 'text/csv');
+  };
+  $('#fill').onclick = fillRows;
+  $('#pclear').onclick = () => { if (!confirmClear()) return; S.proj.poles = []; save(); compute(); render(); };
+  document.querySelectorAll('[data-pole]').forEach(b => b.onclick = () => { const p = m.poles[+b.dataset.pole]; S.tab = 'plan'; render(); S.view = [p.x - 12, -p.y - 8, 24, 16]; applyView(); });
+  document.querySelectorAll('.ptab input[data-t=pole]').forEach(inp => {
+    inp.oninput = () => { S.proj.poles[+inp.dataset.r] = inp.value.trim(); later(); };
+    inp.onpaste = e => { const txt = (e.clipboardData || window.clipboardData).getData('text'); if (!/\n/.test(txt.trim())) return; e.preventDefault();
+      txt.replace(/\r/g, '').replace(/\n$/, '').split('\n').forEach((v, i) => { const r = +inp.dataset.r + i; if (r < m.poles.length) S.proj.poles[r] = v.split('\t')[0].trim(); }); save(); compute(); render(); toast('Вставлено из буфера.'); };
+  });
+  bindView();
+}
+function bindCommon() {
+  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
+  document.querySelectorAll('[data-net]').forEach(b => b.onclick = () => { S.set.net = b.dataset.net; S.view = null; S.tab = 'plan'; save(); compute(); render(); });
+  const d = $('#dxf'); if (d) d.onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
+}
 function render() {
   const app = $('#app');
   if (!S.parsed) { app.innerHTML = topBar() + emptyView(); bindTop(); bindEmpty(); return; }
+  if (S.res && S.res.kind === 'line') { renderLine(); return; }
   const r = S.res, proj = hasProject();
   const fit = S.set.mode === 'fit' && proj;
   let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек с кодами: ' + S.parsed.pts.length + (S.parsed.skipped.length ? ', без кода или с буквенным номером: ' + S.parsed.skipped.length : '') + '</li>';
   if (r) side += '<li>колодцев по ходу: ' + r.order.length + ', пролётов: ' + r.route.length + '</li><li>длина трассы: ' + fnum(r.order[r.order.length - 1].st) + ' м</li>';
-  side += '</ul>';
+  side += '</ul>' + netsBlock();
   if (r) {
     side += '<h3 class="sh">Колодцы по ходу</h3><div class="objs">' + r.order.map((w, i) => {
       const f = wellFlags(w.name);
@@ -610,7 +837,7 @@ function topBar() {
 }
 function emptyView() {
   return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Файл обрабатывается прямо в браузере и никуда не отправляется.</p><div class="row"><button class="btn primary" id="open2">Выбрать файл…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
-    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа найдёт колодцы (476, 47, 99), трубы (478) и футляры (4028), соберёт трассу и пролёты.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
+    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028) и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
 }
 
 // ---------- просмотр: масштаб и сдвиг ----------
@@ -651,7 +878,7 @@ function bindEmpty() {
   $('#drop').onclick = e => { if (e.target.id === 'drop' || e.target.tagName === 'H1' || e.target.tagName === 'P') pick('.dxf,.are,.pco'); };
 }
 function openDemo() {
-  const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.view = null; S.tab = 'plan';
+  const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
   if (!hasProject() || S.demoProj) { S.proj = JSON.parse(JSON.stringify(I.DEMO_PROJECT)); S.demoProj = true; }
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
 }
@@ -661,7 +888,7 @@ let deb; const later = () => { clearTimeout(deb); deb = setTimeout(() => {
   if (key) { const el = key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
 }, 500); };
 function bindWork() {
-  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
+  bindCommon();
   document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { if (b.disabled) return; S.set.mode = b.dataset.mode; save(); compute(); render(); });
   document.querySelectorAll('[data-tol]').forEach(b => b.onclick = () => { S.set.tol = +b.dataset.tol; save(); compute(); render(); });
   document.querySelectorAll('[data-well]').forEach(b => b.onclick = () => {
@@ -671,7 +898,6 @@ function bindWork() {
   const tol = $('#tol'); if (tol) tol.oninput = () => { S.set.tol = num(tol.value) || 0; later(); };
   $('#prof').onchange = e => { S.set.profile = e.target.checked; S.view = null; save(); compute(); render(); };
   $('#start').onchange = e => { S.set.start = e.target.value; save(); compute(); render(); };
-  $('#dxf').onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
   $('#csv').onclick = () => {
     if (!S.res || !S.res.rows) return;
     const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
@@ -699,6 +925,7 @@ function showHelp() {
   const v = document.createElement('div'); v.className = 'veil';
   v.innerHTML = '<div class="modal wide"><div class="modal-head"><h2>Справка</h2><button class="btn small" id="hx">Закрыть</button></div><div class="modal-body help">'
     + '<h3>Что делает программа</h3><p>По съёмке строит исполнительный чертёж телефонной канализации: план трассы с колодцами, пролётами и футлярами, профиль с таблицей и ведомость колодцев. Сверяет съёмку с проектом и показывает, что расходится. Всё считается в браузере, файлы никуда не уходят.</p>'
+    + '<h3>Какие сети</h3><p>Сеть определяется по кодам «Абриса». Сейчас ИЧ строится для <b>телефонной канализации</b> (план, профиль, ведомость колодцев, сверка с проектом) и для <b>кабеля НО / ЭС</b> (план с опорами, трубами и футлярами, ведомость участков). Остальные сети — кабельная канализация, кабельная линия, водопровод, теплосеть, канализация, газопровод, водосток — распознаются и показываются слева; ИЧ для них добавим по образцам. Если в съёмке несколько сетей, выберите нужную слева.</p>'
     + '<h3>Какая нужна съёмка</h3><p>DXF с блоками точек <b>_block2</b> (атрибуты №, H, TXT) или полевой файл .are / .pco. Коды — по «Абрису»:</p>'
     + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr></table>'
     + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'

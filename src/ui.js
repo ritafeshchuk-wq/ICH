@@ -16,16 +16,23 @@ const baseName = () => (S.file || 'ИЧ').replace(/\.[^.]+$/, '');
 // ---------- расчёт ----------
 function hasProject() { return S.proj.wells.some(w => w.name || w.top != null) || S.proj.spans.some(s => s.len != null); }
 function compute() {
-  S.res = null; S.err = null;
+  S.res = null; S.err = null; S.det = null; S.netSel = null;
   if (!S.parsed) return;
   try {
-    const P = S.parsed.pts, proj = hasProject() ? S.proj : null;
+    const P = S.parsed.pts;
+    const det = S.det = I.detectNets(P);
+    const f = det.found.find(x => x.net.id === S.set.net) || det.found.find(x => x.net.kind) || det.found[0];
+    if (!f) throw new Error('В съёмке нет кодов известных сетей (476, 491, 4041…). Проверьте коды точек.');
+    const net = S.netSel = f.net;
+    if (!net.kind) throw new Error('Сеть «' + net.name + '» распознана, но ИЧ для неё программа пока не строит. Пришлите образец ИЧ этой сети — научим.');
+    if (net.kind === 'line') { computeLine(P, net); return; }
+    const proj = hasProject() ? S.proj : null;
     const names = proj ? proj.wells.map(w => w.name) : null;
     const startN = S.set.start === 'auto' ? null : +S.set.start;
-    let m = I.build(P, startN, names);
+    let m = I.build(P, startN, names, net);
     if (proj && !startN && m.order.length === proj.wells.length) {     // направление — по лучшему совпадению с проектом
       const sc = seq => seq.reduce((t, w, i) => t + (proj.wells[i].top != null ? Math.abs(w.top - proj.wells[i].top) : 0), 0);
-      if (sc(m.order.slice().reverse()) < sc(m.order)) m = I.build(P, m.order[m.order.length - 1].c.n, names);
+      if (sc(m.order.slice().reverse()) < sc(m.order)) m = I.build(P, m.order[m.order.length - 1].c.n, names, net);
     }
     const fit = proj && S.set.mode === 'fit', tol = fit ? (num(S.set.tol) || 0) / 100 : null;
     let mode = fit ? 'подогнано под проект, допуск ' + (num(S.set.tol) || 0) + ' см' : 'по фактической съёмке';
@@ -43,8 +50,17 @@ function compute() {
     I.drawWells(D, m.order, xl, yb - 20);
     D.text('Текст и таблицы', 'ИЧ построена: ' + mode, xl, yb - 8, 3.0, 0, 0, fit ? 1 : 7);
     D.mark('table', k); D.mark('all', 0);
-    S.res = { D, order: m.order, route: m.route, warn: m.warn, ends: m.ends, rows, mode, fit };
+    S.res = { kind: 'wells', D, order: m.order, route: m.route, warn: m.warn, ends: m.ends, rows, mode, fit };
   } catch (e) { S.err = e.message || String(e); }
+}
+
+function computeLine(P, net) {
+  const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
+  const m = I.buildLine(P, net, names), D = new I.Dwg();
+  let k = 0; I.drawLine(D, m, { marks: S.set.marks !== false }); D.mark('plan', k);
+  const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
+  k = D.e.length; I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15); D.mark('table', k); D.mark('all', 0);
+  S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
 }
 
 // ---------- открытие файлов ----------
@@ -58,7 +74,7 @@ async function openFile(f) {
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
     if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.view = null; S.tab = 'plan';
+    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
     compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
@@ -71,6 +87,7 @@ function loadProject(p) {
   save(); compute(); render();
 }
 function fillRows() {
+  if (S.res && S.res.kind === 'line') { const p = S.res.m.poles, old = S.proj.poles || []; S.proj.poles = p.map((q, i) => old[i] || q.name); save(); compute(); render(); toast('Опор: ' + p.length + '. Впишите имена из проекта или вставьте столбец из Excel.'); return; }
   if (!S.res) { toast('Сначала откройте съёмку.'); return; }
   const o = S.res.order, r = S.res.route, W = S.proj.wells, P = S.proj.spans;
   S.proj.wells = o.map((w, i) => W[i] || { name: 'К-' + (i + 1), type: w.type, top: null, bottom: null, neck: null, pipe_in: null, pipe_out: null });
@@ -103,14 +120,64 @@ function setCell(t, r, c, val) {
 }
 function wellFlags(name) { if (!S.res || !S.res.rows) return null; const r = S.res.rows.filter(x => x.el === name); return { diff: r.filter(x => x.kind === 'diff' || x.kind === 'bad').length, fit: r.filter(x => x.kind === 'fit').length }; }
 
+function netsBlock() {
+  const d = S.det; if (!d) return '';
+  let h = '<h3 class="sh">Сети в съёмке</h3>';
+  if (!d.found.length) h += '<p class="fine">Не распознано ни одной сети.</p>';
+  h += '<div class="nets">' + d.found.map(f => '<button class="net' + (S.netSel === f.net ? ' on' : '') + '" data-net="' + f.net.id + '"><b>' + esc(f.net.name) + '</b><span>' + esc(f.codes) + '</span><em class="' + (f.net.kind ? 'yes' : 'no') + '">' + (f.net.kind === 'wells' ? 'ИЧ: план, профиль, сверка' : f.net.kind === 'line' ? 'ИЧ: план и ведомость' : 'пока не обучена') + '</em></button>').join('') + '</div>';
+  if (d.situ) h += '<p class="fine">Ситуация (7…): ' + d.situ + ' т. — в ИЧ не входит.</p>';
+  if (d.unknown.length) h += '<p class="issue">Неизвестные коды: ' + esc(d.unknown.join(', ')) + '</p>';
+  return h;
+}
+function renderLine() {
+  const r = S.res, m = r.m;
+  let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li></ul>' + netsBlock();
+  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '</ul>';
+  if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
+  side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
+  if (!['plan', 'table'].includes(S.tab)) S.tab = 'plan';
+  let desk = '<div class="tabs">' + [['plan', 'План'], ['table', 'Ведомость']].map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
+    + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
+    + '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>';
+  const P = S.proj.poles || [];
+  let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': план с опорами, трубами и футлярами, ведомость участков. Профиль для сетей без колодцев пока не строится.</p>'
+    + '<label class="chk"><input type="checkbox" id="marks"' + (S.set.marks !== false ? ' checked' : '') + '> Отметки труб на плане</label>'
+    + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="csvl">Ведомость (CSV)</button></div>'
+    + '<h3>Имена опор</h3><p class="hint">По умолчанию оп.1, оп.2… в порядке номеров точек. Впишите имена из проекта или вставьте столбец из Excel (Ctrl+V).</p>'
+    + '<div class="row"><button class="btn small" id="fill">' + (P.length ? 'Обновить список' : 'Заполнить по съёмке') + '</button><button class="btn small danger" id="pclear"' + (P.length ? '' : ' disabled') + '>Очистить</button></div>'
+    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Точка</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">т.' + p.n + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '');
+  $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  bindTop(); bindCommon();
+  $('#marks').onchange = e => { S.set.marks = e.target.checked; save(); compute(); render(); };
+  $('#csvl').onclick = () => {
+    const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const lines = [['Сеть', m.net.name], ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр, м', 'Футляр', 'Точки']].concat(m.secs.map((x, i) => [i + 1, x.from, x.to, x.pipeT.join(', '), fnum(x.len), x.casLen ? fnum(x.casLen) : '', x.casT.join(', '), x.pts.map(p => p.n).join(' ')]), [[]], [['Итого по составу']], Object.keys(m.tot).sort().map(k => [k, fnum(m.tot[k])]));
+    download(new TextEncoder().encode('\ufeff' + lines.map(l => l.map(q).join(';')).join('\r\n')), baseName() + ' — ведомость.csv', 'text/csv');
+  };
+  $('#fill').onclick = fillRows;
+  $('#pclear').onclick = () => { if (!confirmClear()) return; S.proj.poles = []; save(); compute(); render(); };
+  document.querySelectorAll('[data-pole]').forEach(b => b.onclick = () => { const p = m.poles[+b.dataset.pole]; S.tab = 'plan'; render(); S.view = [p.x - 12, -p.y - 8, 24, 16]; applyView(); });
+  document.querySelectorAll('.ptab input[data-t=pole]').forEach(inp => {
+    inp.oninput = () => { S.proj.poles[+inp.dataset.r] = inp.value.trim(); later(); };
+    inp.onpaste = e => { const txt = (e.clipboardData || window.clipboardData).getData('text'); if (!/\n/.test(txt.trim())) return; e.preventDefault();
+      txt.replace(/\r/g, '').replace(/\n$/, '').split('\n').forEach((v, i) => { const r = +inp.dataset.r + i; if (r < m.poles.length) S.proj.poles[r] = v.split('\t')[0].trim(); }); save(); compute(); render(); toast('Вставлено из буфера.'); };
+  });
+  bindView();
+}
+function bindCommon() {
+  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
+  document.querySelectorAll('[data-net]').forEach(b => b.onclick = () => { S.set.net = b.dataset.net; S.view = null; S.tab = 'plan'; save(); compute(); render(); });
+  const d = $('#dxf'); if (d) d.onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
+}
 function render() {
   const app = $('#app');
   if (!S.parsed) { app.innerHTML = topBar() + emptyView(); bindTop(); bindEmpty(); return; }
+  if (S.res && S.res.kind === 'line') { renderLine(); return; }
   const r = S.res, proj = hasProject();
   const fit = S.set.mode === 'fit' && proj;
   let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек с кодами: ' + S.parsed.pts.length + (S.parsed.skipped.length ? ', без кода или с буквенным номером: ' + S.parsed.skipped.length : '') + '</li>';
   if (r) side += '<li>колодцев по ходу: ' + r.order.length + ', пролётов: ' + r.route.length + '</li><li>длина трассы: ' + fnum(r.order[r.order.length - 1].st) + ' м</li>';
-  side += '</ul>';
+  side += '</ul>' + netsBlock();
   if (r) {
     side += '<h3 class="sh">Колодцы по ходу</h3><div class="objs">' + r.order.map((w, i) => {
       const f = wellFlags(w.name);
@@ -159,7 +226,7 @@ function topBar() {
 }
 function emptyView() {
   return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Файл обрабатывается прямо в браузере и никуда не отправляется.</p><div class="row"><button class="btn primary" id="open2">Выбрать файл…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
-    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа найдёт колодцы (476, 47, 99), трубы (478) и футляры (4028), соберёт трассу и пролёты.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
+    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028) и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
 }
 
 // ---------- просмотр: масштаб и сдвиг ----------
@@ -200,7 +267,7 @@ function bindEmpty() {
   $('#drop').onclick = e => { if (e.target.id === 'drop' || e.target.tagName === 'H1' || e.target.tagName === 'P') pick('.dxf,.are,.pco'); };
 }
 function openDemo() {
-  const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.view = null; S.tab = 'plan';
+  const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
   if (!hasProject() || S.demoProj) { S.proj = JSON.parse(JSON.stringify(I.DEMO_PROJECT)); S.demoProj = true; }
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
 }
@@ -210,7 +277,7 @@ let deb; const later = () => { clearTimeout(deb); deb = setTimeout(() => {
   if (key) { const el = key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
 }, 500); };
 function bindWork() {
-  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
+  bindCommon();
   document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { if (b.disabled) return; S.set.mode = b.dataset.mode; save(); compute(); render(); });
   document.querySelectorAll('[data-tol]').forEach(b => b.onclick = () => { S.set.tol = +b.dataset.tol; save(); compute(); render(); });
   document.querySelectorAll('[data-well]').forEach(b => b.onclick = () => {
@@ -220,7 +287,6 @@ function bindWork() {
   const tol = $('#tol'); if (tol) tol.oninput = () => { S.set.tol = num(tol.value) || 0; later(); };
   $('#prof').onchange = e => { S.set.profile = e.target.checked; S.view = null; save(); compute(); render(); };
   $('#start').onchange = e => { S.set.start = e.target.value; save(); compute(); render(); };
-  $('#dxf').onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
   $('#csv').onclick = () => {
     if (!S.res || !S.res.rows) return;
     const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
@@ -248,6 +314,7 @@ function showHelp() {
   const v = document.createElement('div'); v.className = 'veil';
   v.innerHTML = '<div class="modal wide"><div class="modal-head"><h2>Справка</h2><button class="btn small" id="hx">Закрыть</button></div><div class="modal-body help">'
     + '<h3>Что делает программа</h3><p>По съёмке строит исполнительный чертёж телефонной канализации: план трассы с колодцами, пролётами и футлярами, профиль с таблицей и ведомость колодцев. Сверяет съёмку с проектом и показывает, что расходится. Всё считается в браузере, файлы никуда не уходят.</p>'
+    + '<h3>Какие сети</h3><p>Сеть определяется по кодам «Абриса». Сейчас ИЧ строится для <b>телефонной канализации</b> (план, профиль, ведомость колодцев, сверка с проектом) и для <b>кабеля НО / ЭС</b> (план с опорами, трубами и футлярами, ведомость участков). Остальные сети — кабельная канализация, кабельная линия, водопровод, теплосеть, канализация, газопровод, водосток — распознаются и показываются слева; ИЧ для них добавим по образцам. Если в съёмке несколько сетей, выберите нужную слева.</p>'
     + '<h3>Какая нужна съёмка</h3><p>DXF с блоками точек <b>_block2</b> (атрибуты №, H, TXT) или полевой файл .are / .pco. Коды — по «Абрису»:</p>'
     + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr></table>'
     + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'

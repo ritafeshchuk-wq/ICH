@@ -52,3 +52,5 @@ body.drag .work{outline:3px dashed var(--ink);outline-offset:-8px}
 @media (max-width:720px){.work{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.objs{flex-direction:row;overflow:auto}.obj{min-width:160px}.empty{grid-template-columns:1fr;padding:24px 16px}.drop{padding:32px 20px}.drop h1{font-size:26px}.top{flex-wrap:wrap}}
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
 .ptab td:nth-child(2) input{min-width:64px}.ptab td:nth-child(3) input{min-width:68px}
+.nets{display:flex;flex-direction:column;gap:5px}.net{display:grid;gap:1px;text-align:left;border:1px solid var(--line);border-left:4px solid transparent;background:#fff;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:13px}.net.on{border-left-color:var(--ink);background:#f4f5f6}.net span{color:var(--muted);font-size:12px}.net em{font-style:normal;font-size:12px}.net em.yes{color:#2c7a4b}.net em.no{color:var(--warn)}
+svg.draw text{stroke:none}

@@ -42,7 +42,7 @@ function readDXF(text) {
   const flush = () => {
     if (!ent) return;
     if (ent.type === 'INSERT') { cur = { blk: ent.g[2], x: +ent.g[10], y: +ent.g[20], att: {} }; if (cur.blk === '_block2') pts.push(cur); else cur = null; }
-    else if (ent.type === 'ATTRIB' && cur) cur.att[ent.g[2]] = ent.g[1] == null ? '' : ent.g[1];
+    else if (ent.type === 'ATTRIB' && cur) { const v = ent.g[1] == null ? '' : ent.g[1]; cur.att[ent.g[2]] = v; if (!cur.first) cur.first = { tag: ent.g[2], v }; }
     else if (ent.type === 'SEQEND') cur = null;
   };
   for (let i = a + 2; i < T.length; i++) {
@@ -50,7 +50,9 @@ function readDXF(text) {
     if (c === 0) { flush(); if (v === 'ENDSEC') break; ent = { type: v, g: {} }; }
     else if (ent && !(c in ent.g)) ent.g[c] = v;
   }
-  return pts.map(p => ({ num: String(p.att['№'] || '').trim(), txt: String(p.att.TXT || '').trim(), H: num(p.att.H), x: p.x, y: p.y })).filter(p => p.H != null);
+  // номер — атрибут «№»; если имя тега испорчено перекодировкой, берём первый атрибут блока
+  const numOf = p => p.att['№'] != null ? p.att['№'] : (p.first && !/^(H|TXT|HV|HI)$/.test(p.first.tag) ? p.first.v : '');
+  return pts.map(p => ({ num: String(numOf(p) || '').trim(), txt: String(p.att.TXT || '').trim(), H: num(p.att.H), x: p.x, y: p.y })).filter(p => p.H != null);
 }
 function readARE(text) {   // .are / .pco: 5 — номер, 4 — код, 37 — X (север), 38 — Y (восток), 39 — H
   const pts = []; let cur = null;
@@ -78,20 +80,21 @@ function parsePoints(raw) {
 }
 
 // ---------------- модель трассы ----------------
-function build(P0, startN, names) {
+function build(P0, startN, names, net) {
+  const N = net || NETS[0];
   const P = P0.map(p => Object.assign({}, p)), by = {}; P.forEach(p => by[p.n] = p);
   const warn = [];
-  const wells = P.filter(p => p.code === '476').map(p => {
+  const wells = P.filter(p => p.code === N.well).map(p => {
     const near = code => P.filter(q => q.code === code && dist(q, p) < R_WELL).sort((a, b) => dist(a, p) - dist(b, p))[0];
-    const w = { c: p, top: p.H, suf: p.suf }, q47 = near('47'), q99 = near('99');
+    const w = { c: p, top: p.H, suf: p.suf }, q47 = near(N.neck), q99 = near('99');
     w.plate = q47 && ('_' + q47.suf).indexOf('_vp') < 0 ? q47.H : null;
     w.bottom = q99 ? q99.H : null;
     if (WELL_TYPES[w.suf]) { [w.type, w.L, w.W] = WELL_TYPES[w.suf]; }
     else { const m = /(\d+[.,]\d+)x(\d+[.,]\d+)/.exec(w.suf); w.type = m ? 'камера' : (w.suf || '?'); w.L = m ? num(m[1]) : 1.35; w.W = m ? num(m[2]) : 1.07; }
     return w;
   });
-  if (wells.length < 2) throw new Error('В съёмке меньше двух колодцев (код 476). Найдено: ' + wells.length + '.');
-  const pipe = P.filter(p => p.code === '478' || p.code === '4028'), adj = new Map(pipe.map(p => [p.n, new Set()]));
+  if (wells.length < 2) throw new Error('В съёмке меньше двух колодцев (код ' + N.well + '). Найдено: ' + wells.length + '.');
+  const pipe = P.filter(p => p.code === N.pipe || p.code === N.cas), adj = new Map(pipe.map(p => [p.n, new Set()]));
   pipe.forEach((p, i) => {
     if (!p.link) return;
     let refs = p.link.slice(2).split(',').filter(Boolean).map(Number);
@@ -135,20 +138,175 @@ function build(P0, startN, names) {
     s.pts = s.pts.map(p => Object.assign({}, p));
     for (let i = 1; i < poly.length; i++) { st += dist(poly[i - 1], poly[i]); if (i < poly.length - 1) s.pts[i - 1].st = st; }
     s.len = st - s.a.st; s.b.st = st;
-    const m = s.pts.filter(p => p.code === '478' && p.suf).map(p => /(\d+)[dx](\d+)/.exec(p.suf)).find(Boolean);
+    const m = s.pts.filter(p => p.code === N.pipe && p.suf).map(p => /(\d+)[dx](\d+)/.exec(p.suf)).find(Boolean);
     s.n = m ? +m[1] : 1; s.d = m ? +m[2] : 110;
     if (!m) warn.push('Пролёт ' + s.a.name + ' – ' + s.b.name + ': в кодах труб нет состава (_1d110) — принято 1×d110.');
-    const cas = s.pts.filter(p => p.code === '4028');
+    const cas = s.pts.filter(p => p.code === N.cas);
     s.cas = null; s.drop = 0;
     if (cas.length >= 2) {
       const mc = /(\d+)[dx](\d+)/.exec(cas[0].suf), D = mc ? +mc[2] : 0;
       s.cas = { pts: cas, D, L: cas[cas.length - 1].st - cas[0].st };
       s.drop = s.n === 1 ? D / 1000 - (CASING_WALL[D] || 0.007) - s.d / 1000 : 0;
     }
-    s.pts.forEach(p => { p.top = p.H - (s.cas && p.code === '4028' ? s.drop : 0); p.wall = false; });
+    s.pts.forEach(p => { p.top = p.H - (s.cas && p.code === N.cas ? s.drop : 0); p.wall = false; });
     s.pts[0].wall = s.pts[s.pts.length - 1].wall = true;
   });
   return { order, route, warn, ends: endw.map(w => w.c.n) };
+}
+
+
+// ---------------- сети по кодам «Абриса» ----------------
+// kind: wells — колодцы и пролёты (план, профиль, сверка), line — линия с опорами (план, ведомость), null — пока не обучена
+const NETS = [
+  { id: 'tk', name: 'Телефонная канализация', well: '476', pipe: '478', cas: '4028', neck: '47', pole: '65', own: ['476', '478'], kind: 'wells' },
+  { id: 'kk', name: 'Кабельная канализация', well: '4026', pipe: '491', cas: '4028', neck: '46', pole: '65', own: ['4026'], kind: null },
+  { id: 'no', name: 'Кабель НО / ЭС', pipe: '491', cas: '4028', pole: '65', own: ['491', '65'], kind: 'line' },
+  { id: 'kl', name: 'Кабельная линия', pipe: '4021', cas: '4028', own: ['4021'], kind: null },
+  { id: 'vod', name: 'Водопровод', well: '4044', pipe: '4041', cas: '4043', chamber: '404', neck: '44', own: ['4044', '4041', '4043', '404', '44'], kind: null },
+  { id: 'tep', name: 'Теплосеть', well: '4074', pipe: '4071', cas: '4073', chamber: '407', neck: '47', own: ['4074', '4071', '4073', '407'], kind: null },
+  { id: 'kan', name: 'Канализация', well: '4054', pipe: '4051', cas: '4053', chamber: '405', neck: '45', own: ['4054', '4051', '4053', '405', '45'], kind: null },
+  { id: 'gaz', name: 'Газопровод', well: '4064', pipe: '4061', cas: '4063', chamber: '406', own: ['4064', '4061', '4063', '406'], kind: null },
+  { id: 'vst', name: 'Водосток', well: '4094', pipe: '4091', cas: '4093', chamber: '409', neck: '49', own: ['4094', '4091', '4093', '409', '49'], kind: null },
+];
+const isSitu = c => /^7\d{2,}$/.test(c);
+// какие сети есть в съёмке: по «своим» кодам; общие коды (4028, 65, 99) относятся к найденной сети
+function detectNets(P) {
+  const cnt = {}; P.forEach(p => { cnt[p.code] = (cnt[p.code] || 0) + 1; });
+  const found = [];
+  NETS.forEach(n => {
+    let own = n.own.filter(c => cnt[c]);
+    if (n.id === 'no' && (cnt['4026'] || !cnt['491'])) own = [];          // 491 с обечайками 4026 — это кабельная канализация
+    if (n.id === 'tep' && !cnt['4074'] && !cnt['4071'] && !cnt['4073'] && !cnt['407']) own = [];   // 47 одна — горловина ТК
+    if (!own.length) return;
+    const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+    found.push({ net: n, points: P.filter(p => codes.includes(p.code)).length, codes: own.map(c => c + ' ×' + cnt[c]).join(', ') });
+  });
+  const known = new Set([].concat(...NETS.map(n => [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber].filter(Boolean)), ['99']));
+  const situ = P.filter(p => isSitu(p.code)).length, unknown = [...new Set(P.filter(p => !known.has(p.code) && !isSitu(p.code)).map(p => p.code))];
+  return { found, situ, unknown };
+}
+
+// ---------------- линейная сеть с опорами (НО / ЭС) ----------------
+const compOf = suf => {   // _2x63, _2d63 — две трубы Ø63; _d63 или _63 — одна труба Ø63
+  const m = /(\d+)[dx](\d+)/.exec(suf || ''); if (m) return { n: +m[1], d: +m[2], t: m[1] + 'd' + m[2] };
+  const o = /^(?:d|lot)?(\d{2,4})(?:_|$)/.exec(suf || ''); return o ? { n: 1, d: +o[1], t: '1d' + o[1] } : null; };
+function buildLine(P0, net, names) {
+  const N = net, codes = [N.pipe, N.cas, N.pole], warn = [];
+  const all = P0.slice().sort((a, b) => a.n - b.n), P = all.filter(p => codes.includes(p.code)).map(p => Object.assign({}, p)), by = new Map(P.map(p => [p.n, p]));
+  if (!P.length) throw new Error('В съёмке нет точек сети ' + N.name + '.');
+  const idx = new Map(all.map((p, i) => [p.n, i])), edges = [], seen = new Set();
+  P.forEach(p => {
+    if (!p.link) return;
+    let refs = p.link.slice(2).split(',');
+    refs = refs.map((r, i) => r === '' ? (i === 0 ? 'prev' : null) : +r).filter(r => r !== null);
+    if (!refs.length) refs = ['prev'];
+    refs.forEach(r => {
+      let q;
+      if (r === 'prev') { const i = idx.get(p.n); q = i > 0 ? by.get(all[i - 1].n) : null; if (!q && i > 0) warn.push('т.' + p.n + ': «..» ведёт к т.' + all[i - 1].n + ', а это не точка сети — связь пропущена.'); }
+      else { q = by.get(r); if (!q) warn.push('т.' + p.n + ': связь с т.' + r + ' — такой точки сети нет.'); }
+      if (!q || q === p) return;
+      const key = Math.min(p.n, q.n) + '-' + Math.max(p.n, q.n); if (seen.has(key)) return; seen.add(key);
+      const cas = p.code === N.cas && q.code === N.cas;
+      // состав участка — из точки трубы со связью, иначе из второго конца
+      const comp = cas ? (compOf(p.suf) || compOf(q.suf)) : [p, q].filter(z => z.code === N.pipe).map(z => compOf(z.suf)).find(Boolean) || null;
+      edges.push({ a: q, b: p, cas, comp, len: dist(p, q) });
+    });
+  });
+  if (!edges.length) throw new Error('Точки сети не соединены: в кодах нет связей «..».');
+  // труба между концом футляра и опорой: состав берём у соседней трубы (через футляр или с другой стороны)
+  for (let pass = 0; pass < 3; pass++) edges.forEach(e => {
+    if (e.cas || e.comp) return;
+    const nb = edges.filter(f => f !== e && !f.cas && f.comp && (f.a === e.a || f.b === e.a || f.a === e.b || f.b === e.b));
+    if (nb.length) { e.comp = nb[0].comp; return; }
+    // за футляром: футляр → его другой конец → труба
+    for (const v of [e.a, e.b]) {
+      const fc = edges.find(f => f.cas && (f.a === v || f.b === v)); if (!fc) continue;
+      const w = fc.a === v ? fc.b : fc.a, pe = edges.find(f => f !== fc && !f.cas && f.comp && (f.a === w || f.b === w));
+      if (pe) { e.comp = pe.comp; return; }
+    }
+  });
+  const deg = new Map(P.map(p => [p, 0])); edges.forEach(e => { deg.set(e.a, deg.get(e.a) + 1); deg.set(e.b, deg.get(e.b) + 1); });
+  P.filter(p => deg.get(p) === 0 && p.code !== N.pole).forEach(p => warn.push('т.' + p.n + ' (' + p.code + ') ни с чем не соединена.'));
+  // участки: цепочки рёбер одного вида и состава через узлы степени 2 (опора — всегда граница)
+  const adj = new Map(P.map(p => [p, []])); edges.forEach(e => { adj.get(e.a).push(e); adj.get(e.b).push(e); });
+  const same = (e, f) => e.cas === f.cas && (e.comp && e.comp.t) === (f.comp && f.comp.t);
+  const used = new Set(), runs = [];
+  edges.forEach(e0 => {
+    if (used.has(e0)) return; used.add(e0);
+    let pts = [e0.a, e0.b], es = [e0];
+    const grow = (end, sign) => { for (;;) {
+      const v = sign > 0 ? pts[pts.length - 1] : pts[0];
+      if (v.code === N.pole || deg.get(v) !== 2) return;
+      const f = adj.get(v).find(x => !used.has(x)); if (!f || !same(f, e0)) return;
+      used.add(f); const w = f.a === v ? f.b : f.a;
+      if (sign > 0) { pts.push(w); es.push(f); } else { pts.unshift(w); es.unshift(f); }
+    } };
+    grow(null, 1); grow(null, -1);
+    runs.push({ pts, cas: e0.cas, comp: e0.comp, len: es.reduce((t, x) => t + x.len, 0) });
+  });
+  // разделы ведомости: от опоры (или развилки, или конца) до следующей — независимо от футляров
+  const usedS = new Set(), secs = [];
+  edges.forEach(e0 => {
+    if (usedS.has(e0)) return; usedS.add(e0);
+    const pts = [e0.a, e0.b], es = [e0];
+    for (const sign of [1, -1]) for (;;) {
+      const v = sign > 0 ? pts[pts.length - 1] : pts[0];
+      if (v.code === N.pole || deg.get(v) !== 2) break;
+      const f = adj.get(v).find(x => !usedS.has(x)); if (!f) break;
+      usedS.add(f); const w = f.a === v ? f.b : f.a;
+      if (sign > 0) { pts.push(w); es.push(f); } else { pts.unshift(w); es.unshift(f); }
+    }
+    const pipeT = [...new Set(es.filter(x => !x.cas).map(x => x.comp ? x.comp.t : '?'))], casT = [...new Set(es.filter(x => x.cas).map(x => x.comp ? x.comp.t : '?'))];
+    secs.push({ pts, len: es.reduce((t, x) => t + x.len, 0), casLen: es.filter(x => x.cas).reduce((t, x) => t + x.len, 0), pipeT, casT });
+  });
+  const poles = P.filter(p => p.code === N.pole);
+  poles.forEach((p, i) => { p.name = names && names[i] ? names[i] : 'оп.' + (i + 1); });
+  const label = p => p.code === N.pole ? p.name : 'т.' + p.n;
+  runs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
+  secs.forEach(r => { if (r.pts[0].code !== N.pole && r.pts[r.pts.length - 1].code === N.pole) { r.pts.reverse(); } r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
+  const ord = p => p.code === N.pole ? poles.indexOf(p) : 1e6 + p.n;
+  secs.sort((a, b) => ord(a.pts[0]) - ord(b.pts[0]) || ord(a.pts[a.pts.length - 1]) - ord(b.pts[b.pts.length - 1]));
+  // итоги по составу
+  const tot = {}; runs.forEach(r => { const k = (r.cas ? 'футляр ' : 'труба ') + (r.comp ? r.comp.t : 'без состава'); tot[k] = (tot[k] || 0) + r.len; });
+  if (runs.some(r => !r.comp)) warn.push('У части участков в кодах нет состава (_1d63) — подписаны «без состава».');
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn };
+}
+function drawLine(D, m, opt) {
+  const L2 = { pipe: 'ТРАССА', cas: 'ФУТЛЯР', pole: 'ОПОРЫ', txt: 'ПОДПИСИ', otm: 'ОТМЕТКИ' };
+  m.runs.forEach(r => {
+    const c = r.pts.map(p => [p.x, p.y]);
+    D.poly(L2.pipe, c, r.cas ? 5 : 7);
+    if (r.cas) {
+      const hw = 0.25, left = [], right = [];
+      c.forEach((p, i) => { const q = unit(c[Math.max(i - 1, 0)], c[Math.min(i + 1, c.length - 1)]); left.push([p[0] - q[1] * hw, p[1] + q[0] * hw]); right.push([p[0] + q[1] * hw, p[1] - q[0] * hw]); });
+      D.poly(L2.cas, left.concat(right.reverse()), 5, true);
+    }
+    // подпись участка — на самом длинном отрезке
+    let bi = 0, bl = -1; for (let i = 1; i < c.length; i++) { const l = Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]); if (l > bl) { bl = l; bi = i; } }
+    const a = c[bi - 1], b = c[bi]; let ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+    const u = unit(a, b), n = [-u[1], u[0]], off = r.cas ? 0.75 : 0.55, mx = (a[0] + b[0]) / 2 + n[0] * off, my = (a[1] + b[1]) / 2 + n[1] * off;
+    const t = (r.cas ? 'ф-р ' : '') + (r.comp ? r.comp.t : '?') + ' L=' + fnum(r.len);
+    if (bl >= t.length * 0.36) D.text(L2.txt, t, mx, my, 0.6, ang, 1, r.cas ? 5 : 7);
+  });
+  m.poles.forEach(p => { D.circle(L2.pole, p.x, p.y, 0.35, 1); D.text(L2.pole, p.name, p.x + 0.6, p.y + 0.6, 0.9, 0, 0, 1); });
+  if (opt.marks) m.points.forEach(p => { if (p.code !== m.net.pole) D.text(L2.otm, fnum(p.H), p.x + 0.25, p.y - 0.35, 0.4, 0, 0, 3); });
+}
+function drawLineTable(D, m, x0, y0) {
+  const heads = ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр'], wd = [8, 22, 22, 22, 18, 30], rh = 7, L3 = 'Текст и таблицы';
+  D.text(L3, 'Ведомость участков — ' + m.net.name, x0, y0 + 5, 3.0, 0, 0, 7);
+  const rows = [heads].concat(m.secs.map((r, i) => [String(i + 1), r.from, r.to, r.pipeT.join(', ') || '—', fnum(r.len), r.casLen ? fnum(r.casLen) + ' (' + r.casT.join(', ') + ')' : '—']));
+  const xs = [x0]; wd.forEach(v => xs.push(xs[xs.length - 1] + v));
+  for (let r = 0; r <= rows.length; r++) D.line(L3, xs[0], y0 - r * rh, xs[xs.length - 1], y0 - r * rh, 7);
+  xs.forEach(x => D.line(L3, x, y0, x, y0 - rows.length * rh, 7));
+  rows.forEach((row, r) => row.forEach((v, c) => D.text(L3, v, (xs[c] + xs[c + 1]) / 2, y0 - r * rh - rh / 2, 2.2, 0, 1, 7)));
+  // итоги
+  const x1 = xs[xs.length - 1] + 15; let y = y0;
+  D.text(L3, 'Итого по составу', x1, y + 5, 3.0, 0, 0, 7);
+  Object.keys(m.tot).sort().forEach(k => { D.text(L3, k + ' — ' + fnum(m.tot[k]) + ' м', x1, y - rh / 2, 2.5, 0, 0, 7); y -= rh; });
+  D.text(L3, 'Опор: ' + m.poles.length, x1, y - rh / 2, 2.5, 0, 0, 7);
+  // опоры
+  y -= rh * 2; D.text(L3, 'Опоры', x1, y + 2, 3.0, 0, 0, 7);
+  m.poles.forEach(p => { y -= rh * 0.8; D.text(L3, p.name + ' — т.' + p.n + ', отм. ' + fnum(p.H), x1, y, 2.2, 0, 0, 7); });
 }
 
 // ---------------- сверка с проектом ----------------
@@ -383,5 +541,5 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
-window.ICH = { decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+window.ICH = { NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
 })();
