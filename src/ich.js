@@ -272,24 +272,54 @@ function buildLine(P0, net, names) {
   return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn };
 }
 function drawLine(D, m, opt) {
-  const L2 = { pipe: 'ТРАССА', cas: 'ФУТЛЯР', pole: 'ОПОРЫ', txt: 'ПОДПИСИ', otm: 'ОТМЕТКИ' };
+  // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
+  const L2 = { pipe: 'Кабель НО', cas: 'Футляры', pole: 'Опоры НО', txt: 'длины', otm: 'Отметки', num: 'Номера точек', dim: 'Промеры', vyn: 'П_НО (выноски)' };
+  const seg = (a, b) => { let ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180; const u = unit(a, b); return { ang, n: [-u[1], u[0]], len: Math.hypot(b[0] - a[0], b[1] - a[1]) }; };
   m.runs.forEach(r => {
     const c = r.pts.map(p => [p.x, p.y]);
-    D.poly(L2.pipe, c, r.cas ? 5 : 7);
+    D.poly(L2.pipe, c, r.cas ? 5 : 1);
     if (r.cas) {
       const hw = 0.25, left = [], right = [];
       c.forEach((p, i) => { const q = unit(c[Math.max(i - 1, 0)], c[Math.min(i + 1, c.length - 1)]); left.push([p[0] - q[1] * hw, p[1] + q[0] * hw]); right.push([p[0] + q[1] * hw, p[1] - q[0] * hw]); });
       D.poly(L2.cas, left.concat(right.reverse()), 5, true);
     }
-    // подпись участка — на самом длинном отрезке
-    let bi = 0, bl = -1; for (let i = 1; i < c.length; i++) { const l = Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]); if (l > bl) { bl = l; bi = i; } }
-    const a = c[bi - 1], b = c[bi]; let ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
-    const u = unit(a, b), n = [-u[1], u[0]], off = r.cas ? 0.75 : 0.55, mx = (a[0] + b[0]) / 2 + n[0] * off, my = (a[1] + b[1]) / 2 + n[1] * off;
-    const t = (r.cas ? 'ф-р ' : '') + (r.comp ? r.comp.t : '?') + ' L=' + fnum(r.len);
-    if (bl >= t.length * 0.36) D.text(L2.txt, t, mx, my, 0.6, ang, 1, r.cas ? 5 : 7);
+    // подпись состава — на самом длинном отрезке участка, с другой стороны от промеров
+    let bi = 1, bl = -1; for (let i = 1; i < c.length; i++) { const l = Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]); if (l > bl) { bl = l; bi = i; } }
+    const g = seg(c[bi - 1], c[bi]), mx = (c[bi - 1][0] + c[bi][0]) / 2, my = (c[bi - 1][1] + c[bi][1]) / 2;
+    const comp = r.comp, t1 = comp ? (r.cas ? comp.n + 'ПНД трубы' : comp.n + 'ПНД') : '?', t2 = comp ? 'd' + comp.d : '';
+    // «вниз» по тексту (с учётом поворота): вторая строка всегда под первой
+    const ar = g.ang * Math.PI / 180, dn = [Math.sin(ar), -Math.cos(ar)], side = opt.dims ? 1 : -1;   // промеры сверху, состав — снизу
+    const bx = mx + dn[0] * side * 0.9, by = my + dn[1] * side * 0.9;
+    if (bl >= 3) {
+      if (r.cas) { D.text(L2.txt, t1, bx, by, 0.8, g.ang, 1, 5); D.text(L2.txt, t2, bx + dn[0] * 1.1, by + dn[1] * 1.1, 0.8, g.ang, 1, 5); }
+      else D.text(L2.txt, t1 + ' ' + t2, bx, by, 0.8, g.ang, 1, 7);
+    }
   });
-  m.poles.forEach(p => { D.circle(L2.pole, p.x, p.y, 0.35, 1); D.text(L2.pole, p.name, p.x + 0.6, p.y + 0.6, 0.9, 0, 0, 1); });
-  if (opt.marks) m.points.forEach(p => { if (p.code !== m.net.pole) D.text(L2.otm, fnum(p.H), p.x + 0.25, p.y - 0.35, 0.4, 0, 0, 3); });
+  if (opt.dims) m.edges.forEach(e => {   // промеры: длина каждого отрезка между соседними точками, 1 знак
+    const a = [e.a.x, e.a.y], b = [e.b.x, e.b.y], g = seg(a, b); if (g.len < 0.05) return;
+    const ar = g.ang * Math.PI / 180, up = [-Math.sin(ar), Math.cos(ar)], mx = (a[0] + b[0]) / 2 + up[0] * 0.45, my = (a[1] + b[1]) / 2 + up[1] * 0.45;
+    D.text(L2.dim, fnum(e.len, 1), mx, my, g.len < 1.5 ? 0.5 : 0.8, g.ang, 1, 7);
+  });
+  if (opt.nums) m.points.forEach(p => { D.circle(L2.num, p.x, p.y, 0.15, 7); D.text(L2.num, String(p.n), p.x + 0.3, p.y + 0.35, 0.6, 0, 0, 3); });
+  m.poles.forEach(p => { D.circle(L2.pole, p.x, p.y, 0.35, 1); D.line(L2.vyn, p.x, p.y, p.x + 2.2, p.y + 2.2, 2); D.text(L2.vyn, p.name, p.x + 2.4, p.y + 2.4, 1.0, 0, 0, 2); });
+  if (opt.marks) m.points.forEach(p => { if (p.code !== m.net.pole) D.text(L2.otm, fnum(p.H), p.x + 0.3, p.y - 0.45, 0.4, 0, 0, 3); });
+}
+// надписи листа: КС, договор, длины — как на ваших ИЧ
+function drawNotes(D, m, info, x0, y0) {
+  const L3 = 'Надписи', trench = m.edges.reduce((t, e) => t + e.len, 0);
+  const lines = [];
+  if (info.ks) lines.push('КС N' + info.ks);
+  if (info.contract) lines.push('N Договора ' + info.contract);
+  lines.push('L траншеи - ' + fnum(trench, 1) + 'м');
+  if (info.cableL) lines.push('L кабеля ' + info.cableL);
+  lines.forEach((t, i) => D.text(L3, t, x0, y0 - i * 5, 3.0, 0, 0, 7));
+  // условные обозначения
+  const y = y0 - lines.length * 5 - 6, L4 = 'Условные обозначения';
+  D.text(L4, 'Условные обозначения', x0, y, 3.5, 0, 0, 7);
+  D.line(L4, x0, y - 6, x0 + 12, y - 6, 1); D.text(L4, '— кабель в ПНД трубе', x0 + 14, y - 6, 2.5, 0, 0, 7);
+  D.poly(L4, [[x0, y - 11.5], [x0 + 12, y - 11.5], [x0 + 12, y - 12.5], [x0, y - 12.5]], 5, true); D.text(L4, '— футляр ПНД', x0 + 14, y - 12, 2.5, 0, 0, 7);
+  D.circle(L4, x0 + 6, y - 18, 0.9, 1); D.text(L4, '— опора освещения', x0 + 14, y - 18, 2.5, 0, 0, 7);
+  return trench;
 }
 function drawLineTable(D, m, x0, y0) {
   const heads = ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр'], wd = [8, 22, 22, 22, 18, 30], rh = 7, L3 = 'Текст и таблицы';
@@ -507,6 +537,71 @@ function toDXF(D) {
   return cp1251(out.replace(/\n/g, '\r\n'));
 }
 
+
+// ---------------- Excel (.xlsx) без библиотек: zip без сжатия ----------------
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = b => { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+function zip(files) {          // files: [[имя, строка]]
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  const u16 = v => [v & 255, (v >>> 8) & 255], u32 = v => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  files.forEach(([name, text]) => {
+    const nb = enc.encode(name), data = enc.encode(text), c = crc32(data);
+    const head = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(c), u32(data.length), u32(data.length), u16(nb.length), u16(0));
+    parts.push(new Uint8Array(head), nb, data);
+    cen.push([[].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(c), u32(data.length), u32(data.length), u16(nb.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off)), nb]);
+    off += head.length + nb.length + data.length;
+  });
+  let csize = 0; cen.forEach(([h, nb]) => { parts.push(new Uint8Array(h), nb); csize += h.length + nb.length; });
+  parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(csize), u32(off), u16(0))));
+  const total = parts.reduce((t, p) => t + p.length, 0), out = new Uint8Array(total); let k = 0; parts.forEach(p => { out.set(p, k); k += p.length; });
+  return out;
+}
+const xe = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const colL = i => String.fromCharCode(65 + i);
+// каталог координат в виде, как у вас: титульный «Лист1» и лист «каталог» (№, X, Y[, Z])
+function catalogXlsx(info, pts, withZ) {
+  // стили: 0 обычный; 1 организация Arial 18 жирный по центру; 2 заголовок Times 22 по центру с переносом;
+  // 3 КС Calibri 11 жирный; 4 Arial 14; 5 Arial 14 вправо; 6 шапка по центру с рамкой; 7 ячейка с рамкой
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<fonts count="5"><font><sz val="11"/><name val="Calibri"/><family val="2"/><charset val="204"/></font><font><b/><sz val="18"/><name val="Arial"/><family val="2"/><charset val="204"/></font><font><sz val="22"/><name val="Times New Roman"/><family val="1"/><charset val="204"/></font><font><b/><sz val="11"/><name val="Calibri"/><family val="2"/><charset val="204"/></font><font><sz val="14"/><name val="Arial"/><family val="2"/><charset val="204"/></font></fonts>'
+    + '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+    + '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border></borders>'
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="8">'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    + '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
+    + '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
+    + '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="right"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/>'
+    + '</cellXfs><cellStyles count="1"><cellStyle name="Обычный" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  const cell = (ref, v, st, num) => v == null || v === '' ? (st ? '<c r="' + ref + '" s="' + st + '"/>' : '')
+    : num ? '<c r="' + ref + '" s="' + (st || 0) + '"><v>' + v + '</v></c>' : '<c r="' + ref + '" s="' + (st || 0) + '" t="inlineStr"><is><t xml:space="preserve">' + xe(v) + '</t></is></c>';
+  const row = (r, cells, ht) => '<row r="' + r + '"' + (ht ? ' ht="' + ht + '" customHeight="1"' : '') + '>' + cells.join('') + '</row>';
+  const head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">';
+  const title = '\nКаталог координат точек ' + (info.kind || 'кабеля наружного освещения') + ' на объекте:' + (info.object || '') + '\n';
+  const s1 = head + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><cols><col min="1" max="1" width="36.29" customWidth="1"/><col min="2" max="2" width="76.86" customWidth="1"/></cols><sheetData>'
+    + row(3, [cell('A3', info.org || '', 1)], 15) + row(11, [cell('A11', title, 2)], 175.5) + row(32, [cell('A32', 'КС №' + (info.ks || ''), 3)])
+    + row(38, [cell('A38', 'Составитель ' + (info.author || ''), 4), cell('B38', 'Измерения выполнены тахеометром', 5)])
+    + row(39, [cell('A39', 'Геодезист  __________.', 4), cell('B39', info.device || '', 5)])
+    + '</sheetData><mergeCells count="2"><mergeCell ref="A3:B3"/><mergeCell ref="A11:B11"/></mergeCells><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" fitToHeight="1"/></worksheet>';
+  const nc = withZ ? 4 : 3;
+  let rows = row(1, [cell('A1', 'Номер п/п', 6), cell('B1', 'Координаты', 6), cell('C1', '', 6)].concat(withZ ? [cell('D1', '', 6)] : []))
+    + row(2, [cell('A2', '', 6), cell('B2', 'X, м', 6), cell('C2', 'Y, м', 6)].concat(withZ ? [cell('D2', 'Z, м', 6)] : []));
+  pts.forEach((p, i) => { const r = i + 3; rows += row(r, [cell('A' + r, p.n, 7, true), cell('B' + r, p.y.toFixed(4), 7), cell('C' + r, p.x.toFixed(4), 7)].concat(withZ ? [cell('D' + r, p.H.toFixed(2), 7)] : [])); });
+  const s2 = head + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0"><pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+    + '<cols><col min="1" max="1" width="10.57" customWidth="1"/><col min="2" max="3" width="30.71" customWidth="1"/>' + (withZ ? '<col min="4" max="4" width="15.57" customWidth="1"/>' : '') + '</cols><sheetData>' + rows
+    + '</sheetData><mergeCells count="2"><mergeCell ref="A1:A2"/><mergeCell ref="B1:' + colL(nc - 1) + '1"/></mergeCells><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" fitToHeight="0"/></worksheet>';
+  const wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Лист1" sheetId="1" r:id="rId1"/><sheet name="каталог" sheetId="2" r:id="rId2"/></sheets><definedNames><definedName name="_xlnm.Print_Titles" localSheetId="1">каталог!$1:$2</definedName></definedNames></workbook>';
+  return zip([
+    ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+    ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ['xl/workbook.xml', wb],
+    ['xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ['xl/styles.xml', styles], ['xl/worksheets/sheet1.xml', s1], ['xl/worksheets/sheet2.xml', s2]]);
+}
+
 // ---------------- SVG-просмотр ----------------
 const COL = { 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a00', 8: '#9aa0a6' };
 function toSVG(D) {
@@ -541,5 +636,5 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
-window.ICH = { NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+window.ICH = { drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
 })();

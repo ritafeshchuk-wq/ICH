@@ -4,9 +4,10 @@
 const I = window.ICH, $ = s => document.querySelector(s), esc = I.esc, fnum = I.fnum, num = I.num;
 const KEY = 'ich.v1';
 const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'plan', view: null,
-  set: { mode: 'fact', tol: 10, profile: true, start: 'auto' }, proj: { object: '', wells: [], spans: [] } };
-try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; } } catch (e) { /* хранилище недоступно — работаем без него */ }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
+  set: { mode: 'fact', tol: 10, profile: true, start: 'auto', marks: false, dims: true, nums: true }, proj: { object: '', wells: [], spans: [] },
+  obj: { org: '', kind: 'кабеля наружного освещения', object: '', ks: '', contract: '', cableL: '', author: 'Шахмиров А.М', device: 'Nikon XF 05', z: false } };
+try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); } } catch (e) { /* хранилище недоступно — работаем без него */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
 
 // ---------- уведомления ----------
 let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
@@ -57,10 +58,43 @@ function compute() {
 function computeLine(P, net) {
   const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
   const m = I.buildLine(P, net, names), D = new I.Dwg();
-  let k = 0; I.drawLine(D, m, { marks: S.set.marks !== false }); D.mark('plan', k);
+  let k = 0; I.drawLine(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false }); D.mark('plan', k);
   const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
-  k = D.e.length; I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15); D.mark('table', k); D.mark('all', 0);
+  k = D.e.length; I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
+  m.trench = I.drawNotes(D, m, S.obj, Math.min(...xs) + 170, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
   S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
+}
+
+// точки для каталога координат: все точки выбранной сети по порядку номеров
+function catalogPoints() {
+  const n = S.netSel; if (!n || !S.parsed) return [];
+  const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+  return S.parsed.pts.filter(p => codes.includes(p.code)).sort((a, b) => a.n - b.n);
+}
+function objForm() {
+  const o = S.obj, f = (id, lab, ph) => '<label class="fld">' + lab + '<input data-obj="' + id + '" value="' + esc(o[id] || '') + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '></label>';
+  const kinds = ['кабеля наружного освещения', 'кабеля наружного освещения ожидания', 'кабеля наружного электроснабжения', 'кабельной канализации'];
+  return '<h3>Объект и каталог координат</h3><p class="hint">Для титула каталога и надписей на ИЧ. Сохраняется в браузере.</p>'
+    + f('org', 'Организация', 'ООО «…»')
+    + '<label class="fld">Каталог координат точек<select data-obj="kind">' + kinds.map(k => '<option' + (o.kind === k ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>'
+    + '<label class="fld">Объект<textarea data-obj="object" rows="3" placeholder="Комплексное благоустройство …">' + esc(o.object || '') + '</textarea></label>'
+    + '<div class="two">' + f('ks', 'КС №', '48888-23,5851-24') + f('contract', 'N договора', '6/05911-23') + '</div>'
+    + '<div class="two">' + f('author', 'Составитель') + f('device', 'Прибор') + '</div>'
+    + f('cableL', 'L кабеля (для надписи, необязательно)', 'ВБШв 4х16 - 454м')
+    + '<label class="chk"><input type="checkbox" data-obj="z"' + (o.z ? ' checked' : '') + '> Отметки Z в каталоге</label>'
+    + '<div class="row"><button class="btn" id="cat">Каталог координат (Excel)</button></div>'
+    + '<p class="fine">В каталог идут все точки сети по порядку номеров: ' + catalogPoints().length + ' шт. X — север, Y — восток, как в ваших каталогах.</p>';
+}
+function bindObj() {
+  document.querySelectorAll('[data-obj]').forEach(el => {
+    const k = el.dataset.obj;
+    el.oninput = el.onchange = () => { S.obj[k] = el.type === 'checkbox' ? el.checked : el.value; save(); if (['ks', 'contract', 'cableL'].includes(k)) later(); };
+  });
+  const b = $('#cat'); if (b) b.onclick = () => {
+    const pts = catalogPoints(); if (!pts.length) { toast('Нет точек сети для каталога.'); return; }
+    download(I.catalogXlsx(S.obj, pts, !!S.obj.z), baseName() + ' — каталог координат.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    toast('Каталог: ' + pts.length + ' точек.');
+  };
 }
 
 // ---------- открытие файлов ----------
@@ -132,7 +166,7 @@ function netsBlock() {
 function renderLine() {
   const r = S.res, m = r.m;
   let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li></ul>' + netsBlock();
-  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '</ul>';
+  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>L траншеи — <b>' + fnum(m.trench, 1) + ' м</b></li></ul>';
   if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
   side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
   if (!['plan', 'table'].includes(S.tab)) S.tab = 'plan';
@@ -141,14 +175,17 @@ function renderLine() {
     + '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>';
   const P = S.proj.poles || [];
   let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': план с опорами, трубами и футлярами, ведомость участков. Профиль для сетей без колодцев пока не строится.</p>'
-    + '<label class="chk"><input type="checkbox" id="marks"' + (S.set.marks !== false ? ' checked' : '') + '> Отметки труб на плане</label>'
+    + '<label class="chk"><input type="checkbox" id="nums"' + (S.set.nums !== false ? ' checked' : '') + '> Номера точек</label>'
+    + '<label class="chk"><input type="checkbox" id="dims"' + (S.set.dims !== false ? ' checked' : '') + '> Промеры между точками (1 знак)</label>'
+    + '<label class="chk"><input type="checkbox" id="marks"' + (S.set.marks ? ' checked' : '') + '> Отметки труб на плане</label>'
     + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="csvl">Ведомость (CSV)</button></div>'
     + '<h3>Имена опор</h3><p class="hint">По умолчанию оп.1, оп.2… в порядке номеров точек. Впишите имена из проекта или вставьте столбец из Excel (Ctrl+V).</p>'
     + '<div class="row"><button class="btn small" id="fill">' + (P.length ? 'Обновить список' : 'Заполнить по съёмке') + '</button><button class="btn small danger" id="pclear"' + (P.length ? '' : ' disabled') + '>Очистить</button></div>'
-    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Точка</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">т.' + p.n + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '');
+    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Точка</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">т.' + p.n + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '') + objForm();
   $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
   bindTop(); bindCommon();
-  $('#marks').onchange = e => { S.set.marks = e.target.checked; save(); compute(); render(); };
+  ['marks', 'dims', 'nums'].forEach(id => { $('#' + id).onchange = e => { S.set[id] = e.target.checked; save(); compute(); render(); }; });
+  bindObj();
   $('#csvl').onclick = () => {
     const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const lines = [['Сеть', m.net.name], ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр, м', 'Футляр', 'Точки']].concat(m.secs.map((x, i) => [i + 1, x.from, x.to, x.pipeT.join(', '), fnum(x.len), x.casLen ? fnum(x.casLen) : '', x.casT.join(', '), x.pts.map(p => p.n).join(' ')]), [[]], [['Итого по составу']], Object.keys(m.tot).sort().map(k => [k, fnum(m.tot[k])]));
@@ -206,7 +243,7 @@ function render() {
     + (r ? '<p class="fine">Режим: ' + esc(r.mode) + '.' + (r.rows ? ' ' + summary(r.rows) : '') + '</p>' : '')
     + '<h3>Проект</h3><p class="hint">Имена, типы и проектные значения колодцев и пролётов. Можно вставить столбцы из Excel: встаньте в ячейку и нажмите Ctrl+V.</p>'
     + '<div class="row"><button class="btn small" id="fill">Заполнить строки по съёмке</button><button class="btn small" id="pload">Открыть проект…</button><button class="btn small" id="psave"' + (proj ? '' : ' disabled') + '>Сохранить проект</button><button class="btn small danger" id="pclear"' + (S.proj.wells.length || S.proj.spans.length ? '' : ' disabled') + '>Очистить</button></div>'
-    + (S.proj.wells.length || S.proj.spans.length ? '<div class="ptwrap">' + projTables() + '</div>' : '<p class="fine">Проекта нет — ИЧ строится по съёмке, колодцы называются К-1, К-2…</p>');
+    + (S.proj.wells.length || S.proj.spans.length ? '<div class="ptwrap">' + projTables() + '</div>' : '<p class="fine">Проекта нет — ИЧ строится по съёмке, колодцы называются К-1, К-2…</p>') + objForm();
 
   app.innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
   bindTop(); bindWork();
@@ -272,12 +309,12 @@ function openDemo() {
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
 }
 let deb; const later = () => { clearTimeout(deb); deb = setTimeout(() => {
-  const a = document.activeElement, key = a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
+  const a = document.activeElement, key = a && a.dataset && a.dataset.obj ? ['[data-obj="' + a.dataset.obj + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
   save(); compute(); render();
-  if (key) { const el = key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
+  if (key) { const el = key[1] === 'sel' ? document.querySelector(key[0]) : key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
 }, 500); };
 function bindWork() {
-  bindCommon();
+  bindCommon(); bindObj();
   document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { if (b.disabled) return; S.set.mode = b.dataset.mode; save(); compute(); render(); });
   document.querySelectorAll('[data-tol]').forEach(b => b.onclick = () => { S.set.tol = +b.dataset.tol; save(); compute(); render(); });
   document.querySelectorAll('[data-well]').forEach(b => b.onclick = () => {
