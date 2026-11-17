@@ -530,14 +530,14 @@ function toDXF(D) {
   const T = window.ICH_SKEL, SKEL_LAYERS = ['0', 'Defpoints', 'POINT', 'Name', 'ELEVATION', 'Deskription', 'HV', 'HI'];
   const E = [], n3 = v => (Math.round(v * 1000) / 1000).toFixed(3); let hs = T.handleStart;
   const hex = () => (hs++).toString(16).toUpperCase(), w = (c, v) => E.push(String(c).padStart(3, ' '), String(v));
-  const layers = new Map(), lay = nm => { const t = String(nm).replace(/[<>\/\\":;?*|,=`]/g, '_'); if (!layers.has(t) && !SKEL_LAYERS.includes(t)) layers.set(t, 7); return t; };
+  const LC = D.lc || {}, layers = new Map(), lay = nm => { const t = String(nm).replace(/[<>\/\\":;?*|,=`]/g, '_'); if (!layers.has(t) && !SKEL_LAYERS.includes(t)) layers.set(t, LC[nm] || 7); return t; };
   const head = (type, e) => { w(0, type); w(5, hex()); w(330, T.msOwner); w(100, 'AcDbEntity'); w(8, lay(e.l)); if (e.c != null) w(62, e.c); };
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; const ext = (x, y) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); };
   D.e.forEach(e => {
     if (e.t === 'L') { head('LINE', e); w(100, 'AcDbLine'); w(10, n3(e.p[0][0])); w(20, n3(e.p[0][1])); w(30, '0.0'); w(11, n3(e.p[1][0])); w(21, n3(e.p[1][1])); w(31, '0.0'); e.p.forEach(q => ext(q[0], q[1])); }
     else if (e.t === 'P') { head('LWPOLYLINE', e); w(100, 'AcDbPolyline'); w(90, e.p.length); w(70, e.closed ? 1 : 0); e.p.forEach(q => { w(10, n3(q[0])); w(20, n3(q[1])); ext(q[0], q[1]); }); }
     else if (e.t === 'C') { head('CIRCLE', e); w(100, 'AcDbCircle'); w(10, n3(e.x)); w(20, n3(e.y)); w(30, '0.0'); w(40, n3(e.r)); ext(e.x, e.y); }
-    else if (e.t === 'T') { head('TEXT', e); w(100, 'AcDbText'); w(10, n3(e.x)); w(20, n3(e.y)); w(30, '0.0'); w(40, n3(e.h)); w(1, e.s); if (e.ang) w(50, n3(e.ang)); w(72, e.al); w(11, n3(e.x)); w(21, n3(e.y)); w(31, '0.0'); w(100, 'AcDbText'); w(73, 2); ext(e.x, e.y); }
+    else if (e.t === 'T') { head('TEXT', e); w(100, 'AcDbText'); w(10, n3(e.x)); w(20, n3(e.y)); w(30, '0.0'); w(40, n3(e.h)); w(1, e.s); if (e.ang) w(50, n3(e.ang)); w(72, e.al); w(11, n3(e.x)); w(21, n3(e.y)); w(31, '0.0'); w(100, 'AcDbText'); w(73, e.v == null ? 2 : e.v); ext(e.x, e.y); }
   });
   const LY = [], lw = (c, v) => LY.push(String(c).padStart(3, ' '), String(v));
   layers.forEach((col, nm) => { lw(0, 'LAYER'); lw(5, hex()); lw(330, T.layerOwner); lw(100, 'AcDbSymbolTableRecord'); lw(100, 'AcDbLayerTableRecord'); lw(2, nm); lw(70, 0); lw(62, col); lw(6, 'Continuous'); lw(370, -3); lw(390, '13'); });
@@ -618,10 +618,10 @@ const COL = { 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a
 function toSVG(D) {
   const o = [];
   D.e.forEach(e => {
-    const c = COL[e.c] || COL[7];
+    const c = e.geo ? '#aab0b8' : COL[e.c] || COL[7];
     if (e.t === 'L' || e.t === 'P') { const pts = e.p.map(q => q[0].toFixed(3) + ',' + (-q[1]).toFixed(3)).join(' '); o.push('<' + (e.t === 'P' && e.closed ? 'polygon' : 'polyline') + ' points="' + pts + '" stroke="' + c + '"/>'); }
     else if (e.t === 'C') o.push('<circle cx="' + e.x.toFixed(3) + '" cy="' + (-e.y).toFixed(3) + '" r="' + e.r + '" stroke="' + c + '"/>');
-    else if (e.t === 'T') o.push('<text x="' + e.x.toFixed(3) + '" y="' + (-e.y).toFixed(3) + '" font-size="' + (e.h * 1.4).toFixed(2) + '" fill="' + c + '" text-anchor="' + ['start', 'middle', 'end'][e.al] + '"' + (e.ang ? ' transform="rotate(' + (-e.ang) + ' ' + e.x.toFixed(3) + ' ' + (-e.y).toFixed(3) + ')"' : '') + '>' + esc(e.s) + '</text>');
+    else if (e.t === 'T') o.push('<text x="' + e.x.toFixed(3) + '" y="' + (-e.y).toFixed(3) + '" font-size="' + (e.h * 1.4).toFixed(2) + '" fill="' + c + '" text-anchor="' + ['start', 'middle', 'end'][e.al] + '"' + (e.v === 0 || e.v === 1 ? '' : e.v === 3 ? ' dominant-baseline="hanging"' : ' dominant-baseline="central"') + (e.ang ? ' transform="rotate(' + (-e.ang) + ' ' + e.x.toFixed(3) + ' ' + (-e.y).toFixed(3) + ')"' : '') + '>' + esc(e.s.replace(/%%c/gi, '⌀').replace(/%%d/gi, '°').replace(/%%p/gi, '±')) + '</text>');
   });
   return o.join('');
 }
