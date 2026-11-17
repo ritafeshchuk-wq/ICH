@@ -60,8 +60,8 @@ function computeLine(P, net) {
   const m = I.buildLine(P, net, names), D = new I.Dwg();
   let k = 0; I.drawLine(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false }); D.mark('plan', k);
   const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
-  k = D.e.length; I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
-  m.trench = I.drawNotes(D, m, S.obj, Math.min(...xs) + 170, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
+  k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
+  m.trench = I.drawNotes(D, m, S.obj, xr, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
   S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
 }
 
@@ -257,7 +257,7 @@ function checkTable() {
     + r.rows.map(x => '<tr class="k-' + x.kind + '"><td>' + esc(x.el) + '</td><td>' + esc(x.par) + '</td><td class="num">' + esc(x.pv) + '</td><td class="num">' + esc(x.fv) + '</td><td class="num">' + esc(x.d) + '</td><td class="num"><b>' + esc(x.used) + '</b></td><td>' + esc(x.note) + '</td></tr>').join('') + '</tbody></table>';
 }
 function topBar() {
-  return '<header class="top"><div class="brand"><span class="mark">ИЧ</span><span class="sep"></span><span class="sub">исполнительный чертёж<br>телефонной канализации</span></div>'
+  return '<header class="top"><div class="brand"><span class="mark">ИЧ</span><span class="sep"></span><span class="sub">исполнительный чертёж<br>по съёмке</span></div>'
     + '<div class="top-info">' + (S.file ? esc(S.file) : 'съёмка → план, профиль, ведомость и сверка с проектом') + '</div>'
     + '<div class="top-actions"><button class="btn" id="open">Открыть съёмку…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
 }

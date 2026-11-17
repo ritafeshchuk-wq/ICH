@@ -256,7 +256,7 @@ function buildLine(P0, net, names) {
       usedS.add(f); const w = f.a === v ? f.b : f.a;
       if (sign > 0) { pts.push(w); es.push(f); } else { pts.unshift(w); es.unshift(f); }
     }
-    const pipeT = [...new Set(es.filter(x => !x.cas).map(x => x.comp ? x.comp.t : '?'))], casT = [...new Set(es.filter(x => x.cas).map(x => x.comp ? x.comp.t : '?'))];
+    const pipeT = [...new Set(es.filter(x => !x.cas).map(x => x.comp ? x.comp.t : '?'))].filter((t, i, a) => t !== '?' || a.length === 1), casT = [...new Set(es.filter(x => x.cas).map(x => x.comp ? x.comp.t : '?'))];
     secs.push({ pts, len: es.reduce((t, x) => t + x.len, 0), casLen: es.filter(x => x.cas).reduce((t, x) => t + x.len, 0), pipeT, casT });
   });
   const poles = P.filter(p => p.code === N.pole);
@@ -267,8 +267,13 @@ function buildLine(P0, net, names) {
   const ord = p => p.code === N.pole ? poles.indexOf(p) : 1e6 + p.n;
   secs.sort((a, b) => ord(a.pts[0]) - ord(b.pts[0]) || ord(a.pts[a.pts.length - 1]) - ord(b.pts[b.pts.length - 1]));
   // итоги по составу
-  const tot = {}; runs.forEach(r => { const k = (r.cas ? 'футляр ' : 'труба ') + (r.comp ? r.comp.t : 'без состава'); tot[k] = (tot[k] || 0) + r.len; });
-  if (runs.some(r => !r.comp)) warn.push('У части участков в кодах нет состава (_1d63) — подписаны «без состава».');
+  const tot = {}; runs.forEach(r => { const k = (r.cas ? 'футляр ' : 'труба ') + (r.comp ? r.comp.t : '(состав не указан)'); tot[k] = (tot[k] || 0) + r.len; });
+  if (runs.some(r => !r.comp)) {
+    const bad = {}, empty = P.filter(p => (p.code === N.pipe || p.code === N.cas) && !p.suf).length;
+    P.forEach(p => { if ((p.code === N.pipe || p.code === N.cas) && p.suf && !compOf(p.suf)) bad['_' + p.suf] = (bad['_' + p.suf] || 0) + 1; });
+    const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
+    warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
+  }
   return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn };
 }
 function drawLine(D, m, opt) {
@@ -324,19 +329,21 @@ function drawNotes(D, m, info, x0, y0) {
 function drawLineTable(D, m, x0, y0) {
   const heads = ['№', 'От', 'До', 'Труба', 'Длина, м', 'в т.ч. футляр'], wd = [8, 22, 22, 22, 18, 30], rh = 7, L3 = 'Текст и таблицы';
   D.text(L3, 'Ведомость участков — ' + m.net.name, x0, y0 + 5, 3.0, 0, 0, 7);
-  const rows = [heads].concat(m.secs.map((r, i) => [String(i + 1), r.from, r.to, r.pipeT.join(', ') || '—', fnum(r.len), r.casLen ? fnum(r.casLen) + ' (' + r.casT.join(', ') + ')' : '—']));
+  const rows = [heads].concat(m.secs.map((r, i) => [String(i + 1), r.from, r.to, r.pipeT.join(', ') || '—', fnum(r.len), r.casLen ? fnum(r.casLen) + (r.casT.some(t => t !== '?') ? ' (' + r.casT.filter(t => t !== '?').join(', ') + ')' : '') : '—']));
   const xs = [x0]; wd.forEach(v => xs.push(xs[xs.length - 1] + v));
   for (let r = 0; r <= rows.length; r++) D.line(L3, xs[0], y0 - r * rh, xs[xs.length - 1], y0 - r * rh, 7);
   xs.forEach(x => D.line(L3, x, y0, x, y0 - rows.length * rh, 7));
   rows.forEach((row, r) => row.forEach((v, c) => D.text(L3, v, (xs[c] + xs[c + 1]) / 2, y0 - r * rh - rh / 2, 2.2, 0, 1, 7)));
-  // итоги
+  // итоги и опоры — колонкой справа от таблицы
   const x1 = xs[xs.length - 1] + 15; let y = y0;
   D.text(L3, 'Итого по составу', x1, y + 5, 3.0, 0, 0, 7);
   Object.keys(m.tot).sort().forEach(k => { D.text(L3, k + ' — ' + fnum(m.tot[k]) + ' м', x1, y - rh / 2, 2.5, 0, 0, 7); y -= rh; });
   D.text(L3, 'Опор: ' + m.poles.length, x1, y - rh / 2, 2.5, 0, 0, 7);
-  // опоры
   y -= rh * 2; D.text(L3, 'Опоры', x1, y + 2, 3.0, 0, 0, 7);
   m.poles.forEach(p => { y -= rh * 0.8; D.text(L3, p.name + ' — т.' + p.n + ', отм. ' + fnum(p.H), x1, y, 2.2, 0, 0, 7); });
+  // ширина колонки — по самой длинной строке (≈0,62 высоты на знак)
+  const longest = Math.max(16 * 3.0, ...Object.keys(m.tot).map(k => (k.length + 12) * 2.5), ...m.poles.map(p => (p.name.length + 22) * 2.2)) * 0.62;
+  return x1 + longest + 15;
 }
 
 // ---------------- сверка с проектом ----------------

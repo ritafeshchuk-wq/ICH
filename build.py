@@ -4,7 +4,7 @@ here = os.path.dirname(os.path.abspath(__file__)); src = os.path.join(here, 'src
 rd = lambda n: open(os.path.join(src, n), encoding='utf-8').read()
 skel = json.dumps(json.load(open(os.path.join(src, 'dxf-skeleton.json'), encoding='utf-8')), ensure_ascii=False)
 html = ('<!DOCTYPE html>\n<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">\n'
-        '<title>ИЧ — исполнительный чертёж телефонной канализации</title>\n<style>\n' + rd('style.css') + '</style></head>\n'
+        '<title>ИЧ — исполнительный чертёж по съёмке</title>\n<style>\n' + rd('style.css') + '</style></head>\n'
         '<body><div id="app"></div><input id="picker" type="file" multiple hidden><div id="toast" role="status"></div>\n'
         '<script>window.ICH_SKEL=' + skel + ';</script>\n<script>\n' + rd('ich.js') + '</script>\n<script>\n' + rd('ui.js') + '</script>\n</body></html>\n')
 html = html.replace('</script>\n<script>', '</script>\n<script>')
