@@ -137,8 +137,10 @@ function parsePoints(raw) {
   const out = [], skipped = [];
   raw.forEach(p => {
     const t = p.txt.replace(/[хХ]/g, 'x').replace(/\s+/g, ''), m = CODE_RE.exec(t);
-    if (!m || !/^\d+$/.test(p.num)) { skipped.push(p.num + ' ' + p.txt); return; }
-    out.push(Object.assign({}, p, { n: +p.num, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+    // ГНБ: номер точки локатора с глубиной до оси — «2-1.36», «102-2,49» (бывает с пробелом: «9-2 .19»)
+    const nd = /^(\d+)-(\d+[.,]\d+)$/.exec(String(p.num).replace(/\s+/g, ''));
+    if (!m || !(/^\d+$/.test(p.num) || nd)) { skipped.push(p.num + ' ' + p.txt); return; }
+    out.push(Object.assign({}, p, { n: nd ? +nd[1] : +p.num, dep: nd ? num(nd[2]) : null, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
   });
   out.sort((a, b) => a.n - b.n);
   return { pts: out, skipped };
@@ -223,6 +225,7 @@ function build(P0, startN, names, net) {
 // ---------------- сети по кодам «Абриса» ----------------
 // kind: wells — колодцы и пролёты (план, профиль, сверка), line — линия с опорами (план, ведомость), null — пока не обучена
 const NETS = [
+  { id: 'gnb', name: 'Закрытый переход (ГНБ)', pipe: '4028', own: ['4028'], kind: 'gnb' },
   { id: 'tk', name: 'Телефонная канализация', well: '476', pipe: '478', cas: '4028', neck: '47', pole: '65', own: ['476', '478'], kind: 'wells' },
   { id: 'kk', name: 'Кабельная канализация', well: '4026', pipe: '491', cas: '4028', neck: '46', pole: '65', own: ['4026'], kind: null },
   { id: 'no', name: 'Кабель НО / ЭС', pipe: '491', cas: '4028', pole: '65', own: ['491', '65'], kind: 'line' },
@@ -240,10 +243,11 @@ function detectNets(P) {
   const found = [];
   NETS.forEach(n => {
     let own = n.own.filter(c => cnt[c]);
+    if (n.id === 'gnb' && !P.some(p => p.code === '4028' && p.dep != null)) own = [];   // ГНБ — только если у точек 4028 есть глубины локатора
     if (n.id === 'no' && (cnt['4026'] || !cnt['491'])) own = [];          // 491 с обечайками 4026 — это кабельная канализация
     if (n.id === 'tep' && !cnt['4074'] && !cnt['4071'] && !cnt['4073'] && !cnt['407']) own = [];   // 47 одна — горловина ТК
     if (!own.length) return;
-    const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+    const codes = n.kind === 'gnb' ? ['4028'] : [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
     found.push({ net: n, points: P.filter(p => codes.includes(p.code)).length, codes: own.map(c => c + ' ×' + cnt[c]).join(', ') });
   });
   const known = new Set([].concat(...NETS.map(n => [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber].filter(Boolean)), ['99']));
@@ -708,7 +712,382 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
-window.ICH = { drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+window.ICH = { rnd, zip, xe, unit, cp1251, drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+})();
+</script>
+<script>
+/* ИЧ — закрытый переход методом ГНБ: профиль, план, сечения, штамп, каталог и протокол бурения.
+   Обучено по принятым ИЧ МГГТ 2692а-26 (ГНБ 6) и 3118а-26 (ГНБ 2), ТПУ «Домодедовская». */
+(function () {
+'use strict';
+const I = window.ICH, fnum = I.fnum, num = I.num, rnd = I.rnd;
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const f1 = v => rnd(v, 1).toFixed(1), f2 = v => rnd(v, 2).toFixed(2), f3 = v => rnd(v, 3).toFixed(3);
+
+// настройки перехода по умолчанию — как в принятых ИЧ
+const GNB_DEFAULT = {
+  no: '', n: 19, d: 110, sdr: '13.6', mat: 'ПЭ 100', gost: 'ГОСТ 18599-2001', dskv: 700,
+  reverse: false, chain: 0, groundA: '', groundB: '', pit: 0.70, dcorr: '',
+  cables: '', cover: '', cross: '',
+  projPlan: '', projArc: '',
+  // протокол бурения
+  city: 'г. Москва', protDate: '', pilot: 90, reams: '200, 400', reamer: 'Кодиак', locator: 'F-2', sonde: 'FX (серый)', rod: 3.05, dStart: '', dEnd: '',
+  // штамп
+  org: '', object: '', customer: 'ГКУ "ДКР"', order: '', designer: '', ops: '', yStart: '', yEnd: '', insp: 'Административная инспекция',
+  chief: '', pm: '', geod: '', chiefPost: 'Гл.инженер', pmPost: 'Рук.проекта', geodPost: 'Геодезист'
+};
+
+// ---------------- переходы в съёмке ----------------
+// точки 4028 по порядку номеров; «..» — продолжение предыдущей точки, без связи — начало нового перехода
+function gnbChains(P) {
+  const pts = P.filter(p => p.code === '4028').sort((a, b) => a.n - b.n), chains = [];
+  let cur = null;
+  pts.forEach(p => {
+    if (!p.link || !cur) { cur = [p]; chains.push(cur); return; }
+    const r = p.link.slice(2).split(',').filter(Boolean).map(Number);
+    if (r.length && !cur.some(q => q.n === r[0])) { const ch = chains.find(c => c.some(q => q.n === r[0])); if (ch) { ch.push(p); cur = ch; return; } }
+    cur.push(p);
+  });
+  return chains.filter(c => c.length >= 2 && c.some(p => p.dep != null));
+}
+
+// ---------------- расчёт ----------------
+function buildGnb(P, g) {
+  const warn = [], chains = gnbChains(P);
+  if (!chains.length) throw new Error('В съёмке нет перехода ГНБ: нужны точки 4028 с глубиной в номере («2-1.36»).');
+  const ci = Math.min(Math.max(+g.chain || 0, 0), chains.length - 1);
+  let ch = chains[ci].map(p => Object.assign({}, p));
+  if (ch[0].x > ch[ch.length - 1].x) ch.reverse();          // нумерация с запада (слева на профиле), как в принятых ИЧ
+  if (g.reverse) ch.reverse();
+  const d = (num(g.d) || 110) / 1000, Dskv = (num(g.dskv) || 700) / 1000, pit = num(g.pit) != null ? num(g.pit) : 0.70;
+  // локатор даёт глубину до оси; верх трубы = земля − глубина + поправка (по умолчанию половина d, округлённая вниз до см: d110 → 0,05)
+  const dcorr = num(g.dcorr) != null ? num(g.dcorr) : Math.floor(d * 100 / 2 + 1e-9) / 100;
+  const situ = P.filter(p => /^7\d{2,}$/.test(p.code));
+  ch.forEach((p, i) => {
+    p.k = i + 1;
+    if (p.dep != null) { p.ground = p.H; p.top = p.H - p.dep + dcorr; p.gsrc = 'съёмка'; return; }
+    p.top = p.H;                                             // приямок: отметка верха трубы снята прямо
+    const end = i === 0 || i === ch.length - 1, user = num(i === 0 ? g.groundA : i === ch.length - 1 ? g.groundB : null);
+    if (!end) warn.push('т.' + p.n + ' в середине перехода без глубины — отметка принята как верх трубы, земля = верх + ' + fnum(pit) + '.');
+    if (user != null) { p.ground = user; p.gsrc = 'введено'; return; }
+    const near = situ.filter(q => dist(q, p) < 6).sort((a, b) => dist(a, p) - dist(b, p))[0];
+    // точка ситуации рядом с приямком — только если труба под ней не мельче приямка (иначе это не земля над трубой)
+    if (near && end && near.H - p.top >= pit - 1e-9) { p.ground = near.H; p.gsrc = 'т.' + near.n + ' (' + fnum(dist(near, p), 1) + ' м)'; }
+    else { p.ground = p.top + pit; p.gsrc = 'верх + ' + fnum(pit); }
+  });
+  // в таблицу и в каталог идут округлённые отметки; глубина и уклоны — из них, чтобы цифры на ИЧ сходились между собой
+  ch.forEach(p => { p.top = rnd(p.top, 2); p.ground = rnd(p.ground, 2); });
+  const segs = [];
+  let st = 0;
+  ch.forEach((p, i) => {
+    p.st = st;
+    if (i < ch.length - 1) {
+      const q = ch[i + 1], L = dist(p, q), dh = q.top - p.top;
+      segs.push({ a: p, b: q, L, dh, i: L > 0 ? dh / L : 0, len: Math.hypot(L, dh) });
+      st += L;
+    }
+  });
+  // длины перехода — суммы того, что написано в таблице профиля (расстояния до 0,1 м, длины до 0,01 м), как в принятых ИЧ
+  const Lplan = segs.reduce((t, s) => t + rnd(s.L, 1), 0), Lprof = segs.reduce((t, s) => t + rnd(s.len, 2), 0);
+  const Lexact = segs.reduce((t, s) => t + s.L, 0);
+  ch.forEach(p => { p.depth = rnd(p.ground - p.top, 2); });
+  const minDepth = Math.min(...ch.map(p => p.depth)), maxDepth = Math.max(...ch.map(p => p.depth));
+  if (ch.some(p => p.depth < 0)) warn.push('Есть точки, где верх трубы выше земли — проверьте глубины и отметки.');
+  // кабели в трубах
+  const cables = parseCables(g.cables), used = cables.reduce((t, c) => t + c.k, 0), nP = +g.n || 1;
+  if (used > nP) warn.push('Кабелей (' + used + ') больше, чем труб (' + nP + ').');
+  return { kind: 'gnb', chains, ci, pts: ch, segs, Lplan, Lprof, Lexact, dcorr, d, Dskv, minDepth, maxDepth, cables, warn };
+}
+// «9к ВБвШВ 3x16-ЭС», «1кл ОКБ-0,22-24-П-7,0-ВОЛС» — число кабелей и подпись; цвет по назначению
+const NET_COL = [[/-?ЭС\s*$/i, 1], [/-?НО\s*$/i, 6], [/ВОЛС/i, 3], [/-?ОДН\s*$/i, 5]];
+function parseCables(txt) {
+  return String(txt || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean).map(s => {
+    const m = /^(\d+)\s*(к|кл|каб)\.?\s*(.*)$/i.exec(s), col = (NET_COL.find(c => c[0].test(s)) || [0, 7])[1];
+    return { k: m ? +m[1] : 1, s, col };
+  });
+}
+// «ПЛИТ; 4.5» — покрытие до 4,5 м от начала (по плану); последняя строка без числа — до конца
+function parseCover(txt, Ltot) {
+  let a = 0; const out = [];
+  String(txt || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean).forEach(s => {
+    const p = s.split(/\t|;/).map(x => x.trim()), to = num(p[1]);
+    const b = to != null ? Math.min(to, Ltot) : Ltot; if (b > a) out.push({ a, b, s: p[0] }); a = b;
+  });
+  return out;
+}
+// «5.0; Водопровод d400 170,49в.тр.; 170.49» — пересечение: расстояние от т.1 по плану, подпись, отметка (необязательно)
+function parseCross(txt) {
+  return String(txt || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean).map(s => { const p = s.split(/\t|;/).map(x => x.trim()); return { at: num(p[0]), s: p[1] || '', h: num(p[2]) }; }).filter(c => c.at != null);
+}
+// протокол бурения: штанги по плану от точки входа; уклон — на длине штанги, глубина — до оси на её конце
+function drillRods(m, g) {
+  const rod = num(g.rod) || 3.05, cnt = Math.floor(m.Lprof / rod + 1e-9), P = m.pts;
+  const at = (s, key) => { s = Math.min(Math.max(s, 0), m.Lexact); for (let i = 0; i < P.length - 1; i++) if (s <= P[i + 1].st + 1e-9) { const t = (s - P[i].st) / ((P[i + 1].st - P[i].st) || 1); return P[i][key] + (P[i + 1][key] - P[i][key]) * t; } return P[P.length - 1][key]; };
+  const rods = [];
+  for (let k = 1; k <= cnt; k++) {
+    const s = Math.min(rod * k, m.Lexact), s0 = rod * (k - 1);
+    const sl = Math.round((at(s, 'top') - at(s0, 'top')) / ((s - s0) || rod) * 100), dp = Math.round((at(s, 'ground') - at(s, 'top') + m.dcorr) * 100);
+    rods.push({ k, slope: (sl > 0 ? '+' : sl < 0 ? '-' : '') + Math.abs(sl), depth: dp });
+  }
+  return rods;
+}
+
+// ---------------- чертёж ----------------
+const LG = { plan: 'ГНБ_трасса', pt: 'ГНБ_точки', otm: 'ГНБ_отметки', dim: 'ГНБ_длины', prof: 'ГНБ_профиль', net: 'ГНБ_труба', grd: 'ГНБ_земля',
+  val: 'ГНБ_таблица', crs: 'ГНБ_пересечения', sec: 'ГНБ_сечения', stamp: 'ГНБ_штамп' };
+const K = 5;   // 1:100 на листе 1:500 (1 м = 1 ед. плана)
+const ROWS_G = [['Фактические отметки земли', 10], ['Отметки верха трубы', 10], ['Глубина заложения трубы', 7], ['Расстояние', 7], ['Уклон|Длина', 10],
+  ['Материал и диаметр труб', 7], ['Покрытие', 7], ['Контрольные точки', 7]];
+const pipeMark = g => 'Труба ' + (g.mat || 'ПЭ 100') + ' SDR ' + (g.sdr || '13.6') + ' ' + (g.n || 1) + 'd' + (g.d || 110) + ' ' + (g.gost || '');
+const title = g => 'Закрытый переход N' + (g.no || '');
+
+function drawGnbPlan(D, m, g, opt) {
+  const P = m.pts, c = P.map(p => [p.x, p.y]);
+  D.poly(LG.plan, c, 7);
+  P.forEach((p, i) => {
+    D.circle(LG.pt, p.x, p.y, 0.12, 7);
+    const q = P[Math.min(i + 1, P.length - 1)], r = P[Math.max(i - 1, 0)], u = I.unit([r.x, r.y], [q.x, q.y]);
+    const nx = u[1], ny = -u[0];   // номер — справа от хода (снизу), отметка — слева (сверху)
+    D.text(LG.pt, String(p.k), p.x + nx * 1.2, p.y + ny * 1.2 - 0.3, 1.0, 0, 1, 7);
+    if (opt.marks) D.text(LG.otm, f2(p.top), p.x - nx * 0.8, p.y - ny * 0.8, 0.3, 0, 1, 2);
+  });
+  // «L=3.90» на выносках над каждым отрезком, как в принятых ИЧ
+  m.segs.forEach((s, i) => {
+    const mx = (s.a.x + s.b.x) / 2, my = (s.a.y + s.b.y) / 2, u = I.unit([s.a.x, s.a.y], [s.b.x, s.b.y]);
+    let nx = -u[1], ny = u[0]; if (ny < 0) { nx = -nx; ny = -ny; }
+    const k = 4 + (i % 2) * 2.5, lx = mx + nx * k, ly = my + ny * k, t = 'L=' + f2(rnd(s.L, 1));
+    D.line(LG.dim, mx, my, lx, ly, 7); D.line(LG.dim, lx, ly, lx - t.length * 0.62, ly, 7);
+    D.text(LG.dim, t, lx - t.length * 0.31, ly + 0.65, 1.0, 0, 1, 7);
+  });
+  // выноска с составом перехода
+  const s = m.segs[Math.floor(m.segs.length / 2)], mx = (s.a.x + s.b.x) / 2, my = (s.a.y + s.b.y) / 2;
+  const tx = mx - 3, ty = my - 12, lines = ['Закрытый переход методом ГНБ N' + (g.no || ''), (g.n || 1) + ' труб d' + (g.d || 110) + ' ' + (g.mat || '') + ' SDR ' + (g.sdr || ''), 'Lв плане=' + fnum(m.Lplan) + 'м', 'Lв профиле=' + fnum(m.Lprof) + 'м'];
+  D.line(LG.dim, mx, my, tx, ty + 0.6, 7); D.line(LG.dim, tx, ty + 0.6, tx + lines[0].length * 0.62, ty + 0.6, 7);
+  lines.forEach((t, i) => D.text(LG.dim, t, tx, ty - i * 1.6, 1.0, 0, 0, 7));
+}
+
+function drawGnbProfile(D, m, g, X0, Ytop) {
+  const P = m.pts, Lt = m.Lexact;
+  const hs = P.map(p => p.top - m.Dskv).concat(parseCross(g.cross).filter(c => c.h != null).map(c => c.h));
+  const Hc = Math.floor(Math.min(...hs) - 1), Hmax = Math.max(...P.map(p => p.ground)) + 1;
+  const YB = Ytop - (Hmax - Hc) * K;                       // условный горизонт — верх таблицы
+  const X = st => X0 + st * K, Y = h => YB + (h - Hc) * K, xr = X(Lt);
+  const xl = X0 - 70, xh = X0 - 12;
+  // заголовок
+  const tl = [['Продольный профиль', 2.0], [title(g), 2.0], ['длина по плану ' + fnum(m.Lplan) + 'м', 2.0], ['длина по профилю ' + fnum(m.Lprof) + 'м', 2.0]];
+  tl.forEach((t, i) => D.text(LG.prof, t[0], (X0 + xr) / 2, Y(Hmax) + 16 - i * 3, t[1], 0, 1, 7));
+  // линейка высот
+  D.line(LG.prof, xh, YB, xh, Y(Math.ceil(Hmax)), 7);
+  for (let h = Hc; h <= Math.ceil(Hmax); h++) { D.line(LG.prof, xh - 1, Y(h), xh, Y(h), 7); if (h % 2 === 1 || h === Hc) D.text(LG.prof, f2(h), xh - 1.5, Y(h), 1.5, 0, 2, 7); }
+  [['Продольный профиль', 2.0], ['М вертикальный 1:100', 2.0], ['М горизонтальный 1:100', 2.0], ['Условный горизонт ' + f2(Hc) + 'м', 2.0]]
+    .forEach((t, i) => D.text(LG.prof, t[0], xl, YB + 12 - i * 3, t[1], 0, 0, 7));
+  // таблица
+  const ys = [YB]; ROWS_G.forEach(r => ys.push(ys[ys.length - 1] - r[1]));
+  const mid = i => (ys[i] + ys[i + 1]) / 2;
+  ys.forEach(y => D.line(LG.val, xl, y, xr, y, 7));
+  [xl, X0].forEach(x => D.line(LG.val, x, ys[0], x, ys[ys.length - 1], 7)); D.line(LG.val, xr, ys[0], xr, ys[ys.length - 1], 7);
+  ROWS_G.forEach(([nm], i) => {
+    if (nm.includes('|')) { const [a, b] = nm.split('|'); D.text(LG.val, a, X0 - 2, ys[i] - 2.5, 2.0, 0, 2, 7); D.text(LG.val, b, xl + 1.5, ys[i + 1] + 2.5, 2.0, 0, 0, 7); D.line(LG.val, xl, ys[i], X0, ys[i + 1], 7); }
+    else D.text(LG.val, nm, xl + 1.5, mid(i), 2.0, 0, 0, 7);
+  });
+  // земля, труба, скважина
+  D.poly(LG.grd, P.map(p => [X(p.st), Y(p.ground)]), 7);
+  D.poly(LG.net, P.map(p => [X(p.st), Y(p.top)]), 7);
+  D.poly(LG.net, P.map(p => [X(p.st), Y(p.top - m.Dskv)]), 7);
+  P.forEach(p => {
+    const x = X(p.st);
+    D.line(LG.prof, x, Y(p.ground), x, YB, 7);
+    D.line(LG.val, x, ys[0], x, ys[3], 7); D.line(LG.val, x, ys[3], x, ys[5], 7);
+    D.text(LG.val, f2(p.ground), x - 0.9, mid(0), 1.5, 90, 1, 7);
+    D.text(LG.val, f2(p.top), x - 0.9, mid(1), 1.5, 90, 1, 7);
+    D.text(LG.val, f2(p.depth), x - 0.9, mid(2), 1.5, 90, 1, 7);
+    D.circle(LG.val, x, mid(7), 1.0, 7); D.text(LG.val, String(p.k), x, mid(7), 1.3, 0, 1, 7);
+  });
+  m.segs.forEach(s => {
+    const xa = X(s.a.st), xb = X(s.b.st), xm = (xa + xb) / 2, down = s.dh < 0;
+    D.text(LG.val, f1(s.L), xm, mid(3), 1.5, 0, 1, 7);
+    // уклон — над диагональю, длина — под ней; диагональ — по направлению уклона
+    if (down) { D.line(LG.val, xa, ys[4], xb, ys[5], 7); D.text(LG.val, f3(Math.abs(s.i)), xb - 0.6, ys[4] - 2.2, 1.5, 0, 2, 7); D.text(LG.val, f2(s.len), xa + 0.6, ys[5] + 2.2, 1.5, 0, 0, 7); }
+    else { D.line(LG.val, xa, ys[5], xb, ys[4], 7); D.text(LG.val, f3(Math.abs(s.i)), xa + 0.6, ys[4] - 2.2, 1.5, 0, 0, 7); D.text(LG.val, f2(s.len), xb - 0.6, ys[5] + 2.2, 1.5, 0, 2, 7); }
+  });
+  D.text(LG.val, pipeMark(g), (X0 + xr) / 2, mid(5), 1.5, 0, 1, 7);
+  parseCover(g.cover, Lt).forEach((c, i, a) => { if (i < a.length - 1) D.line(LG.val, X(c.b), ys[6], X(c.b), ys[7], 7); D.text(LG.val, c.s, (X(c.a) + X(c.b)) / 2, mid(6), 1.5, 0, 1, 7); });
+  // пересечения с коммуникациями
+  const gAt = s => { for (let i = 0; i < P.length - 1; i++) if (s <= P[i + 1].st + 1e-9) { const t = (s - P[i].st) / ((P[i + 1].st - P[i].st) || 1); return P[i].ground + (P[i + 1].ground - P[i].ground) * t; } return P[P.length - 1].ground; };
+  parseCross(g.cross).forEach(c => {
+    const s = Math.min(Math.max(c.at, 0), Lt), x = X(s), yg = Y(gAt(s)), yb = c.h != null ? Y(c.h) : YB;
+    D.line(LG.crs, x, yg, x, yb, 7); if (c.h != null) D.circle(LG.crs, x, yb, 0.4, 7);
+    D.text(LG.crs, c.s, x - 0.8, YB + 1, 1.5, 90, 0, 7);
+  });
+  // знаки сечений 1-1 и 2-2
+  [[X0, '1', -1], [xr, '2', 1]].forEach(([x, t, sd]) => {
+    const p = sd < 0 ? P[0] : P[P.length - 1];
+    [Y(p.ground) + 3, Y(p.top) - 1].forEach(y => { D.line(LG.sec, x, y, x + sd * 2.2, y, 7); D.text(LG.sec, t, x + sd * 2.2, y + 1.6, 2.5, 0, 1, 7); });
+  });
+  return { yb: ys[ys.length - 1], xl, xr, ytop: Y(Hmax) + 4 };
+}
+
+// упаковка труб в скважине: ближайшие узлы шестиугольной сетки (с центром в узле или в центре треугольника)
+function pack(n) {
+  const best = [];
+  [[0, 0], [0.5, Math.sqrt(3) / 6]].forEach(o => {
+    const c = [];
+    for (let j = -6; j <= 6; j++) for (let i = -6; i <= 6; i++) { const x = i + (j % 2 ? 0.5 : 0) - o[0], y = j * Math.sqrt(3) / 2 - o[1]; c.push([x, y]); }
+    c.sort((a, b) => Math.hypot(...a) - Math.hypot(...b) || b[1] - a[1] || a[0] - b[0]);
+    const pick = c.slice(0, n), R = Math.max(...pick.map(q => Math.hypot(...q)));
+    best.push({ pick, R });
+  });
+  best.sort((a, b) => a.R - b.R);
+  // нумерация — сверху вниз, слева направо
+  return best[0].pick.sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+}
+function drawSection(D, m, g, cx, cy, label, mirror) {
+  const S = 25, R = m.Dskv / 2 * S, r = m.d / 2 * S, n = +g.n || 1, pos = pack(n).map(q => [q[0] * m.d * S * (mirror ? -1 : 1), q[1] * m.d * S]);
+  D.text(LG.sec, 'Сечение перехода ' + label, cx, cy + R + 6, 1.5, 0, 1, 7);
+  D.circle(LG.sec, cx, cy, R, 7);
+  D.line(LG.sec, cx - R - 2, cy, cx + R + 2, cy, 8); D.line(LG.sec, cx, cy - R - 2, cx, cy + R + 2, 8);
+  const occ = []; m.cables.forEach(c => { for (let k = 0; k < c.k; k++) occ.push(c); });
+  pos.forEach((q, i) => {
+    D.circle(LG.sec, cx + q[0], cy + q[1], r * 0.96, 7);
+    D.text(LG.sec, String(i + 1), cx + q[0], cy + q[1] + r * 0.2, Math.min(2.2, r * 0.9), 0, 1, 7);
+    if (occ[i]) D.circle(LG.sec, cx + q[0], cy + q[1] - r * 0.45, 0.25, occ[i].col);
+  });
+  D.line(LG.sec, cx - R * 0.7, cy + R * 0.7, cx - R - 6, cy + R + 2, 7); D.text(LG.sec, 'Дскв=' + (g.dskv || '') + ' мм', cx - R - 7, cy + R + 2.7, 1.25, 0, 2, 7);
+  const lp = pos[pos.length - 1] || [0, 0];
+  D.line(LG.sec, cx + lp[0], cy + lp[1], cx - R - 6, cy - R - 2, 7); D.text(LG.sec, 'Дтр=' + (g.d || '') + ' мм', cx - R - 7, cy - R - 1.3, 1.25, 0, 2, 7);
+  // подписи кабелей: по группам, справа и слева, цветом назначения
+  let k = 0;
+  m.cables.forEach((c, j) => {
+    const q = pos[Math.min(k, pos.length - 1)]; k += c.k;
+    const side = (j % 2 ? -1 : 1) * (mirror ? -1 : 1), y = cy + R - 3 - Math.floor(j / 2) * 4;
+    const xe = cx + side * (R + 4);
+    D.line(LG.sec, cx + q[0], cy + q[1], xe, y, c.col); D.line(LG.sec, xe, y, xe + side * c.s.length * 0.8, y, c.col);
+    D.text(LG.sec, c.s, xe + side * 0.5, y + 0.9, 1.25, 0, side > 0 ? 0 : 2, c.col);
+  });
+}
+
+const wrap = (t, n) => { const out = []; let cur = ''; String(t).split(/\s+/).filter(Boolean).forEach(w => { if (cur && (cur + ' ' + w).length > n) { out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w; }); if (cur) out.push(cur); return out; };
+// штамп как в принятых ИЧ (размеры листа в мм × 0,5 — для печати плана в 1:500)
+function drawStamp(D, m, g, x0, y0) {
+  const k = 0.5, W = 107 * k, obj = wrap(g.object || '', 52), rows = [[8, g.org || 'ООО «…»'], [Math.max(18, 6 + obj.length * 3.4), ['Исполнительный чертеж трассы ГНБ ' + (g.no || '') + ' по объекту:'].concat(obj).join('|')], [12, g.insp || ''],
+    [12, ['Заказчик ' + (g.customer || ''), 'Заказ|' + (g.order || '')]], [10, ['Проектная мастерская', g.designer || '']], [10, ['Стр-во начато: ' + (g.yStart || ''), 'Согл. с ОПС № ' + (g.ops || '')]],
+    [10, ['Стр-во закончено: ' + (g.yEnd || ''), 'Масштаб гориз. 1:500']], [7.5, ['Должность', 'Подпись', 'Ф.И.О.', 'Дата']],
+    [7.5, [g.chiefPost || '', '', g.chief || '', '']], [7.5, [g.pmPost || '', '', g.pm || '', '']], [7.5, [g.geodPost || '', '', g.geod || '', '']]];
+  let y = y0; const xs4 = [0, 26, 47, 85, 107].map(v => x0 + v * k), xs2 = [x0, x0 + 46 * k, x0 + W];
+  D.text(LG.stamp, 'Lпл=' + fnum(m.Lplan) + 'м', x0, y0 + 3.4, 1.2, 0, 0, 7); D.text(LG.stamp, 'Lпроф=' + fnum(m.Lprof) + 'м', x0, y0 + 1.6, 1.2, 0, 0, 7);
+  D.line(LG.stamp, x0, y, x0 + W, y, 7);
+  rows.forEach(([h, v]) => {
+    const hh = h * k, ym = y - hh / 2;
+    if (Array.isArray(v)) {
+      const xs = v.length === 4 ? xs4 : xs2;
+      xs.forEach(x => D.line(LG.stamp, x, y, x, y - hh, 7));
+      v.forEach((t, i) => { const ps = String(t).split('|'); ps.forEach((p, j) => D.text(LG.stamp, p, xs[i] + 1, ym + (ps.length - 1) * 0.8 - j * 1.6, 1.2, 0, 0, 7)); });
+    } else {
+      D.line(LG.stamp, x0, y, x0, y - hh, 7); D.line(LG.stamp, x0 + W, y, x0 + W, y - hh, 7);
+      const ps = String(v).split('|'); ps.forEach((p, j) => D.text(LG.stamp, p, x0 + W / 2, ym + (ps.length - 1) * 0.8 - j * 1.6, 1.2, 0, 1, 7));
+    }
+    y -= hh; D.line(LG.stamp, x0, y, x0 + W, y, 7);
+  });
+  return y;
+}
+
+function drawGnb(D, m, g, opt) {
+  let k = D.e.length; drawGnbPlan(D, m, g, opt); D.mark('plan', k);
+  const xs = m.pts.map(p => p.x), ys = m.pts.map(p => p.y);
+  const X0 = Math.max(...xs) + 120, Ytop = Math.max(...ys) + 10;
+  k = D.e.length;
+  const pr = drawGnbProfile(D, m, g, X0, Ytop);
+  const xr = pr.xr, R = m.Dskv / 2 * 25;
+  drawSection(D, m, g, X0 + R + 25, pr.ytop + R + 8, '1-1', false);
+  drawSection(D, m, g, xr - R - 25, pr.ytop + R + 8, '2-2', true);
+  D.mark('profile', k);
+  k = D.e.length; drawStamp(D, m, g, xr - 107 * 0.5, pr.yb - 15); D.mark('stamp', k);
+  D.mark('all', 0);
+}
+
+// ---------------- Excel ----------------
+const xe = I.xe;
+function sheetXml(cols, rows, merges, extra) {
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+    + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><cols>' + cols.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>').join('') + '</cols><sheetData>' + rows + '</sheetData>'
+    + (merges.length ? '<mergeCells count="' + merges.length + '">' + merges.map(r => '<mergeCell ref="' + r + '"/>').join('') + '</mergeCells>' : '')
+    + '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="portrait" fitToHeight="0"/>' + (extra || '') + '</worksheet>';
+}
+const cellX = (ref, v, st, isNum) => v == null || v === '' ? '<c r="' + ref + '" s="' + (st || 0) + '"/>'
+  : isNum ? '<c r="' + ref + '" s="' + (st || 0) + '"><v>' + v + '</v></c>' : '<c r="' + ref + '" s="' + (st || 0) + '" t="inlineStr"><is><t xml:space="preserve">' + xe(v) + '</t></is></c>';
+const rowX = (r, cells, ht) => '<row r="' + r + '"' + (ht ? ' ht="' + ht + '" customHeight="1"' : '') + '>' + cells.join('') + '</row>';
+function book(sheets, styles) {
+  const names = sheets.map(s => s[0]);
+  return I.zip([
+    ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      + names.map((n, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+    ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ['xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + names.map((n, i) => '<sheet name="' + xe(n) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>'],
+    ['xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + names.map((n, i) => '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId99" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ['xl/styles.xml', styles]].concat(sheets.map((s, i) => ['xl/worksheets/sheet' + (i + 1) + '.xml', s[1]])));
+}
+// каталог ГНБ — как в 2692а-26: № точки, X, Y, H, «в.тр.»; X — север
+function catalogGnbXlsx(m) {
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="0.000"/><numFmt numFmtId="165" formatCode="0.00"/></numFmts>'
+    + '<fonts count="1"><font><sz val="11"/><name val="Calibri"/><family val="2"/><charset val="204"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+    + '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5">'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
+    + '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '<xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '</cellXfs><cellStyles count="1"><cellStyle name="Обычный" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  let rows = rowX(1, [cellX('A1', 'Номер точки', 1), cellX('B1', 'Координаты', 1), cellX('C1', '', 1), cellX('D1', 'H', 1), cellX('E1', '', 1)])
+    + rowX(2, [cellX('A2', '', 1), cellX('B2', 'X', 1), cellX('C2', 'Y', 1), cellX('D2', '', 1), cellX('E2', '', 1)]);
+  m.pts.forEach((p, i) => { const r = i + 3; rows += rowX(r, [cellX('A' + r, p.k, 4, true), cellX('B' + r, rnd(p.y, 3), 2, true), cellX('C' + r, rnd(p.x, 3), 2, true), cellX('D' + r, rnd(p.top, 2), 3, true), cellX('E' + r, 'в.тр.', 4)]); });
+  return book([['Лист1', sheetXml([14.33, 12.66, 12.66, 9.22, 8], rows, ['A1:A2', 'B1:C1', 'D1:E2'])]], styles);
+}
+// протокол бурения — как у АМС-Компании: Times New Roman 12, три колонки по 24 штанги
+function protocolXlsx(m, g, rods) {
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<fonts count="2"><font><sz val="12"/><name val="Times New Roman"/><family val="1"/><charset val="204"/></font><font><b/><sz val="12"/><name val="Times New Roman"/><family val="1"/><charset val="204"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+    + '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5">'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    + '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+    + '<xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '</cellXfs><cellStyles count="1"><cellStyle name="Обычный" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  const reams = String(g.reams || '').split(/[,;\s]+/).map(num).filter(v => v != null), pull = num(g.dskv) || 700, R = g.reamer || 'Кодиак';
+  const works = ['Пройдена пилотная скважина                                        ∅' + (g.pilot || 90) + ' мм']
+    .concat(reams.map(v => 'Расширение скважины расширителем «' + R + '»         ∅' + v + ' мм'), ['Протяжка трубы с расширителем «' + R + '»                 ∅' + pull + ' мм']).map((t, i) => (i + 1) + '. ' + t);
+  let r = 1, out = '';
+  const line = (t, st, ht) => { out += rowX(r, [cellX('A' + r, t, st || 0)], ht); r++; };
+  line('Протокол бурения ', 1);
+  line(' ' + (g.city || 'г. Москва') + '                                                                                                        ' + (g.protDate || ''));
+  r++;
+  const rObj = r; line('Объект: ' + (g.object || ''), 2, 32);
+  line('Заказчик:  ' + (g.customer || ''));
+  line('Выполненные работы:');
+  works.forEach(t => line(t));
+  line('Тип локационной системы: ' + (g.locator || ''));
+  line('Тип зонда:   ' + (g.sonde || ''));
+  line('Начало работ: ' + (g.dStart || ''));
+  line('Окончание работ: ' + (g.dEnd || ''));
+  r++;
+  const h = ['№ шт.', 'Уклон в   %', 'Глубина в   см', '№  шт.', 'Уклон в %', 'Глубина в см ', '№ ', 'Уклон в  %', 'Глубина в  см'];
+  out += rowX(r, h.map((t, i) => cellX(String.fromCharCode(65 + i) + r, t, 3)), 32); r++;
+  const by = new Map(rods.map(x => [x.k, x]));
+  for (let i = 1; i <= 24; i++) {
+    const c = [];
+    [i, i + 24, i + 48].forEach((k, j) => { const L = String.fromCharCode(65 + j * 3), x = by.get(k);
+      c.push(cellX(L + r, k, 3, true), cellX(String.fromCharCode(66 + j * 3) + r, x ? x.slope : '', 4), x ? cellX(String.fromCharCode(67 + j * 3) + r, x.depth, 3, true) : cellX(String.fromCharCode(67 + j * 3) + r, '', 3)); });
+    out += rowX(r, c); r++;
+  }
+  r++;
+  line('                                          Длина 1 буровой штанги — ' + String(num(g.rod) || 3.05).replace('.', ',') + ' метра.');
+  r++;
+  line(' ' + (g.chiefPost === 'Гл.инженер' || !g.chiefPost ? 'Гл. инженер' : g.chiefPost) + '    ' + (g.org || '') + '___________________' + (g.chief || '').replace(/\.$/, ''));
+  if (rods.length > 72) out += '';
+  return book([['Sheet1', sheetXml([8.78, 8.78, 8.78, 7.66, 8.78, 8.78, 7.78, 8.78, 8.89, 8.22], out, ['A1:I1', 'A' + rObj + ':I' + rObj])]], styles);
+}
+
+Object.assign(I, { GNB_DEFAULT, gnbChains, buildGnb, drillRods, drawGnb, catalogGnbXlsx, protocolXlsx, parseCover, parseCross, parseCables, gnbPipeMark: pipeMark });
 })();
 </script>
 <script>
@@ -720,8 +1099,9 @@ const KEY = 'ich.v1';
 const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'plan', view: null,
   set: { mode: 'fact', tol: 10, profile: true, start: 'auto', marks: false, dims: true, nums: true }, proj: { object: '', wells: [], spans: [] },
   obj: { org: '', kind: 'кабеля наружного освещения', object: '', ks: '', contract: '', cableL: '', author: 'Шахмиров А.М', device: 'Nikon XF 05', z: false } };
-try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); } } catch (e) { /* хранилище недоступно — работаем без него */ }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
+S.gnb = Object.assign({}, I.GNB_DEFAULT);
+try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); if (st.gnb) Object.assign(S.gnb, st.gnb); } } catch (e) { /* хранилище недоступно — работаем без него */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
 
 // ---------- уведомления ----------
 let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
@@ -741,6 +1121,7 @@ function compute() {
     const net = S.netSel = f.net;
     if (!net.kind) throw new Error('Сеть «' + net.name + '» распознана, но ИЧ для неё программа пока не строит. Пришлите образец ИЧ этой сети — научим.');
     if (net.kind === 'line') { computeLine(P, net); return; }
+    if (net.kind === 'gnb') { computeGnb(P); return; }
     const proj = hasProject() ? S.proj : null;
     const names = proj ? proj.wells.map(w => w.name) : null;
     const startN = S.set.start === 'auto' ? null : +S.set.start;
@@ -777,6 +1158,15 @@ function computeLine(P, net) {
   k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
   m.trench = I.drawNotes(D, m, S.obj, xr, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
   S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
+}
+
+function computeGnb(P) {
+  const g = S.gnb, m = I.buildGnb(P, g), D = new I.Dwg();
+  I.drawGnb(D, m, g, { marks: g.marks !== false });
+  const rods = I.drillRods(m, g), rows = [];
+  const cmp = (par, pv, fv) => { pv = num(pv); if (pv == null) return; const d = fv - pv; rows.push({ par, pv: fnum(pv), fv: fnum(fv), d: (d >= 0 ? '+' : '−') + fnum(Math.abs(d)), bad: Math.abs(d) > 0.5 }); };
+  cmp('Длина в плане, м', g.projPlan, m.Lplan); cmp('Длина по дуге (профилю), м', g.projArc, m.Lprof);
+  S.res = { kind: 'gnb', D, m, rods, rows, warn: m.warn, mode: 'ГНБ: профиль, план, сечения, штамп' };
 }
 
 // точки для каталога координат: все точки выбранной сети по порядку номеров
@@ -822,7 +1212,7 @@ async function openFile(f) {
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
     if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
+    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan'; S.gnb.chain = 0; S.gnb.groundA = S.gnb.groundB = '';
     compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
@@ -872,7 +1262,7 @@ function netsBlock() {
   const d = S.det; if (!d) return '';
   let h = '<h3 class="sh">Сети в съёмке</h3>';
   if (!d.found.length) h += '<p class="fine">Не распознано ни одной сети.</p>';
-  h += '<div class="nets">' + d.found.map(f => '<button class="net' + (S.netSel === f.net ? ' on' : '') + '" data-net="' + f.net.id + '"><b>' + esc(f.net.name) + '</b><span>' + esc(f.codes) + '</span><em class="' + (f.net.kind ? 'yes' : 'no') + '">' + (f.net.kind === 'wells' ? 'ИЧ: план, профиль, сверка' : f.net.kind === 'line' ? 'ИЧ: план и ведомость' : 'пока не обучена') + '</em></button>').join('') + '</div>';
+  h += '<div class="nets">' + d.found.map(f => '<button class="net' + (S.netSel === f.net ? ' on' : '') + '" data-net="' + f.net.id + '"><b>' + esc(f.net.name) + '</b><span>' + esc(f.codes) + '</span><em class="' + (f.net.kind ? 'yes' : 'no') + '">' + (f.net.kind === 'wells' ? 'ИЧ: план, профиль, сверка' : f.net.kind === 'line' ? 'ИЧ: план и ведомость' : f.net.kind === 'gnb' ? 'ИЧ: профиль, сечения, протокол' : 'пока не обучена') + '</em></button>').join('') + '</div>';
   if (d.situ) h += '<p class="fine">Ситуация (7…): ' + d.situ + ' т. — в ИЧ не входит.</p>';
   if (d.unknown.length) h += '<p class="issue">Неизвестные коды: ' + esc(d.unknown.join(', ')) + '</p>';
   return h;
@@ -915,15 +1305,78 @@ function renderLine() {
   });
   bindView();
 }
+// ---------- ГНБ ----------
+function gnbField(id, lab, ph, wide) {
+  const v = S.gnb[id] == null ? '' : String(S.gnb[id]);
+  if (wide) return '<label class="fld">' + lab + '<textarea data-g="' + id + '" rows="' + wide + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '>' + esc(v) + '</textarea></label>';
+  return '<label class="fld">' + lab + '<input data-g="' + id + '" value="' + esc(v) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '></label>';
+}
+const gchk = (id, lab) => '<label class="chk"><input type="checkbox" data-g="' + id + '"' + (S.gnb[id] === true || (id === 'marks' && S.gnb[id] !== false) ? ' checked' : '') + '> ' + lab + '</label>';
+function renderGnb() {
+  const r = S.res, m = r.m, g = S.gnb, f2 = v => fnum(v, 2);
+  let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек перехода: ' + m.pts.length + ' (т.' + m.pts[0].n + ' → т.' + m.pts[m.pts.length - 1].n + ')</li>'
+    + '<li>L в плане — <b>' + f2(m.Lplan) + ' м</b>, по профилю — <b>' + f2(m.Lprof) + ' м</b></li><li>глубина трубы ' + f2(m.minDepth) + '…' + f2(m.maxDepth) + ' м</li><li>штанг ' + (num(g.rod) || 3.05) + ' м: ' + r.rods.length + '</li></ul>' + netsBlock();
+  if (m.chains.length > 1) side += '<h3 class="sh">Переходы в съёмке</h3><div class="nets">' + m.chains.map((c, i) => '<button class="net' + (i === m.ci ? ' on' : '') + '" data-chain="' + i + '"><b>т.' + c[0].n + '…т.' + c[c.length - 1].n + '</b><span>' + c.length + ' точек</span></button>').join('') + '</div>';
+  side += '<h3 class="sh">Точки</h3><table class="sum" style="font-size:11.5px;width:100%;table-layout:fixed"><tr><th>№</th><th>т.</th><th>верх</th><th>земля</th><th>глуб.</th></tr>' + m.pts.map(p => '<tr><td>' + p.k + '</td><td>' + p.n + '</td><td>' + f2(p.top) + '</td><td title="' + esc(p.gsrc) + '">' + f2(p.ground) + (p.gsrc !== 'съёмка' ? '*' : '') + '</td><td>' + f2(p.depth) + '</td></tr>').join('') + '</table>'
+    + '<p class="fine">* земля у приямка: ' + esc(m.pts[0].gsrc) + ' / ' + esc(m.pts[m.pts.length - 1].gsrc) + '. Верх трубы = земля − глубина локатора + ' + fnum(m.dcorr) + '.</p>';
+  if (r.rows.length) side += '<h3 class="sh">Сверка с проектом</h3><table class="sum"><tr><th></th><th>проект</th><th>факт</th><th>разн.</th></tr>' + r.rows.map(x => '<tr' + (x.bad ? ' class="k-diff"' : '') + '><td>' + esc(x.par) + '</td><td>' + x.pv + '</td><td>' + x.fv + '</td><td>' + x.d + '</td></tr>').join('') + '</table>';
+  if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
+  const tabs = [['all', 'Лист'], ['plan', 'План'], ['profile', 'Профиль'], ['stamp', 'Штамп']];
+  if (!tabs.some(t => t[0] === S.tab)) S.tab = 'all';
+  const desk = '<div class="tabs">' + tabs.map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
+    + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
+    + '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke-width="1" vector-effect="non-scaling-stroke">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>';
+  const dists = m.pts.map(p => 'т.' + p.k + ' — ' + fnum(p.st, 1)).join(', ');
+  const card = '<div class="card-head"><h2>Закрытый переход</h2></div>'
+    + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="gcat">Каталог (Excel)</button><button class="btn" id="gprot">Протокол бурения</button></div>'
+    + '<div class="two">' + gnbField('no', 'ГНБ №', '6') + gnbField('n', 'Труб, шт') + '</div>'
+    + '<div class="two">' + gnbField('d', 'Труба d, мм') + gnbField('dskv', 'Скважина Дскв, мм') + '</div>'
+    + '<div class="two">' + gnbField('mat', 'Материал') + gnbField('sdr', 'SDR') + '</div>' + gnbField('gost', 'ГОСТ')
+    + gchk('reverse', 'Нумерация с другого конца') + gchk('marks', 'Отметки верха трубы на плане')
+    + '<details open><summary>Земля у приямков и глубины</summary><p class="hint">Пусто — берётся ближайшая точка ситуации (7…) в 6 м, если труба под ней не мельче приямка; иначе верх трубы + глубина приямка.</p>'
+    + '<div class="two">' + gnbField('groundA', 'Земля у т.1', f2(m.pts[0].ground)) + gnbField('groundB', 'Земля у т.' + m.pts.length, f2(m.pts[m.pts.length - 1].ground)) + '</div>'
+    + '<div class="two">' + gnbField('pit', 'Глубина в приямке, м') + gnbField('dcorr', 'Поправка к глубине локатора, м', fnum(m.dcorr)) + '</div></details>'
+    + '<details open><summary>Кабели, покрытие, пересечения</summary>'
+    + gnbField('cables', 'Кабели в трубах (строка — группа; цвет по -ЭС, -НО, ВОЛС, -ОДН)', '9к ВБвШВ 3x16-ЭС', 4)
+    + gnbField('cover', 'Покрытие: «название; до, м от т.1» (последнее — до конца)', 'ПЛИТ; 4.5\nАСФАЛЬТ; 36\nГАЗОН', 3)
+    + gnbField('cross', 'Пересечения: «м от т.1; подпись; отметка»', '0.9; Водопровод d400 170,49в.тр.; 170.49', 4)
+    + '<p class="fine">Расстояния точек от т.1 по плану: ' + esc(dists) + '. Из Excel можно вставлять столбцы через Tab.</p></details>'
+    + '<details><summary>Проект — для сверки</summary><div class="two">' + gnbField('projPlan', 'Длина в плане, м', '46.7') + gnbField('projArc', 'Длина по дуге, м', '48.1') + '</div></details>'
+    + '<details><summary>Протокол бурения</summary><div class="two">' + gnbField('protDate', 'Дата протокола', '«25» 05  2025г.') + gnbField('rod', 'Длина штанги, м') + '</div>'
+    + '<div class="two">' + gnbField('dStart', 'Начало работ', '«23» мая 2025г.') + gnbField('dEnd', 'Окончание работ', '«10» июня 2025г.') + '</div>'
+    + '<div class="two">' + gnbField('pilot', 'Пилотная скважина ∅, мм') + gnbField('reams', 'Расширения ∅, мм', '200, 400') + '</div>'
+    + '<div class="two">' + gnbField('reamer', 'Расширитель') + gnbField('locator', 'Локационная система') + '</div>' + gnbField('sonde', 'Зонд')
+    + '<p class="fine">Протяжка — с расширителем ∅ скважины. Штанги считаются по плану от т.1: уклон — на длине штанги, глубина — до оси трубы на её конце.</p></details>'
+    + '<details><summary>Штамп</summary>' + gnbField('org', 'Организация', 'ООО «…»') + gnbField('object', 'Объект', '', 3)
+    + '<div class="two">' + gnbField('customer', 'Заказчик') + gnbField('order', 'Заказ (шифр)') + '</div>'
+    + '<div class="two">' + gnbField('designer', 'Проектная мастерская') + gnbField('ops', 'Согл. с ОПС №') + '</div>'
+    + '<div class="two">' + gnbField('yStart', 'Стр-во начато') + gnbField('yEnd', 'Стр-во закончено') + '</div>' + gnbField('insp', 'Инспекция')
+    + '<div class="two">' + gnbField('chiefPost', 'Должность 1') + gnbField('chief', 'Ф.И.О.') + '</div>'
+    + '<div class="two">' + gnbField('pmPost', 'Должность 2') + gnbField('pm', 'Ф.И.О.') + '</div>'
+    + '<div class="two">' + gnbField('geodPost', 'Должность 3') + gnbField('geod', 'Ф.И.О.') + '</div></details>';
+  $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  bindTop(); bindCommon();
+  document.querySelectorAll('[data-g]').forEach(el => {
+    const k = el.dataset.g;
+    if (el.type === 'checkbox') el.onchange = () => { S.gnb[k] = el.checked; S.view = null; save(); compute(); render(); };
+    else el.oninput = () => { S.gnb[k] = el.value; later(); };
+  });
+  document.querySelectorAll('[data-chain]').forEach(b => b.onclick = () => { S.gnb.chain = +b.dataset.chain; S.view = null; save(); compute(); render(); });
+  const nm = () => baseName() + (g.no ? ' — ГНБ ' + g.no : '');
+  $('#gcat').onclick = () => { download(I.catalogGnbXlsx(m), nm() + ' — каталог.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); toast('Каталог: ' + m.pts.length + ' точек.'); };
+  $('#gprot').onclick = () => { download(I.protocolXlsx(m, g, r.rods), nm() + ' — протокол бурения.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); toast('Протокол: ' + r.rods.length + ' штанг.'); };
+  bindView();
+}
 function bindCommon() {
   document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
   document.querySelectorAll('[data-net]').forEach(b => b.onclick = () => { S.set.net = b.dataset.net; S.view = null; S.tab = 'plan'; save(); compute(); render(); });
-  const d = $('#dxf'); if (d) d.onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
+  const d = $('#dxf'); if (d) d.onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + (S.res.kind === 'gnb' && S.gnb.no ? ' — ГНБ ' + S.gnb.no : '') + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
 }
 function render() {
   const app = $('#app');
   if (!S.parsed) { app.innerHTML = topBar() + emptyView(); bindTop(); bindEmpty(); return; }
   if (S.res && S.res.kind === 'line') { renderLine(); return; }
+  if (S.res && S.res.kind === 'gnb') { renderGnb(); return; }
   const r = S.res, proj = hasProject();
   const fit = S.set.mode === 'fit' && proj;
   let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек с кодами: ' + S.parsed.pts.length + (S.parsed.skipped.length ? ', без кода или с буквенным номером: ' + S.parsed.skipped.length : '') + '</li>';
@@ -977,7 +1430,7 @@ function topBar() {
 }
 function emptyView() {
   return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Файл обрабатывается прямо в браузере и никуда не отправляется.</p><div class="row"><button class="btn primary" id="open2">Выбрать файл…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
-    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028) и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
+    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028), закрытый переход ГНБ (4028 с глубиной в номере: «2-1.36») и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
 }
 
 // ---------- просмотр: масштаб и сдвиг ----------
@@ -1023,7 +1476,7 @@ function openDemo() {
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
 }
 let deb; const later = () => { clearTimeout(deb); deb = setTimeout(() => {
-  const a = document.activeElement, key = a && a.dataset && a.dataset.obj ? ['[data-obj="' + a.dataset.obj + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
+  const a = document.activeElement, key = a && a.dataset && a.dataset.g ? ['[data-g="' + a.dataset.g + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.obj ? ['[data-obj="' + a.dataset.obj + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
   save(); compute(); render();
   if (key) { const el = key[1] === 'sel' ? document.querySelector(key[0]) : key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
 }, 500); };
@@ -1065,9 +1518,9 @@ function showHelp() {
   const v = document.createElement('div'); v.className = 'veil';
   v.innerHTML = '<div class="modal wide"><div class="modal-head"><h2>Справка</h2><button class="btn small" id="hx">Закрыть</button></div><div class="modal-body help">'
     + '<h3>Что делает программа</h3><p>По съёмке строит исполнительный чертёж телефонной канализации: план трассы с колодцами, пролётами и футлярами, профиль с таблицей и ведомость колодцев. Сверяет съёмку с проектом и показывает, что расходится. Всё считается в браузере, файлы никуда не уходят.</p>'
-    + '<h3>Какие сети</h3><p>Сеть определяется по кодам «Абриса». Сейчас ИЧ строится для <b>телефонной канализации</b> (план, профиль, ведомость колодцев, сверка с проектом) и для <b>кабеля НО / ЭС</b> (план с опорами, трубами и футлярами, ведомость участков). Остальные сети — кабельная канализация, кабельная линия, водопровод, теплосеть, канализация, газопровод, водосток — распознаются и показываются слева; ИЧ для них добавим по образцам. Если в съёмке несколько сетей, выберите нужную слева.</p>'
+    + '<h3>Какие сети</h3><p>Сеть определяется по кодам «Абриса». Сейчас ИЧ строится для <b>телефонной канализации</b> (план, профиль, ведомость колодцев, сверка с проектом) и для <b>кабеля НО / ЭС</b> (план с опорами, трубами и футлярами, ведомость участков). Для <b>закрытого перехода ГНБ</b> — профиль с таблицей, план с длинами, сечения 1-1 и 2-2 с кабелями, штамп, каталог (№, X, Y, H) и протокол бурения. Остальные сети — кабельная канализация, кабельная линия, водопровод, теплосеть, канализация, газопровод, водосток — распознаются и показываются слева; ИЧ для них добавим по образцам. Если в съёмке несколько сетей, выберите нужную слева.</p>'
     + '<h3>Какая нужна съёмка</h3><p>DXF с блоками точек <b>_block2</b> (атрибуты №, H, TXT) или полевой файл .are / .pco. Коды — по «Абрису»:</p>'
-    + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr></table>'
+    + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr><tr><td>4028 / 4028..</td><td>номер «2-1.36»</td><td>ГНБ: земля над трубой и глубина локатора до оси; без глубины — верх трубы в приямке</td></tr></table>'
     + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'
     + '<h3>Проект и подгонка</h3><p>Колодцы проекта сопоставляются со съёмкой по порядку вдоль трассы; направление хода выбирается по лучшему совпадению отметок (или задайте «Начало хода»). В режиме «под проект» значения, отличающиеся не больше допуска, берутся из проекта, остальные — по съёмке. Подгоняются обечайки, дно, горловина, верх трубы на входе и выходе, длины пролётов и футляров. План и промежуточные точки трубы остаются по съёмке.</p>'
     + '<p>Проект сохраняется в браузере автоматически; файлом (.json) его можно перенести на другой компьютер.</p>'

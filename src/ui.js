@@ -6,8 +6,9 @@ const KEY = 'ich.v1';
 const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'plan', view: null,
   set: { mode: 'fact', tol: 10, profile: true, start: 'auto', marks: false, dims: true, nums: true }, proj: { object: '', wells: [], spans: [] },
   obj: { org: '', kind: 'кабеля наружного освещения', object: '', ks: '', contract: '', cableL: '', author: 'Шахмиров А.М', device: 'Nikon XF 05', z: false } };
-try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); } } catch (e) { /* хранилище недоступно — работаем без него */ }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
+S.gnb = Object.assign({}, I.GNB_DEFAULT);
+try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); if (st.gnb) Object.assign(S.gnb, st.gnb); } } catch (e) { /* хранилище недоступно — работаем без него */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
 
 // ---------- уведомления ----------
 let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
@@ -27,6 +28,7 @@ function compute() {
     const net = S.netSel = f.net;
     if (!net.kind) throw new Error('Сеть «' + net.name + '» распознана, но ИЧ для неё программа пока не строит. Пришлите образец ИЧ этой сети — научим.');
     if (net.kind === 'line') { computeLine(P, net); return; }
+    if (net.kind === 'gnb') { computeGnb(P); return; }
     const proj = hasProject() ? S.proj : null;
     const names = proj ? proj.wells.map(w => w.name) : null;
     const startN = S.set.start === 'auto' ? null : +S.set.start;
@@ -63,6 +65,15 @@ function computeLine(P, net) {
   k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
   m.trench = I.drawNotes(D, m, S.obj, xr, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
   S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
+}
+
+function computeGnb(P) {
+  const g = S.gnb, m = I.buildGnb(P, g), D = new I.Dwg();
+  I.drawGnb(D, m, g, { marks: g.marks !== false });
+  const rods = I.drillRods(m, g), rows = [];
+  const cmp = (par, pv, fv) => { pv = num(pv); if (pv == null) return; const d = fv - pv; rows.push({ par, pv: fnum(pv), fv: fnum(fv), d: (d >= 0 ? '+' : '−') + fnum(Math.abs(d)), bad: Math.abs(d) > 0.5 }); };
+  cmp('Длина в плане, м', g.projPlan, m.Lplan); cmp('Длина по дуге (профилю), м', g.projArc, m.Lprof);
+  S.res = { kind: 'gnb', D, m, rods, rows, warn: m.warn, mode: 'ГНБ: профиль, план, сечения, штамп' };
 }
 
 // точки для каталога координат: все точки выбранной сети по порядку номеров
@@ -108,7 +119,7 @@ async function openFile(f) {
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
     if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
+    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan'; S.gnb.chain = 0; S.gnb.groundA = S.gnb.groundB = '';
     compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
@@ -158,7 +169,7 @@ function netsBlock() {
   const d = S.det; if (!d) return '';
   let h = '<h3 class="sh">Сети в съёмке</h3>';
   if (!d.found.length) h += '<p class="fine">Не распознано ни одной сети.</p>';
-  h += '<div class="nets">' + d.found.map(f => '<button class="net' + (S.netSel === f.net ? ' on' : '') + '" data-net="' + f.net.id + '"><b>' + esc(f.net.name) + '</b><span>' + esc(f.codes) + '</span><em class="' + (f.net.kind ? 'yes' : 'no') + '">' + (f.net.kind === 'wells' ? 'ИЧ: план, профиль, сверка' : f.net.kind === 'line' ? 'ИЧ: план и ведомость' : 'пока не обучена') + '</em></button>').join('') + '</div>';
+  h += '<div class="nets">' + d.found.map(f => '<button class="net' + (S.netSel === f.net ? ' on' : '') + '" data-net="' + f.net.id + '"><b>' + esc(f.net.name) + '</b><span>' + esc(f.codes) + '</span><em class="' + (f.net.kind ? 'yes' : 'no') + '">' + (f.net.kind === 'wells' ? 'ИЧ: план, профиль, сверка' : f.net.kind === 'line' ? 'ИЧ: план и ведомость' : f.net.kind === 'gnb' ? 'ИЧ: профиль, сечения, протокол' : 'пока не обучена') + '</em></button>').join('') + '</div>';
   if (d.situ) h += '<p class="fine">Ситуация (7…): ' + d.situ + ' т. — в ИЧ не входит.</p>';
   if (d.unknown.length) h += '<p class="issue">Неизвестные коды: ' + esc(d.unknown.join(', ')) + '</p>';
   return h;
@@ -201,15 +212,78 @@ function renderLine() {
   });
   bindView();
 }
+// ---------- ГНБ ----------
+function gnbField(id, lab, ph, wide) {
+  const v = S.gnb[id] == null ? '' : String(S.gnb[id]);
+  if (wide) return '<label class="fld">' + lab + '<textarea data-g="' + id + '" rows="' + wide + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '>' + esc(v) + '</textarea></label>';
+  return '<label class="fld">' + lab + '<input data-g="' + id + '" value="' + esc(v) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '></label>';
+}
+const gchk = (id, lab) => '<label class="chk"><input type="checkbox" data-g="' + id + '"' + (S.gnb[id] === true || (id === 'marks' && S.gnb[id] !== false) ? ' checked' : '') + '> ' + lab + '</label>';
+function renderGnb() {
+  const r = S.res, m = r.m, g = S.gnb, f2 = v => fnum(v, 2);
+  let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек перехода: ' + m.pts.length + ' (т.' + m.pts[0].n + ' → т.' + m.pts[m.pts.length - 1].n + ')</li>'
+    + '<li>L в плане — <b>' + f2(m.Lplan) + ' м</b>, по профилю — <b>' + f2(m.Lprof) + ' м</b></li><li>глубина трубы ' + f2(m.minDepth) + '…' + f2(m.maxDepth) + ' м</li><li>штанг ' + (num(g.rod) || 3.05) + ' м: ' + r.rods.length + '</li></ul>' + netsBlock();
+  if (m.chains.length > 1) side += '<h3 class="sh">Переходы в съёмке</h3><div class="nets">' + m.chains.map((c, i) => '<button class="net' + (i === m.ci ? ' on' : '') + '" data-chain="' + i + '"><b>т.' + c[0].n + '…т.' + c[c.length - 1].n + '</b><span>' + c.length + ' точек</span></button>').join('') + '</div>';
+  side += '<h3 class="sh">Точки</h3><table class="sum" style="font-size:11.5px;width:100%;table-layout:fixed"><tr><th>№</th><th>т.</th><th>верх</th><th>земля</th><th>глуб.</th></tr>' + m.pts.map(p => '<tr><td>' + p.k + '</td><td>' + p.n + '</td><td>' + f2(p.top) + '</td><td title="' + esc(p.gsrc) + '">' + f2(p.ground) + (p.gsrc !== 'съёмка' ? '*' : '') + '</td><td>' + f2(p.depth) + '</td></tr>').join('') + '</table>'
+    + '<p class="fine">* земля у приямка: ' + esc(m.pts[0].gsrc) + ' / ' + esc(m.pts[m.pts.length - 1].gsrc) + '. Верх трубы = земля − глубина локатора + ' + fnum(m.dcorr) + '.</p>';
+  if (r.rows.length) side += '<h3 class="sh">Сверка с проектом</h3><table class="sum"><tr><th></th><th>проект</th><th>факт</th><th>разн.</th></tr>' + r.rows.map(x => '<tr' + (x.bad ? ' class="k-diff"' : '') + '><td>' + esc(x.par) + '</td><td>' + x.pv + '</td><td>' + x.fv + '</td><td>' + x.d + '</td></tr>').join('') + '</table>';
+  if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
+  const tabs = [['all', 'Лист'], ['plan', 'План'], ['profile', 'Профиль'], ['stamp', 'Штамп']];
+  if (!tabs.some(t => t[0] === S.tab)) S.tab = 'all';
+  const desk = '<div class="tabs">' + tabs.map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
+    + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
+    + '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke-width="1" vector-effect="non-scaling-stroke">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>';
+  const dists = m.pts.map(p => 'т.' + p.k + ' — ' + fnum(p.st, 1)).join(', ');
+  const card = '<div class="card-head"><h2>Закрытый переход</h2></div>'
+    + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="gcat">Каталог (Excel)</button><button class="btn" id="gprot">Протокол бурения</button></div>'
+    + '<div class="two">' + gnbField('no', 'ГНБ №', '6') + gnbField('n', 'Труб, шт') + '</div>'
+    + '<div class="two">' + gnbField('d', 'Труба d, мм') + gnbField('dskv', 'Скважина Дскв, мм') + '</div>'
+    + '<div class="two">' + gnbField('mat', 'Материал') + gnbField('sdr', 'SDR') + '</div>' + gnbField('gost', 'ГОСТ')
+    + gchk('reverse', 'Нумерация с другого конца') + gchk('marks', 'Отметки верха трубы на плане')
+    + '<details open><summary>Земля у приямков и глубины</summary><p class="hint">Пусто — берётся ближайшая точка ситуации (7…) в 6 м, если труба под ней не мельче приямка; иначе верх трубы + глубина приямка.</p>'
+    + '<div class="two">' + gnbField('groundA', 'Земля у т.1', f2(m.pts[0].ground)) + gnbField('groundB', 'Земля у т.' + m.pts.length, f2(m.pts[m.pts.length - 1].ground)) + '</div>'
+    + '<div class="two">' + gnbField('pit', 'Глубина в приямке, м') + gnbField('dcorr', 'Поправка к глубине локатора, м', fnum(m.dcorr)) + '</div></details>'
+    + '<details open><summary>Кабели, покрытие, пересечения</summary>'
+    + gnbField('cables', 'Кабели в трубах (строка — группа; цвет по -ЭС, -НО, ВОЛС, -ОДН)', '9к ВБвШВ 3x16-ЭС', 4)
+    + gnbField('cover', 'Покрытие: «название; до, м от т.1» (последнее — до конца)', 'ПЛИТ; 4.5\nАСФАЛЬТ; 36\nГАЗОН', 3)
+    + gnbField('cross', 'Пересечения: «м от т.1; подпись; отметка»', '0.9; Водопровод d400 170,49в.тр.; 170.49', 4)
+    + '<p class="fine">Расстояния точек от т.1 по плану: ' + esc(dists) + '. Из Excel можно вставлять столбцы через Tab.</p></details>'
+    + '<details><summary>Проект — для сверки</summary><div class="two">' + gnbField('projPlan', 'Длина в плане, м', '46.7') + gnbField('projArc', 'Длина по дуге, м', '48.1') + '</div></details>'
+    + '<details><summary>Протокол бурения</summary><div class="two">' + gnbField('protDate', 'Дата протокола', '«25» 05  2025г.') + gnbField('rod', 'Длина штанги, м') + '</div>'
+    + '<div class="two">' + gnbField('dStart', 'Начало работ', '«23» мая 2025г.') + gnbField('dEnd', 'Окончание работ', '«10» июня 2025г.') + '</div>'
+    + '<div class="two">' + gnbField('pilot', 'Пилотная скважина ∅, мм') + gnbField('reams', 'Расширения ∅, мм', '200, 400') + '</div>'
+    + '<div class="two">' + gnbField('reamer', 'Расширитель') + gnbField('locator', 'Локационная система') + '</div>' + gnbField('sonde', 'Зонд')
+    + '<p class="fine">Протяжка — с расширителем ∅ скважины. Штанги считаются по плану от т.1: уклон — на длине штанги, глубина — до оси трубы на её конце.</p></details>'
+    + '<details><summary>Штамп</summary>' + gnbField('org', 'Организация', 'ООО «…»') + gnbField('object', 'Объект', '', 3)
+    + '<div class="two">' + gnbField('customer', 'Заказчик') + gnbField('order', 'Заказ (шифр)') + '</div>'
+    + '<div class="two">' + gnbField('designer', 'Проектная мастерская') + gnbField('ops', 'Согл. с ОПС №') + '</div>'
+    + '<div class="two">' + gnbField('yStart', 'Стр-во начато') + gnbField('yEnd', 'Стр-во закончено') + '</div>' + gnbField('insp', 'Инспекция')
+    + '<div class="two">' + gnbField('chiefPost', 'Должность 1') + gnbField('chief', 'Ф.И.О.') + '</div>'
+    + '<div class="two">' + gnbField('pmPost', 'Должность 2') + gnbField('pm', 'Ф.И.О.') + '</div>'
+    + '<div class="two">' + gnbField('geodPost', 'Должность 3') + gnbField('geod', 'Ф.И.О.') + '</div></details>';
+  $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  bindTop(); bindCommon();
+  document.querySelectorAll('[data-g]').forEach(el => {
+    const k = el.dataset.g;
+    if (el.type === 'checkbox') el.onchange = () => { S.gnb[k] = el.checked; S.view = null; save(); compute(); render(); };
+    else el.oninput = () => { S.gnb[k] = el.value; later(); };
+  });
+  document.querySelectorAll('[data-chain]').forEach(b => b.onclick = () => { S.gnb.chain = +b.dataset.chain; S.view = null; save(); compute(); render(); });
+  const nm = () => baseName() + (g.no ? ' — ГНБ ' + g.no : '');
+  $('#gcat').onclick = () => { download(I.catalogGnbXlsx(m), nm() + ' — каталог.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); toast('Каталог: ' + m.pts.length + ' точек.'); };
+  $('#gprot').onclick = () => { download(I.protocolXlsx(m, g, r.rods), nm() + ' — протокол бурения.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); toast('Протокол: ' + r.rods.length + ' штанг.'); };
+  bindView();
+}
 function bindCommon() {
   document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; S.view = null; render(); });
   document.querySelectorAll('[data-net]').forEach(b => b.onclick = () => { S.set.net = b.dataset.net; S.view = null; S.tab = 'plan'; save(); compute(); render(); });
-  const d = $('#dxf'); if (d) d.onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
+  const d = $('#dxf'); if (d) d.onclick = () => { if (!S.res) return; download(I.toDXF(S.res.D), baseName() + (S.res.kind === 'gnb' && S.gnb.no ? ' — ГНБ ' + S.gnb.no : '') + ' — ИЧ.dxf', 'application/dxf'); toast('ИЧ сохранена: AutoCAD 2000 DXF.'); };
 }
 function render() {
   const app = $('#app');
   if (!S.parsed) { app.innerHTML = topBar() + emptyView(); bindTop(); bindEmpty(); return; }
   if (S.res && S.res.kind === 'line') { renderLine(); return; }
+  if (S.res && S.res.kind === 'gnb') { renderGnb(); return; }
   const r = S.res, proj = hasProject();
   const fit = S.set.mode === 'fit' && proj;
   let side = '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек с кодами: ' + S.parsed.pts.length + (S.parsed.skipped.length ? ', без кода или с буквенным номером: ' + S.parsed.skipped.length : '') + '</li>';
@@ -263,7 +337,7 @@ function topBar() {
 }
 function emptyView() {
   return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Файл обрабатывается прямо в браузере и никуда не отправляется.</p><div class="row"><button class="btn primary" id="open2">Выбрать файл…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
-    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028) и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
+    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028), закрытый переход ГНБ (4028 с глубиной в номере: «2-1.36») и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
 }
 
 // ---------- просмотр: масштаб и сдвиг ----------
@@ -309,7 +383,7 @@ function openDemo() {
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
 }
 let deb; const later = () => { clearTimeout(deb); deb = setTimeout(() => {
-  const a = document.activeElement, key = a && a.dataset && a.dataset.obj ? ['[data-obj="' + a.dataset.obj + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
+  const a = document.activeElement, key = a && a.dataset && a.dataset.g ? ['[data-g="' + a.dataset.g + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.obj ? ['[data-obj="' + a.dataset.obj + '"]', 'sel', null, a.selectionStart] : a && a.dataset && a.dataset.t ? [a.dataset.t, a.dataset.r, a.dataset.c, a.selectionStart] : a && a.id ? [a.id, null, null, a.selectionStart] : null;
   save(); compute(); render();
   if (key) { const el = key[1] === 'sel' ? document.querySelector(key[0]) : key[1] == null ? document.getElementById(key[0]) : document.querySelector('.ptab input[data-t="' + key[0] + '"][data-r="' + key[1] + '"][data-c="' + key[2] + '"]'); if (el) { el.focus(); try { el.setSelectionRange(key[3], key[3]); } catch (e) { /* поле без курсора */ } } }
 }, 500); };
@@ -351,9 +425,9 @@ function showHelp() {
   const v = document.createElement('div'); v.className = 'veil';
   v.innerHTML = '<div class="modal wide"><div class="modal-head"><h2>Справка</h2><button class="btn small" id="hx">Закрыть</button></div><div class="modal-body help">'
     + '<h3>Что делает программа</h3><p>По съёмке строит исполнительный чертёж телефонной канализации: план трассы с колодцами, пролётами и футлярами, профиль с таблицей и ведомость колодцев. Сверяет съёмку с проектом и показывает, что расходится. Всё считается в браузере, файлы никуда не уходят.</p>'
-    + '<h3>Какие сети</h3><p>Сеть определяется по кодам «Абриса». Сейчас ИЧ строится для <b>телефонной канализации</b> (план, профиль, ведомость колодцев, сверка с проектом) и для <b>кабеля НО / ЭС</b> (план с опорами, трубами и футлярами, ведомость участков). Остальные сети — кабельная канализация, кабельная линия, водопровод, теплосеть, канализация, газопровод, водосток — распознаются и показываются слева; ИЧ для них добавим по образцам. Если в съёмке несколько сетей, выберите нужную слева.</p>'
+    + '<h3>Какие сети</h3><p>Сеть определяется по кодам «Абриса». Сейчас ИЧ строится для <b>телефонной канализации</b> (план, профиль, ведомость колодцев, сверка с проектом) и для <b>кабеля НО / ЭС</b> (план с опорами, трубами и футлярами, ведомость участков). Для <b>закрытого перехода ГНБ</b> — профиль с таблицей, план с длинами, сечения 1-1 и 2-2 с кабелями, штамп, каталог (№, X, Y, H) и протокол бурения. Остальные сети — кабельная канализация, кабельная линия, водопровод, теплосеть, канализация, газопровод, водосток — распознаются и показываются слева; ИЧ для них добавим по образцам. Если в съёмке несколько сетей, выберите нужную слева.</p>'
     + '<h3>Какая нужна съёмка</h3><p>DXF с блоками точек <b>_block2</b> (атрибуты №, H, TXT) или полевой файл .are / .pco. Коды — по «Абрису»:</p>'
-    + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr></table>'
+    + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr><tr><td>4028 / 4028..</td><td>номер «2-1.36»</td><td>ГНБ: земля над трубой и глубина локатора до оси; без глубины — верх трубы в приямке</td></tr></table>'
     + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'
     + '<h3>Проект и подгонка</h3><p>Колодцы проекта сопоставляются со съёмкой по порядку вдоль трассы; направление хода выбирается по лучшему совпадению отметок (или задайте «Начало хода»). В режиме «под проект» значения, отличающиеся не больше допуска, берутся из проекта, остальные — по съёмке. Подгоняются обечайки, дно, горловина, верх трубы на входе и выходе, длины пролётов и футляров. План и промежуточные точки трубы остаются по съёмке.</p>'
     + '<p>Проект сохраняется в браузере автоматически; файлом (.json) его можно перенести на другой компьютер.</p>'

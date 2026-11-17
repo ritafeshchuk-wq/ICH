@@ -72,8 +72,10 @@ function parsePoints(raw) {
   const out = [], skipped = [];
   raw.forEach(p => {
     const t = p.txt.replace(/[хХ]/g, 'x').replace(/\s+/g, ''), m = CODE_RE.exec(t);
-    if (!m || !/^\d+$/.test(p.num)) { skipped.push(p.num + ' ' + p.txt); return; }
-    out.push(Object.assign({}, p, { n: +p.num, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+    // ГНБ: номер точки локатора с глубиной до оси — «2-1.36», «102-2,49» (бывает с пробелом: «9-2 .19»)
+    const nd = /^(\d+)-(\d+[.,]\d+)$/.exec(String(p.num).replace(/\s+/g, ''));
+    if (!m || !(/^\d+$/.test(p.num) || nd)) { skipped.push(p.num + ' ' + p.txt); return; }
+    out.push(Object.assign({}, p, { n: nd ? +nd[1] : +p.num, dep: nd ? num(nd[2]) : null, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
   });
   out.sort((a, b) => a.n - b.n);
   return { pts: out, skipped };
@@ -158,6 +160,7 @@ function build(P0, startN, names, net) {
 // ---------------- сети по кодам «Абриса» ----------------
 // kind: wells — колодцы и пролёты (план, профиль, сверка), line — линия с опорами (план, ведомость), null — пока не обучена
 const NETS = [
+  { id: 'gnb', name: 'Закрытый переход (ГНБ)', pipe: '4028', own: ['4028'], kind: 'gnb' },
   { id: 'tk', name: 'Телефонная канализация', well: '476', pipe: '478', cas: '4028', neck: '47', pole: '65', own: ['476', '478'], kind: 'wells' },
   { id: 'kk', name: 'Кабельная канализация', well: '4026', pipe: '491', cas: '4028', neck: '46', pole: '65', own: ['4026'], kind: null },
   { id: 'no', name: 'Кабель НО / ЭС', pipe: '491', cas: '4028', pole: '65', own: ['491', '65'], kind: 'line' },
@@ -175,10 +178,11 @@ function detectNets(P) {
   const found = [];
   NETS.forEach(n => {
     let own = n.own.filter(c => cnt[c]);
+    if (n.id === 'gnb' && !P.some(p => p.code === '4028' && p.dep != null)) own = [];   // ГНБ — только если у точек 4028 есть глубины локатора
     if (n.id === 'no' && (cnt['4026'] || !cnt['491'])) own = [];          // 491 с обечайками 4026 — это кабельная канализация
     if (n.id === 'tep' && !cnt['4074'] && !cnt['4071'] && !cnt['4073'] && !cnt['407']) own = [];   // 47 одна — горловина ТК
     if (!own.length) return;
-    const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+    const codes = n.kind === 'gnb' ? ['4028'] : [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
     found.push({ net: n, points: P.filter(p => codes.includes(p.code)).length, codes: own.map(c => c + ' ×' + cnt[c]).join(', ') });
   });
   const known = new Set([].concat(...NETS.map(n => [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber].filter(Boolean)), ['99']));
@@ -643,5 +647,5 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
-window.ICH = { drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+window.ICH = { rnd, zip, xe, unit, cp1251, drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
 })();
