@@ -26,8 +26,8 @@ function geoDwg(pts) {
   return D;
 }
 function geoBlock() {
-  if (!S.geo) return '<div class="geo-need"><b>Нужна геоподоснова.</b> ИЧ строится на геоподоснове МГГТ — откройте её DXF. Без неё чертёж только для просмотра, DXF не выдаётся.<div class="row"><button class="btn primary small" id="geoopen">Открыть геоподоснову…</button></div></div>';
-  return '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов в окне ±' + esc(String(S.set.geoPad || 40)) + ' м</li></ul>'
+  if (!S.geo) return reqList(true) +  '<div class="geo-need"><b>Нужна геоподоснова.</b> ИЧ строится на геоподоснове МГГТ — откройте её DXF. Без неё чертёж только для просмотра, DXF не выдаётся.<div class="row"><button class="btn primary small" id="geoopen">Открыть геоподоснову…</button></div></div>';
+  return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов в окне ±' + esc(String(S.set.geoPad || 40)) + ' м</li></ul>'
     + '<div class="row"><label class="fld" style="flex:1">Окно вокруг сети, м<input id="geopad" inputmode="decimal" value="' + esc(String(S.set.geoPad || 40)) + '"></label></div><div class="row"><button class="btn small" id="geoopen">Другая геоподоснова…</button></div>';
 }
 function projBlock() {
@@ -155,7 +155,7 @@ async function openFile(f) {
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
     if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan'; S.gnb.chain = 0; S.gnb.groundA = S.gnb.groundB = '';
+    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan'; S.gnb.chain = 0; if (S.gnb.file !== f.name) { ['groundA', 'groundB', 'no', 'cables', 'cover', 'cross', 'projPlan', 'projArc'].forEach(k => { S.gnb[k] = ''; }); S.gnb.file = f.name; save(); }
     compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
@@ -397,9 +397,35 @@ function topBar() {
     + '<div class="top-info">' + (S.file ? esc(S.file) : 'съёмка → план, профиль, ведомость и сверка с проектом') + '</div>'
     + '<div class="top-actions"><button class="btn" id="open">Открыть съёмку…</button><button class="btn' + (S.geo ? ' ghost' : '') + '" id="geotop" title="Геоподоснова МГГТ в DXF — обязательна для ИЧ">' + (S.geo ? 'Геоподоснова ✓' : 'Геоподоснова…') + '</button><button class="btn ghost" id="projtop" title="Проект: PDF для сверки, DXF — для спецификации">Проект…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
 }
+// ---------- что нужно для корректной ИЧ: подсказка на старте и в работе ----------
+function reqItems() {
+  const kind = S.res ? S.res.kind : null, o = S.obj, g = S.gnb, has = v => v != null && String(v).trim() !== '';
+  const it = [
+    { k: 'need', ok: !!S.parsed, t: 'Съёмка с кодами «Абриса»', d: 'DXF с блоками _block2 (атрибуты №, H, TXT) или .are / .pco. Коды: ТК — 476, 478, 47, 99, 4028; НО / ЭС — 491, 65, 4028 с составом труб (_2d110); ГНБ — 4028, глубина локатора в номере («2-1.36»), приямки без глубины.', act: 'open' },
+    { k: 'need', ok: !!S.geo, t: 'Геоподоснова МГГТ (DXF)', d: 'Обязательна: её слои ложатся на ИЧ, без неё DXF не выдаётся. DWG сохраните в AutoCAD как DXF.', act: 'geotop' },
+    { k: 'want', ok: !!S.pdf, t: 'Проект в PDF', d: 'Для сверки ИЧ с проектом — лист плана или профиля открывается рядом с чертежом.', act: 'projtop' },
+    { k: 'want', ok: !!(S.spec && S.spec.text.trim()), t: 'Спецификация проекта', d: 'Строки с трубами и кабелями (вставить или DXF проекта): из неё берутся материал, SDR, ГОСТ трубы и марки кабелей.', act: 'projtop' }
+  ];
+  if (!kind || kind === 'line') it.push({ k: 'want', ok: has(o.object) && has(o.ks), t: 'НО / ЭС: объект, КС №, договор, организация', d: 'Для надписей ИЧ и титула каталога координат.' });
+  if (!kind || kind === 'wells') it.push({ k: 'want', ok: hasProject(), t: 'ТК: проектные отметки колодцев', d: 'Обечайка, дно, горловина, верх трубы, длины пролётов — для сверки и режима «под проект».' });
+  if (!kind || kind === 'gnb') {
+    it.push({ k: 'want', ok: has(g.no) && has(g.cables), t: 'ГНБ: номер, трубы, кабели по трубам', d: 'Число и d труб, Дскв, список кабелей; покрытие и пересечения с коммуникациями — для профиля.' });
+    it.push({ k: 'want', ok: has(g.dStart) && has(g.dEnd) && has(g.protDate), t: 'ГНБ: данные бурения', d: 'Даты протокола и работ, пилотная скважина и расширения, локатор, зонд.' });
+    it.push({ k: 'want', ok: has(g.org) && has(g.object) && has(g.chief), t: 'ГНБ: штамп', d: 'Организация, объект, заказчик, шифр, ОПС, годы, ФИО гл. инженера, руководителя проекта, геодезиста.' });
+  }
+  return it;
+}
+function reqList(compact) {
+  const it = reqItems(), miss = it.filter(x => x.k === 'need' && !x.ok).length;
+  const li = it.map(x => '<li class="req ' + (x.ok ? 'ok' : x.k) + '"><span class="rq-m">' + (x.ok ? '✓' : x.k === 'need' ? '!' : '○') + '</span><div><b>' + esc(x.t) + '</b> <em>' + (x.ok ? 'есть' : x.k === 'need' ? 'обязательно' : 'желательно') + '</em>'
+    + (compact && x.ok ? '' : '<p>' + esc(x.d) + '</p>') + (!x.ok && x.act ? '<button class="btn small" data-req="' + x.act + '">Открыть…</button>' : '') + '</div></li>').join('');
+  if (compact) return '<details class="reqbox"' + (miss ? ' open' : '') + '><summary>Что нужно для корректной ИЧ' + (miss ? ' — не хватает ' + miss : ' ✓') + '</summary><ul class="reqs">' + li + '</ul></details>';
+  return '<div class="reqcol"><h2>Что нужно для корректной ИЧ</h2><ul class="reqs">' + li + '</ul><p class="fine">Файлы обрабатываются в браузере и никуда не отправляются. Данные объекта и проекта сохраняются в браузере.</p></div>';
+}
+function bindReq() { document.querySelectorAll('[data-req]').forEach(b => b.onclick = () => { const a = b.dataset.req; if (a === 'open') { S.pickFor = null; pick('.dxf,.are,.pco'); } else if (a === 'geotop') { S.pickFor = 'geo'; pick('.dxf'); } else { S.pickFor = 'proj'; pick('.pdf,.dxf'); } }); }
 function emptyView() {
-  return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Файл обрабатывается прямо в браузере и никуда не отправляется.</p><div class="row"><button class="btn primary" id="open2">Выбрать файл…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
-    + '<ol class="steps"><li><b>Откройте съёмку.</b> Программа сама определит сеть по кодам: телефонная канализация (476, 478, 4028), кабель НО / ЭС (491, 65, 4028), закрытый переход ГНБ (4028 с глубиной в номере: «2-1.36») и другие.</li><li><b>Заполните проект</b> справа — имена колодцев и проектные отметки. Можно вставить из Excel или открыть сохранённый файл проекта.</li><li><b>Выберите режим:</b> по факту или под проект с допуском (например, 10 см). Профиль можно выключить.</li><li><b>Скачайте ИЧ</b> в DXF и список расхождений в CSV.</li></ol></div>';
+  return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Геоподоснову и проект можно перетащить сюда же или открыть кнопками вверху.</p><div class="row"><button class="btn primary" id="open2">Выбрать съёмку…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
+    + reqList(false) + '</div>';
 }
 
 // ---------- просмотр: масштаб и сдвиг ----------
@@ -435,7 +461,7 @@ function bindTop() {
   $('#open').onclick = () => { S.pickFor = null; pick('.dxf,.are,.pco'); };
   $('#geotop').onclick = () => { S.pickFor = 'geo'; pick('.dxf'); };
   $('#projtop').onclick = () => { S.pickFor = 'proj'; pick('.pdf,.dxf'); };
-  $('#demo').onclick = openDemo; $('#help').onclick = showHelp; bindProj();
+  $('#demo').onclick = openDemo; $('#help').onclick = showHelp; bindProj(); bindReq();
 }
 function bindEmpty() {
   $('#open2').onclick = () => pick('.dxf,.are,.pco'); $('#demo2').onclick = openDemo;
