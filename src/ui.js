@@ -8,8 +8,110 @@ const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'pla
   obj: { org: '', kind: 'кабеля наружного освещения', object: '', ks: '', contract: '', cableL: '', author: 'Шахмиров А.М', device: 'Nikon XF 05', z: false } };
 S.gnb = Object.assign({}, I.GNB_DEFAULT);
 S.geo = null; S.pdf = null; S.spec = { text: '', src: '' }; S.pickFor = null;
+S.job = null; S.jobs = []; S.demo = false;   // проект ИЧ: имя, съёмки, настройки — хранится в браузере (IndexedDB)
 try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); if (st.gnb) Object.assign(S.gnb, st.gnb); if (st.spec) S.spec = st.spec; } } catch (e) { /* хранилище недоступно — работаем без него */ }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, spec: S.spec, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, spec: S.spec, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } saveJobSoon(); };
+
+// ---------- проекты ИЧ: несколько съёмок в одном проекте, всё хранится в браузере ----------
+const DB = { p: null,
+  open() { return this.p || (this.p = new Promise((res, rej) => { const r = indexedDB.open('ich', 1); r.onupgradeneeded = () => { r.result.createObjectStore('jobs', { keyPath: 'id' }); r.result.createObjectStore('files'); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); },
+  tx(store, mode, fn) { return this.open().then(db => new Promise((res, rej) => { const t = db.transaction(store, mode), q = fn(t.objectStore(store)); t.oncomplete = () => res(q && q.result); t.onerror = t.onabort = () => rej(t.error); })); },
+  all() { return this.tx('jobs', 'readonly', st => st.getAll()); }, get(id) { return this.tx('jobs', 'readonly', st => st.get(id)); },
+  put(rec) { return this.tx('jobs', 'readwrite', st => st.put(rec)); }, del(id) { return this.tx('jobs', 'readwrite', st => st.delete(id)).then(() => this.tx('files', 'readwrite', st => { st.delete(id + ':geo'); st.delete(id + ':pdf'); })); },
+  fput(key, val) { return this.tx('files', 'readwrite', st => st.put(val, key)); }, fget(key) { return this.tx('files', 'readonly', st => st.get(key)); } };
+let dbWarned = false; const dbFail = e => { if (!dbWarned) { dbWarned = true; toast('Браузер не даёт сохранить проект (' + (e && e.message || 'хранилище недоступно') + '). Сохраните проект в файл.'); } };
+const jobRec = () => ({ id: S.job.id, name: S.job.name, created: S.job.created, updated: S.job.updated, surveys: S.job.surveys, set: S.set, proj: S.proj, obj: S.obj, gnb: S.gnb, spec: S.spec });
+function saveJobNow() { clearTimeout(jobT); if (!S.job || S.demo) return Promise.resolve(); S.job.updated = Date.now(); return DB.put(JSON.parse(JSON.stringify(jobRec()))).catch(dbFail); }
+let jobT; function saveJobSoon() { if (!S.job || S.demo) return; clearTimeout(jobT); jobT = setTimeout(saveJobNow, 400); }
+function refreshJobs() { return DB.all().then(a => { S.jobs = (a || []).sort((x, y) => (y.updated || 0) - (x.updated || 0)).map(j => ({ id: j.id, name: j.name, updated: j.updated, ns: (j.surveys || []).length, np: (j.surveys || []).reduce((t, v) => t + (v.raw ? v.raw.length : 0), 0) })); }).catch(() => { S.jobs = []; }); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const dmy = t => t ? new Date(t).toLocaleDateString('ru-RU') : '';
+// точки всех включённых съёмок проекта — в один список; у каждой точки пометка, из какой она съёмки
+function rebuild() {
+  const j = S.job, raw = [];
+  j.surveys.forEach((sv, i) => { if (sv.on !== false) sv.raw.forEach(p => raw.push(Object.assign({}, p, { s: i, sname: sv.name }))); });
+  S.file = j.name; S.raw = raw; S.parsed = I.parsePoints(raw);
+}
+function storeFiles() {   // геоподоснова и PDF проекта хранятся вместе с проектом ИЧ
+  if (!S.job || S.demo) return;
+  if (S.geo && S.geo.blob && !S.geo.kept) { S.geo.kept = true; DB.fput(S.job.id + ':geo', { name: S.geo.name, blob: S.geo.blob }).catch(dbFail); }
+  if (S.pdf && S.pdf.blob && !S.pdf.kept) { S.pdf.kept = true; DB.fput(S.job.id + ':pdf', { name: S.pdf.name, blob: S.pdf.blob }).catch(dbFail); }
+}
+function newJob(name) {
+  let first = false; try { first = !localStorage.getItem('ich.jobs'); localStorage.setItem('ich.jobs', '1'); } catch (e) { /* без хранилища */ }
+  // первому проекту достаётся всё, что было введено до появления проектов; следующие начинаются с чистых таблиц
+  if (!first || S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.spec = { text: '', src: '' }; S.set.mode = 'fact'; Object.assign(S.obj, { object: '', ks: '', contract: '', cableL: '' }); ['groundA', 'groundB', 'no', 'cables', 'cover', 'cross', 'projPlan', 'projArc'].forEach(k => { S.gnb[k] = ''; }); }
+  S.demo = false; S.demoProj = false; S.set.start = 'auto'; S.set.net = null; S.gnb.chain = 0;
+  S.job = { id: uid(), name: name || 'Новый проект', created: Date.now(), updated: Date.now(), surveys: [] };
+  try { localStorage.setItem('ich.job', S.job.id); } catch (e) { /* без хранилища */ }
+  if (S.geo) S.geo.kept = false; if (S.pdf) S.pdf.kept = false; storeFiles();
+}
+function addSurvey(name, raw) {
+  if (S.demo || !S.job) { if (S.demo) { S.geo = null; S.pdf = null; } newJob(name.replace(/\.[^.]+$/, '')); }
+  const j = S.job, old = j.surveys.find(v => v.name === name);
+  if (old) { old.raw = raw; old.added = Date.now(); old.on = true; } else j.surveys.push({ id: uid(), name, added: Date.now(), raw, on: true });
+  S.view = null; S.tab = 'plan'; rebuild(); compute(); render(); save();
+  const all = S.parsed.pts.length;
+  toast((old ? 'Съёмка обновлена: ' : j.surveys.length > 1 ? 'Съёмка добавлена в проект: ' : 'Открыто: ') + name + ' — ' + raw.length + ' точек' + (j.surveys.length > 1 ? '. Всего в проекте: ' + all : '') + (S.parsed.dups ? '. Повторов точек убрано: ' + S.parsed.dups : ''));
+}
+function openJob(id) {
+  return saveJobNow().then(() => DB.get(id)).then(rec => {
+    if (!rec) { toast('Проект не найден — возможно, браузер очистил данные.'); return refreshJobs().then(render); }
+    S.demo = false; S.demoProj = false; S.job = { id: rec.id, name: rec.name, created: rec.created, updated: rec.updated, surveys: rec.surveys || [] };
+    if (rec.set) Object.assign(S.set, rec.set); if (rec.proj) S.proj = rec.proj; if (rec.obj) Object.assign(S.obj, rec.obj); if (rec.gnb) Object.assign(S.gnb, rec.gnb); S.spec = rec.spec || { text: '', src: '' };
+    if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.geo = null; S.pdf = null; S.view = null; S.tab = 'plan';
+    try { localStorage.setItem('ich.job', id); } catch (e) { /* без хранилища */ }
+    rebuild(); compute(); render();
+    DB.fget(id + ':pdf').then(f => { if (f && S.job && S.job.id === id) { S.pdf = { name: f.name, url: URL.createObjectURL(f.blob), blob: f.blob, kept: true }; render(); } }).catch(() => {});
+    DB.fget(id + ':geo').then(f => { if (!f || !S.job || S.job.id !== id) return; toast('Читаю геоподоснову ' + f.name + '…');
+      return f.blob.arrayBuffer().then(b => { if (!S.job || S.job.id !== id) return; S.geo = { name: f.name, G: I.readGeo(I.decode(new Uint8Array(b), true)), blob: f.blob, kept: true }; compute(); render(); toast('Проект открыт: ' + rec.name + '. Геоподоснова на месте.'); }); }).catch(() => {});
+  }).catch(dbFail);
+}
+function closeJob() { return saveJobNow().then(() => { if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.job = null; S.demo = false; S.file = null; S.raw = null; S.parsed = null; S.res = null; S.err = null; S.geo = null; S.pdf = null; try { localStorage.removeItem('ich.job'); } catch (e) { /* без хранилища */ } return refreshJobs(); }).then(render); }
+function exportJob() { const r = jobRec(); download(new TextEncoder().encode(JSON.stringify(Object.assign({ ich: 1 }, r))), r.name + '.ich.json', 'application/json'); toast('Проект сохранён в файл: съёмки, таблицы и данные объекта. Геоподоснову и PDF откройте заново на другом компьютере.'); }
+function importJob(p) {
+  if (!Array.isArray(p.surveys)) { toast('В файле проекта нет съёмок.'); return; }
+  saveJobNow().then(refreshJobs).then(() => {
+    let name = p.name || 'Проект', k = 2; const base = name; while (S.jobs.some(j => j.name === name)) name = base + ' (' + (k++) + ')';
+    const rec = { id: uid(), name, created: p.created || Date.now(), updated: Date.now(), surveys: p.surveys, set: p.set, proj: p.proj, obj: p.obj, gnb: p.gnb, spec: p.spec };
+    try { localStorage.setItem('ich.jobs', '1'); } catch (e) { /* без хранилища */ }
+    return DB.put(rec).then(() => openJob(rec.id)).then(() => toast('Проект открыт из файла: ' + name));
+  }).catch(dbFail);
+}
+let armed = ['', 0]; const twice = (key, msg) => { if (armed[0] === key && Date.now() - armed[1] < 4000) { armed = ['', 0]; return true; } armed = [key, Date.now()]; toast(msg); return false; };
+function jobBlock() {
+  const j = S.job;
+  if (!j) return S.demo ? '<div class="jobbox"><b>Пример</b><p class="fine">Условные данные, не сохраняются. Откройте свою съёмку — создастся проект.</p></div>' : '';
+  const ses = S.parsed ? S.parsed.sessions : [];
+  const li = j.surveys.map((v, i) => { const mine = ses.filter(x => x.s === i), offs = mine.filter(x => x.off).map(x => '+' + x.off);
+    return '<li><label class="chk"><input type="checkbox" data-son="' + i + '"' + (v.on !== false ? ' checked' : '') + '><span><b>' + esc(v.name) + '</b><em>' + dmy(v.added) + ' · ' + v.raw.length + ' т.' + (mine.length > 1 ? ' · выездов: ' + mine.length : '') + (offs.length ? ' · номера на ИЧ: ' + offs.join(', ') : '') + '</em></span></label><button class="btn small danger" data-sdel="' + i + '" title="Убрать съёмку из проекта">✕</button></li>'; }).join('');
+  return '<div class="jobbox"><label class="fld">Проект ИЧ<input id="jobname" value="' + esc(j.name) + '"></label>'
+    + '<h3 class="sh">Съёмки проекта</h3>' + (li ? '<ul class="survs">' + li + '</ul>' : '<p class="fine">Съёмок пока нет.</p>')
+    + '<div class="row"><button class="btn small primary" id="sadd">Добавить съёмку…</button><button class="btn small" id="jsave" title="Файл проекта: для переноса на другой компьютер и про запас">В файл</button></div>'
+    + (ses.length > 1 ? '<label class="fld">Стыковать съёмки: точки ближе, см<input id="jjoin" inputmode="decimal" value="' + esc(String(S.set.join == null ? 10 : S.set.join)) + '"></label>' : '')
+    + '<p class="fine">Проект сохраняется в браузере сам. Новая съёмка дополняет ИЧ; файл с тем же именем заменяет прежний.</p></div>';
+}
+function bindJob() {
+  const nm = $('#jobname'); if (!nm) return;
+  nm.onchange = () => { const v = nm.value.trim(); if (!v) { nm.value = S.job.name; return; } S.job.name = v; S.file = v; save(); render(); };
+  $('#sadd').onclick = () => { S.pickFor = null; pick('.dxf,.are,.pco'); };
+  $('#jsave').onclick = exportJob;
+  const jj = $('#jjoin'); if (jj) jj.onchange = () => { const v = num(jj.value); S.set.join = v == null || v < 0 ? 10 : v; save(); compute(); render(); };
+  document.querySelectorAll('[data-son]').forEach(c => c.onchange = () => { S.job.surveys[+c.dataset.son].on = c.checked; S.view = null; rebuild(); compute(); render(); save(); });
+  document.querySelectorAll('[data-sdel]').forEach(b => b.onclick = () => { const i = +b.dataset.sdel, v = S.job.surveys[i]; if (!twice('s' + v.id, 'Нажмите ✕ ещё раз, чтобы убрать съёмку «' + v.name + '» из проекта.')) return; S.job.surveys.splice(i, 1); S.view = null; rebuild(); compute(); render(); save(); });
+}
+function jobsList() {
+  return '<div class="jobs"><h2>Проекты ИЧ</h2>' + (S.jobs.length ? '<ul class="joblist">' + S.jobs.map(j => '<li><button class="job" data-job="' + j.id + '"><b>' + esc(j.name) + '</b><span>съёмок: ' + j.ns + ' · точек: ' + j.np + ' · изменён ' + dmy(j.updated) + '</span></button><button class="btn small danger" data-jdel="' + j.id + '">Удалить</button></li>').join('') + '</ul>'
+    : '<p class="fine">Пока нет. Проект создаётся сам, когда вы открываете съёмку. Потом в него догружают новые съёмки — ИЧ дополняется.</p>')
+    + '<div class="row"><input id="newjob" placeholder="Название нового проекта"><button class="btn" id="newjobb">Создать</button><button class="btn ghost" id="jobfile" title="Файл проекта .ich.json">Из файла…</button></div></div>';
+}
+function bindJobs() {
+  document.querySelectorAll('[data-job]').forEach(b => b.onclick = () => openJob(b.dataset.job));
+  document.querySelectorAll('[data-jdel]').forEach(b => b.onclick = () => { const j = S.jobs.find(x => x.id === b.dataset.jdel); if (!twice('j' + j.id, 'Нажмите «Удалить» ещё раз: проект «' + j.name + '» со съёмками будет удалён из браузера.')) return; DB.del(j.id).then(refreshJobs).then(render).catch(dbFail); });
+  const mk = () => { const v = $('#newjob').value.trim(); if (!v) { toast('Впишите название проекта.'); $('#newjob').focus(); return; } if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.geo = null; S.pdf = null; newJob(v); rebuild(); compute(); render(); save(); };
+  $('#newjobb').onclick = mk; $('#newjob').onkeydown = e => { if (e.key === 'Enter') mk(); };
+  $('#jobfile').onclick = () => pick('.json');
+}
 
 // ---------- уведомления ----------
 let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
@@ -25,7 +127,8 @@ function geoDwg(pts) {
   }
   return D;
 }
-function geoBlock() {
+function geoBlock() { return jobBlock() + geoBlock0(); }
+function geoBlock0() {
   if (!S.geo) return reqList(true) +  '<div class="geo-need"><b>Нужна геоподоснова.</b> ИЧ строится на геоподоснове МГГТ — откройте её DXF. Без неё чертёж только для просмотра, DXF не выдаётся.<div class="row"><button class="btn primary small" id="geoopen">Открыть геоподоснову…</button></div></div>';
   return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов в окне ±' + esc(String(S.set.geoPad || 40)) + ' м</li></ul>'
     + '<div class="row"><label class="fld" style="flex:1">Окно вокруг сети, м<input id="geopad" inputmode="decimal" value="' + esc(String(S.set.geoPad || 40)) + '"></label></div><div class="row"><button class="btn small" id="geoopen">Другая геоподоснова…</button></div>';
@@ -53,6 +156,7 @@ function compute() {
   if (!S.parsed) return;
   try {
     const P = S.parsed.pts;
+    if (S.job && !S.job.surveys.length) throw new Error('В проекте пока нет съёмок. Нажмите «Добавить съёмку…» слева или перетащите файл в окно.');
     const det = S.det = I.detectNets(P);
     const f = det.found.find(x => x.net.id === S.set.net) || det.found.find(x => x.net.kind) || det.found[0];
     if (!f) throw new Error('В съёмке нет кодов известных сетей (476, 491, 4041…). Проверьте коды точек.');
@@ -90,7 +194,7 @@ function compute() {
 
 function computeLine(P, net) {
   const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
-  const m = I.buildLine(P, net, names), D = geoDwg(m.points);
+  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100 }), D = geoDwg(m.points);
   let k = D.e.length; I.drawLine(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false }); D.mark('plan', k);
   const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
   k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
@@ -145,24 +249,22 @@ async function openFile(f) {
   try {
     const bytes = new Uint8Array(await f.arrayBuffer()), ext = (f.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
     let raw;
-    if (ext === '.json') { loadProject(JSON.parse(new TextDecoder().decode(bytes))); return; }
+    if (ext === '.json') { const pj = JSON.parse(new TextDecoder().decode(bytes)); if (pj && pj.ich) importJob(pj); else loadProject(pj); return; }
     const purpose = S.pickFor; S.pickFor = null;
-    if (ext === '.pdf') { if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.pdf = { name: f.name, url: URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })) }; S.tab = 'pdf'; render(); toast('Проект открыт: ' + f.name + '. Сверяйте на вкладке «Проект»; спецификацию вставьте справа или откройте DXF проекта.'); return; }
+    if (ext === '.pdf') { if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.pdf = { name: f.name, url: URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })), blob: f }; storeFiles(); S.tab = 'pdf'; render(); toast('Проект открыт: ' + f.name + '. Сверяйте на вкладке «Проект»; спецификацию вставьте справа или откройте DXF проекта.'); return; }
     if (ext === '.dxf' && purpose === 'proj') { loadProjDXF(f.name, I.decode(bytes, true)); return; }
-    if (ext === '.dxf' && purpose === 'geo') { loadGeo(f.name, I.decode(bytes, true)); return; }
-    if (ext === '.dxf') { const txt = I.decode(bytes, true); raw = I.readDXF(txt); if (!raw.length) { if (/проект|иот|спец|ИОТ/i.test(f.name)) loadProjDXF(f.name, txt); else loadGeo(f.name, txt); return; } }
+    if (ext === '.dxf' && purpose === 'geo') { loadGeo(f.name, I.decode(bytes, true), f); return; }
+    if (ext === '.dxf') { const txt = I.decode(bytes, true); raw = I.readDXF(txt); if (!raw.length) { if (/проект|иот|спец|ИОТ/i.test(f.name)) loadProjDXF(f.name, txt); else loadGeo(f.name, txt, f); return; } }
     else if (ext === '.are' || ext === '.pco') raw = I.readARE(I.decode(bytes, false));
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
-    if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan'; S.gnb.chain = 0; if (S.gnb.file !== f.name) { ['groundA', 'groundB', 'no', 'cables', 'cover', 'cross', 'projPlan', 'projArc'].forEach(k => { S.gnb[k] = ''; }); S.gnb.file = f.name; save(); }
-    compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
+    addSurvey(f.name, raw);
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
-function loadGeo(name, txt) {
+function loadGeo(name, txt, blob) {
   toast('Читаю геоподоснову ' + name + '…');
   setTimeout(() => {
-    try { const G = I.readGeo(txt); S.geo = { name, G }; compute(); render(); toast('Геоподоснова: ' + name + ' — ' + G.layers.size + ' слоёв. На ИЧ ложится окно вокруг сети.'); }
+    try { const G = I.readGeo(txt); S.geo = { name, G, blob }; storeFiles(); compute(); render(); toast('Геоподоснова: ' + name + ' — ' + G.layers.size + ' слоёв. На ИЧ ложится окно вокруг сети.'); }
     catch (e) { toast('Не удалось прочитать геоподоснову: ' + e.message); }
   }, 30);
 }
@@ -228,7 +330,7 @@ function netsBlock() {
 }
 function renderLine() {
   const r = S.res, m = r.m;
-  let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li></ul>' + netsBlock();
+  let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li>' + (m.joined ? '<li>съёмки состыкованы в ' + m.joined + ' т.</li>' : '') + '</ul>' + netsBlock();
   side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>L траншеи — <b>' + fnum(m.trench, 1) + ' м</b></li></ul>';
   if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
   side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
@@ -395,7 +497,7 @@ function checkTable() {
 function topBar() {
   return '<header class="top"><div class="brand"><span class="mark">ИЧ</span><span class="sep"></span><span class="sub">исполнительный чертёж<br>по съёмке</span></div>'
     + '<div class="top-info">' + (S.file ? esc(S.file) : 'съёмка → план, профиль, ведомость и сверка с проектом') + '</div>'
-    + '<div class="top-actions"><button class="btn" id="open">Открыть съёмку…</button><button class="btn' + (S.geo ? ' ghost' : '') + '" id="geotop" title="Геоподоснова МГГТ в DXF — обязательна для ИЧ">' + (S.geo ? 'Геоподоснова ✓' : 'Геоподоснова…') + '</button><button class="btn ghost" id="projtop" title="Проект: PDF для сверки, DXF — для спецификации">Проект…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
+    + '<div class="top-actions"><button class="btn ghost" id="jobs" title="Список сохранённых проектов ИЧ">Проекты</button><button class="btn" id="open">' + (S.job ? 'Добавить съёмку…' : 'Открыть съёмку…') + '</button><button class="btn' + (S.geo ? ' ghost' : '') + '" id="geotop" title="Геоподоснова МГГТ в DXF — обязательна для ИЧ">' + (S.geo ? 'Геоподоснова ✓' : 'Геоподоснова…') + '</button><button class="btn ghost" id="projtop" title="Рабочая документация: PDF для сверки, DXF — для спецификации">РД (проект)…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
 }
 // ---------- что нужно для корректной ИЧ: подсказка на старте и в работе ----------
 function reqItems() {
@@ -424,7 +526,7 @@ function reqList(compact) {
 }
 function bindReq() { document.querySelectorAll('[data-req]').forEach(b => b.onclick = () => { const a = b.dataset.req; if (a === 'open') { S.pickFor = null; pick('.dxf,.are,.pco'); } else if (a === 'geotop') { S.pickFor = 'geo'; pick('.dxf'); } else { S.pickFor = 'proj'; pick('.pdf,.dxf'); } }); }
 function emptyView() {
-  return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Геоподоснову и проект можно перетащить сюда же или открыть кнопками вверху.</p><div class="row"><button class="btn primary" id="open2">Выбрать съёмку…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
+  return '<div class="empty"><div class="startcol">' + jobsList() + '<div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Геоподоснову и проект можно перетащить сюда же или открыть кнопками вверху.</p><div class="row"><button class="btn primary" id="open2">Выбрать съёмку…</button><button class="btn" id="demo2">Открыть пример</button></div></div></div>'
     + reqList(false) + '</div>';
 }
 
@@ -461,13 +563,15 @@ function bindTop() {
   $('#open').onclick = () => { S.pickFor = null; pick('.dxf,.are,.pco'); };
   $('#geotop').onclick = () => { S.pickFor = 'geo'; pick('.dxf'); };
   $('#projtop').onclick = () => { S.pickFor = 'proj'; pick('.pdf,.dxf'); };
-  $('#demo').onclick = openDemo; $('#help').onclick = showHelp; bindProj(); bindReq();
+  $('#jobs').onclick = () => { if (!S.job && !S.parsed) { toast('Список проектов — на этом экране слева.'); return; } closeJob(); };
+  $('#demo').onclick = openDemo; $('#help').onclick = showHelp; bindProj(); bindReq(); bindJob();
 }
 function bindEmpty() {
-  $('#open2').onclick = () => pick('.dxf,.are,.pco'); $('#demo2').onclick = openDemo;
+  $('#open2').onclick = () => pick('.dxf,.are,.pco'); $('#demo2').onclick = openDemo; bindJobs();
   $('#drop').onclick = e => { if (e.target.id === 'drop' || e.target.tagName === 'H1' || e.target.tagName === 'P') pick('.dxf,.are,.pco'); };
 }
 function openDemo() {
+  saveJobNow(); S.job = null; S.demo = true; try { localStorage.removeItem('ich.job'); } catch (e) { /* без хранилища */ }
   const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
   if (!hasProject() || S.demoProj) { S.proj = JSON.parse(JSON.stringify(I.DEMO_PROJECT)); S.demoProj = true; }
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
@@ -520,7 +624,8 @@ function showHelp() {
     + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr><tr><td>4028 / 4028..</td><td>номер «2-1.36»</td><td>ГНБ: земля над трубой и глубина локатора до оси; без глубины — верх трубы в приямке</td></tr></table>'
     + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'
     + '<h3>Проект и подгонка</h3><p>Колодцы проекта сопоставляются со съёмкой по порядку вдоль трассы; направление хода выбирается по лучшему совпадению отметок (или задайте «Начало хода»). В режиме «под проект» значения, отличающиеся не больше допуска, берутся из проекта, остальные — по съёмке. Подгоняются обечайки, дно, горловина, верх трубы на входе и выходе, длины пролётов и футляров. План и промежуточные точки трубы остаются по съёмке.</p>'
-    + '<p>Проект сохраняется в браузере автоматически; файлом (.json) его можно перенести на другой компьютер.</p>'
+    + '<p>Таблицы проектных значений сохраняются вместе с проектом ИЧ.</p>'
+    + '<h3>Проекты ИЧ и несколько съёмок</h3><p>Когда вы открываете съёмку, создаётся <b>проект ИЧ</b> — он сохраняется в браузере сам вместе с геоподосновой, PDF, таблицами и данными объекта. Кнопка «Проекты» вверху показывает список сохранённых проектов.</p><p>Объект снят не весь — откройте проект позже и нажмите <b>«Добавить съёмку…»</b>: новые точки дополнят ИЧ. Номера в новой съёмке могут повторяться — на ИЧ они сдвигаются на 1000, 2000… Точки разных съёмок ближе 10 см (допуск меняется) считаются одной: трасса продолжается от переснятой точки. Файл с тем же именем заменяет прежнюю съёмку; галочка у съёмки временно выключает её.</p><p>Кнопка «В файл» сохраняет проект файлом .ich.json — про запас и для другого компьютера (геоподоснову и PDF там откройте заново). Браузер может очистить данные сайта, поэтому важные проекты держите и в файле.</p>'
     + '<h3>Что пока не умеет</h3><p>Ответвления трассы, развёртки колодцев, линию земли и пересечения с коммуникациями (нужна геоподоснова), рамку и штамп, чтение проекта прямо из ИД.</p>'
     + '</div></div>';
   document.body.appendChild(v); v.onclick = e => { if (e.target === v || e.target.id === 'hx') v.remove(); };
@@ -536,4 +641,6 @@ document.addEventListener('keydown', e => {
   if (e.key === '+' || e.key === '=') zoomAt(1.5, s.width / 2, s.height / 2); else if (e.key === '-') zoomAt(1 / 1.5, s.width / 2, s.height / 2); else if (e.key === '0') fitView(S.tab);
 });
 render();
+refreshJobs().then(() => { let id = null; try { id = localStorage.getItem('ich.job'); } catch (e) { /* без хранилища */ } if (id && S.jobs.some(j => j.id === id)) openJob(id); else render(); });
+window.addEventListener('pagehide', () => { saveJobNow(); });
 })();

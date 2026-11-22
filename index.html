@@ -64,6 +64,12 @@ svg.draw text{stroke:none}
 .reqcol h2{font-size:20px;margin:0 0 12px}.reqs{list-style:none;margin:0;padding:0;display:grid;gap:10px}.req{display:flex;gap:10px;align-items:flex-start;font-size:13.5px}.req p{margin:3px 0 4px;color:var(--muted);line-height:1.35}.req em{font-style:normal;font-size:11.5px;padding:1px 6px;border-radius:9px;background:#eef0f2;color:var(--muted);margin-left:4px}.req .btn{margin-top:2px}
 .rq-m{flex:0 0 20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:#eef0f2;color:#6b7076}.req.ok .rq-m{background:#e3f3e8;color:#2c7a4b}.req.need .rq-m{background:#fdecea;color:#b3261e}.req.need em{background:#fdecea;color:#b3261e}.req.ok em{background:#e3f3e8;color:#2c7a4b}
 .reqbox{margin:0 0 12px;border:1px solid var(--line);border-radius:6px;padding:6px 9px;background:#fafbfc}.reqbox summary{cursor:pointer;font-weight:600;font-size:13px}.reqbox .reqs{margin-top:8px;gap:7px}.reqbox .req{font-size:12.5px}
+.jobbox{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:14px;background:#fff}.jobbox .fld input{font-weight:700}
+.survs{list-style:none;margin:4px 0 8px;padding:0;display:grid;gap:4px}.survs li{display:flex;gap:6px;align-items:flex-start;justify-content:space-between;border-bottom:1px dashed var(--line);padding:3px 0}.survs .chk{margin:0;align-items:flex-start;flex:1;min-width:0}.survs span{display:grid;min-width:0}.survs b{font-size:13px;word-break:break-all}.survs em{font-style:normal;color:var(--muted);font-size:12px}
+.startcol{display:grid;gap:22px;min-width:0}.jobs h2{font-size:20px;margin:0 0 10px}.joblist{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px;max-height:34vh;overflow:auto}.joblist li{display:flex;gap:8px;align-items:center}
+.job{flex:1;min-width:0;display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 10px;cursor:pointer}.job:hover{border-color:var(--ink)}.job b{font-size:15px;word-break:break-all}.job span{color:var(--muted);font-size:12.5px}
+.jobs .row input{flex:1;min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font:inherit}
+.req.ok{position:static;height:auto;min-width:0;padding:0;border-radius:0;background:none;color:inherit;display:flex;place-items:initial;align-items:flex-start}
 </style></head>
 <body><div id="app"></div><input id="picker" type="file" multiple hidden><div id="toast" role="status"></div>
 <script>window.ICH_SKEL={"skel": "  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1015\n  9\n$ACADMAINTVER\n 70\n6\n  9\n$DWGCODEPAGE\n  3\nANSI_1251\n  9\n$INSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$EXTMIN\n 10\n{{EXMINX}}\n 20\n{{EXMINY}}\n 30\n0.0\n  9\n$EXTMAX\n 10\n{{EXMAXX}}\n 20\n{{EXMAXY}}\n 30\n0.0\n  9\n$LIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$LIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$ORTHOMODE\n 70\n0\n  9\n$REGENMODE\n 70\n1\n  9\n$FILLMODE\n 70\n1\n  9\n$QTEXTMODE\n 70\n0\n  9\n$MIRRTEXT\n 70\n1\n  9\n$LTSCALE\n 40\n{{LTSCALE}}\n  9\n$ATTMODE\n 70\n1\n  9\n$TEXTSIZE\n 40\n2.5\n  9\n$TRACEWID\n 40\n1.0\n  9\n$TEXTSTYLE\n  7\nStandard\n  9\n$CLAYER\n  8\n0\n  9\n$CELTYPE\n  6\nByLayer\n  9\n$CECOLOR\n 62\n256\n  9\n$CELTSCALE\n 40\n1.0\n  9\n$DISPSILH\n 70\n0\n  9\n$DIMSCALE\n 40\n1.0\n  9\n$DIMASZ\n 40\n2.5\n  9\n$DIMEXO\n 40\n0.625\n  9\n$DIMDLI\n 40\n3.75\n  9\n$DIMRND\n 40\n0.0\n  9\n$DIMDLE\n 40\n0.0\n  9\n$DIMEXE\n 40\n1.25\n  9\n$DIMTP\n 40\n0.0\n  9\n$DIMTM\n 40\n0.0\n  9\n$DIMTXT\n 40\n2.5\n  9\n$DIMCEN\n 40\n2.5\n  9\n$DIMTSZ\n 40\n0.0\n  9\n$DIMTOL\n 70\n0\n  9\n$DIMLIM\n 70\n0\n  9\n$DIMTIH\n 70\n0\n  9\n$DIMTOH\n 70\n0\n  9\n$DIMSE1\n 70\n0\n  9\n$DIMSE2\n 70\n0\n  9\n$DIMTAD\n 70\n1\n  9\n$DIMZIN\n 70\n8\n  9\n$DIMBLK\n  1\n\n  9\n$DIMASO\n 70\n1\n  9\n$DIMSHO\n 70\n1\n  9\n$DIMPOST\n  1\n\n  9\n$DIMAPOST\n  1\n\n  9\n$DIMALT\n 70\n0\n  9\n$DIMALTD\n 70\n3\n  9\n$DIMALTF\n 40\n0.03937007874\n  9\n$DIMLFAC\n 40\n1.0\n  9\n$DIMTOFL\n 70\n1\n  9\n$DIMTVP\n 40\n0.0\n  9\n$DIMTIX\n 70\n0\n  9\n$DIMSOXD\n 70\n0\n  9\n$DIMSAH\n 70\n0\n  9\n$DIMBLK1\n  1\n\n  9\n$DIMBLK2\n  1\n\n  9\n$DIMSTYLE\n  2\nISO-25\n  9\n$DIMCLRD\n 70\n0\n  9\n$DIMCLRE\n 70\n0\n  9\n$DIMCLRT\n 70\n0\n  9\n$DIMTFAC\n 40\n1.0\n  9\n$DIMGAP\n 40\n0.625\n  9\n$DIMJUST\n 70\n0\n  9\n$DIMSD1\n 70\n0\n  9\n$DIMSD2\n 70\n0\n  9\n$DIMTOLJ\n 70\n0\n  9\n$DIMTZIN\n 70\n8\n  9\n$DIMALTZ\n 70\n0\n  9\n$DIMALTTZ\n 70\n0\n  9\n$DIMUPT\n 70\n0\n  9\n$DIMDEC\n 70\n2\n  9\n$DIMTDEC\n 70\n2\n  9\n$DIMALTU\n 70\n2\n  9\n$DIMALTTD\n 70\n3\n  9\n$DIMTXSTY\n  7\nStandard\n  9\n$DIMAUNIT\n 70\n0\n  9\n$DIMADEC\n 70\n0\n  9\n$DIMALTRND\n 40\n0.0\n  9\n$DIMAZIN\n 70\n0\n  9\n$DIMDSEP\n 70\n44\n  9\n$DIMATFIT\n 70\n3\n  9\n$DIMFRAC\n 70\n0\n  9\n$DIMLDRBLK\n  1\n\n  9\n$DIMLUNIT\n 70\n2\n  9\n$DIMLWD\n 70\n-2\n  9\n$DIMLWE\n 70\n-2\n  9\n$DIMTMOVE\n 70\n0\n  9\n$LUNITS\n 70\n2\n  9\n$LUPREC\n 70\n4\n  9\n$SKETCHINC\n 40\n1.0\n  9\n$FILLETRAD\n 40\n10.0\n  9\n$AUNITS\n 70\n0\n  9\n$AUPREC\n 70\n2\n  9\n$MENU\n  1\n.\n  9\n$ELEVATION\n 40\n0.0\n  9\n$PELEVATION\n 40\n0.0\n  9\n$THICKNESS\n 40\n0.0\n  9\n$LIMCHECK\n 70\n0\n  9\n$CHAMFERA\n 40\n0.0\n  9\n$CHAMFERB\n 40\n0.0\n  9\n$CHAMFERC\n 40\n0.0\n  9\n$CHAMFERD\n 40\n0.0\n  9\n$SKPOLY\n 70\n0\n  9\n$TDCREATE\n 40\n2461313.7136921296\n  9\n$TDUCREATE\n 40\n2458532.153996898\n  9\n$TDUPDATE\n 40\n2461313.7136921296\n  9\n$TDUUPDATE\n 40\n2458532.1544311\n  9\n$TDINDWG\n 40\n0.0\n  9\n$TDUSRTIMER\n 40\n0.0\n  9\n$USRTIMER\n 70\n1\n  9\n$ANGBASE\n 50\n0.0\n  9\n$ANGDIR\n 70\n0\n  9\n$PDMODE\n 70\n35\n  9\n$PDSIZE\n 40\n{{PDSIZE}}\n  9\n$PLINEWID\n 40\n0.0\n  9\n$SPLFRAME\n 70\n0\n  9\n$SPLINETYPE\n 70\n6\n  9\n$SPLINESEGS\n 70\n8\n  9\n$HANDSEED\n  5\n{{HANDSEED}}\n  9\n$SURFTAB1\n 70\n6\n  9\n$SURFTAB2\n 70\n6\n  9\n$SURFTYPE\n 70\n6\n  9\n$SURFU\n 70\n6\n  9\n$SURFV\n 70\n6\n  9\n$UCSBASE\n  2\n\n  9\n$UCSNAME\n  2\n\n  9\n$UCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$UCSORTHOREF\n  2\n\n  9\n$UCSORTHOVIEW\n 70\n0\n  9\n$UCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSBASE\n  2\n\n  9\n$PUCSNAME\n  2\n\n  9\n$PUCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$PUCSORTHOREF\n  2\n\n  9\n$PUCSORTHOVIEW\n 70\n0\n  9\n$PUCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$USERI1\n 70\n0\n  9\n$USERI2\n 70\n0\n  9\n$USERI3\n 70\n0\n  9\n$USERI4\n 70\n0\n  9\n$USERI5\n 70\n0\n  9\n$USERR1\n 40\n0.0\n  9\n$USERR2\n 40\n0.0\n  9\n$USERR3\n 40\n0.0\n  9\n$USERR4\n 40\n0.0\n  9\n$USERR5\n 40\n0.0\n  9\n$WORLDVIEW\n 70\n1\n  9\n$SHADEDGE\n 70\n3\n  9\n$SHADEDIF\n 70\n70\n  9\n$TILEMODE\n 70\n1\n  9\n$MAXACTVP\n 70\n64\n  9\n$PINSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PLIMCHECK\n 70\n0\n  9\n$PEXTMIN\n 10\n1e+20\n 20\n1e+20\n 30\n1e+20\n  9\n$PEXTMAX\n 10\n-1e+20\n 20\n-1e+20\n 30\n-1e+20\n  9\n$PLIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$PLIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$UNITMODE\n 70\n0\n  9\n$VISRETAIN\n 70\n1\n  9\n$PLINEGEN\n 70\n0\n  9\n$PSLTSCALE\n 70\n1\n  9\n$TREEDEPTH\n 70\n3020\n  9\n$CMLSTYLE\n  2\nStandard\n  9\n$CMLJUST\n 70\n0\n  9\n$CMLSCALE\n 40\n20.0\n  9\n$PROXYGRAPHICS\n 70\n1\n  9\n$MEASUREMENT\n 70\n1\n  9\n$CELWEIGHT\n370\n-1\n  9\n$ENDCAPS\n280\n0\n  9\n$JOINSTYLE\n280\n0\n  9\n$LWDISPLAY\n290\n0\n  9\n$INSUNITS\n 70\n6\n  9\n$HYPERLINKBASE\n  1\n\n  9\n$STYLESHEET\n  1\n\n  9\n$XEDIT\n290\n1\n  9\n$CEPSNTYPE\n380\n0\n  9\n$PSTYLEMODE\n290\n1\n  9\n$FINGERPRINTGUID\n  2\n{83AAAAEA-91C6-4B45-A960-A1CEF3310842}\n  9\n$VERSIONGUID\n  2\n{D81DBDA3-241D-4286-9503-0B4CF4FEC05F}\n  9\n$EXTNAMES\n290\n1\n  9\n$PSVPSCALE\n 40\n0.0\n  9\n$OLESTARTUP\n290\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nCLASSES\n  0\nCLASS\n  1\nACDBDICTIONARYWDFLT\n  2\nAcDbDictionaryWithDefault\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nSUN\n  2\nAcDbSun\n  3\nSCENEOE\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nVISUALSTYLE\n  2\nAcDbVisualStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMATERIAL\n  2\nAcDbMaterial\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nSCALE\n  2\nAcDbScale\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nTABLESTYLE\n  2\nAcDbTableStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMLEADERSTYLE\n  2\nAcDbMLeaderStyle\n  3\nACDB_MLEADERSTYLE_CLASS\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nDICTIONARYVAR\n  2\nAcDbDictionaryVar\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nCELLSTYLEMAP\n  2\nAcDbCellStyleMap\n  3\nObjectDBX Classes\n 90\n1152\n280\n0\n281\n0\n  0\nCLASS\n  1\nMENTALRAYRENDERSETTINGS\n  2\nAcDbMentalRayRenderSettings\n  3\nSCENEOE\n 90\n1024\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBDETAILVIEWSTYLE\n  2\nAcDbDetailViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBSECTIONVIEWSTYLE\n  2\nAcDbSectionViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nRASTERVARIABLES\n  2\nAcDbRasterVariables\n  3\nISM\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBPLACEHOLDER\n  2\nAcDbPlaceHolder\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nLAYOUT\n  2\nAcDbLayout\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nVPORT\n  5\n8\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nVPORT\n  5\n23\n330\n8\n100\nAcDbSymbolTableRecord\n100\nAcDbViewportTableRecord\n  2\n*Active\n 70\n0\n 10\n0.0\n 20\n0.0\n 11\n1.0\n 21\n1.0\n 12\n0.0\n 22\n0.0\n 13\n0.0\n 23\n0.0\n 14\n0.5\n 24\n0.5\n 15\n0.5\n 25\n0.5\n 16\n0.0\n 26\n0.0\n 36\n1.0\n 17\n0.0\n 27\n0.0\n 37\n0.0\n 40\n1000.0\n 41\n1.34\n 42\n50.0\n 43\n0.0\n 44\n0.0\n 50\n0.0\n 51\n0.0\n 71\n0\n 72\n1000\n 73\n1\n 74\n3\n 75\n0\n 76\n0\n 77\n0\n 78\n0\n281\n0\n 65\n0\n146\n0.0\n  0\nENDTAB\n  0\nTABLE\n  2\nLTYPE\n  5\n2\n330\n0\n100\nAcDbSymbolTable\n 70\n4\n  0\nLTYPE\n  5\n24\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByBlock\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n25\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByLayer\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n26\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nContinuous\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n35\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nDASHED\n 70\n0\n  3\n\n 72\n65\n 73\n2\n 40\n1.0\n 49\n0.6\n 74\n0\n 49\n-0.4\n 74\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nLAYER\n  5\n1\n330\n0\n100\nAcDbSymbolTable\n 70\n{{NLAYERS}}\n  0\nLAYER\n  5\n27\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\n0\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n28\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDefpoints\n 70\n0\n 62\n7\n  6\nContinuous\n290\n0\n370\n-3\n390\n13\n  0\nLAYER\n  5\n2F\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nPOINT\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n30\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nName\n 70\n0\n 62\n1\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n31\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nELEVATION\n 70\n0\n 62\n5\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n32\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDeskription\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n33\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHV\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n34\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHI\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n{{LAYERS}}  0\nENDTAB\n  0\nTABLE\n  2\nSTYLE\n  5\n5\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nSTYLE\n  5\n29\n330\n5\n100\nAcDbSymbolTableRecord\n100\nAcDbTextStyleTableRecord\n  2\nStandard\n 70\n0\n 40\n0.0\n 41\n1.0\n 50\n0.0\n 71\n0\n 42\n2.5\n  3\narial.ttf\n  4\n\n  0\nENDTAB\n  0\nTABLE\n  2\nVIEW\n  5\n7\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nUCS\n  5\n6\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nAPPID\n  5\n3\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nAPPID\n  5\n2A\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nACAD\n 70\n0\n  0\nAPPID\n  5\n3F\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nHATCHBACKGROUNDCOLOR\n 70\n0\n  0\nAPPID\n  5\n40\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nEZDXF\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nDIMSTYLE\n  5\n4\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n100\nAcDbDimStyleTable\n  0\nDIMSTYLE\n105\n2B\n330\n4\n100\nAcDbSymbolTableRecord\n100\nAcDbDimStyleTableRecord\n  2\nStandard\n 70\n0\n  3\n\n  4\n\n 40\n1.0\n 41\n2.5\n 42\n0.625\n 43\n3.75\n 44\n1.25\n 45\n0.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n140\n2.5\n141\n2.5\n142\n0.0\n143\n0.03937007874\n144\n1.0\n145\n0.0\n146\n1.0\n147\n0.625\n148\n0.0\n 71\n0\n 72\n0\n 73\n0\n 74\n0\n 75\n0\n 76\n0\n 77\n1\n 78\n8\n 79\n3\n170\n0\n171\n3\n172\n1\n173\n0\n174\n0\n175\n0\n176\n0\n177\n0\n178\n0\n179\n2\n271\n2\n272\n2\n273\n2\n274\n3\n275\n0\n276\n0\n277\n2\n278\n44\n279\n0\n280\n0\n281\n0\n282\n0\n283\n0\n284\n8\n285\n0\n286\n0\n288\n0\n289\n3\n371\n-2\n372\n-2\n  0\nENDTAB\n  0\nTABLE\n  2\nBLOCK_RECORD\n  5\n9\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nBLOCK_RECORD\n  5\n17\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Model_Space\n340\n1A\n  0\nBLOCK_RECORD\n  5\n1B\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Paper_Space\n340\n1E\n  0\nBLOCK_RECORD\n  5\n36\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n_block2\n340\n0\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nBLOCKS\n  0\nBLOCK\n  5\n18\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Model_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Model_Space\n  1\n\n  0\nENDBLK\n  5\n19\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n1C\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Paper_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Paper_Space\n  1\n\n  0\nENDBLK\n  5\n1D\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n37\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n_block2\n 70\n2\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n_block2\n  1\n\n  0\nCIRCLE\n  5\n39\n330\n36\n100\nAcDbEntity\n  8\nPOINT\n100\nAcDbCircle\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 40\n0.0762\n  0\nATTDEF\n  5\n3A\n330\n36\n100\nAcDbEntity\n  8\nName\n 62\n250\n100\nAcDbText\n 10\n0.096\n 20\n0.178\n 30\n0.0\n 40\n0.2\n  1\n1\n100\nAcDbAttributeDefinition\n  3\nНОМЕР\n  2\n№\n 70\n0\n  0\nATTDEF\n  5\n3B\n330\n36\n100\nAcDbEntity\n  8\nELEVATION\n100\nAcDbText\n 10\n0.096\n 20\n-0.08\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОТМЕТКА\n  2\nH\n 70\n0\n  0\nATTDEF\n  5\n3C\n330\n36\n100\nAcDbEntity\n  8\nDeskription\n100\nAcDbText\n 10\n0.096\n 20\n-0.357\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОписание\n  2\nTXT\n 70\n0\n  0\nATTDEF\n  5\n3D\n330\n36\n100\nAcDbEntity\n  8\nHV\n100\nAcDbText\n 10\n0.151\n 20\n-0.622\n 30\n0.0\n 40\n0.2\n  1\n2.500\n100\nAcDbAttributeDefinition\n  3\nвысота вехи\n  2\nHV\n 70\n0\n  0\nATTDEF\n  5\n3E\n330\n36\n100\nAcDbEntity\n  8\nHI\n100\nAcDbText\n 10\n-0.866\n 20\n-0.084\n 30\n0.0\n 40\n0.2\n  1\n1.600\n100\nAcDbAttributeDefinition\n  3\nвысота инструмента\n  2\nHI\n 70\n0\n  0\nENDBLK\n  5\n38\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n{{ENTITIES}}  0\nENDSEC\n  0\nSECTION\n  2\nOBJECTS\n  0\nDICTIONARY\n  5\nA\n330\n0\n100\nAcDbDictionary\n281\n1\n  3\nACAD_COLOR\n350\nB\n  3\nACAD_GROUP\n350\nC\n  3\nACAD_LAYOUT\n350\nD\n  3\nACAD_MATERIAL\n350\nE\n  3\nACAD_MLEADERSTYLE\n350\nF\n  3\nACAD_MLINESTYLE\n350\n10\n  3\nACAD_PLOTSETTINGS\n350\n11\n  3\nACAD_PLOTSTYLENAME\n350\n12\n  3\nACAD_SCALELIST\n350\n14\n  3\nACAD_TABLESTYLE\n350\n15\n  3\nACAD_VISUALSTYLE\n350\n16\n  3\nEZDXF_META\n350\n2D\n  0\nDICTIONARY\n  5\nB\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nC\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nD\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nModel\n350\n1A\n  3\nLayout1\n350\n1E\n  0\nDICTIONARY\n  5\nE\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nByBlock\n350\n1F\n  3\nByLayer\n350\n20\n  3\nGlobal\n350\n21\n  0\nDICTIONARY\n  5\nF\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n2C\n  0\nDICTIONARY\n  5\n10\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n22\n  0\nDICTIONARY\n  5\n11\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nACDBDICTIONARYWDFLT\n  5\n12\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nNormal\n350\n13\n100\nAcDbDictionaryWithDefault\n340\n13\n  0\nACDBPLACEHOLDER\n  5\n13\n330\n12\n  0\nDICTIONARY\n  5\n14\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n15\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n16\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nLAYOUT\n  5\n1A\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n1024\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nModel\n 70\n1\n 71\n0\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n17\n  0\nLAYOUT\n  5\n1E\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n0\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nLayout1\n 70\n1\n 71\n1\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n1B\n  0\nMATERIAL\n  5\n1F\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByBlock\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n20\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByLayer\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n21\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nGlobal\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMLINESTYLE\n  5\n22\n102\n{ACAD_REACTORS\n330\n10\n102\n}\n330\n10\n100\nAcDbMlineStyle\n  2\nStandard\n 70\n0\n  3\n\n 62\n256\n 51\n90.0\n 52\n90.0\n 71\n2\n 49\n0.5\n 62\n256\n  6\nBYLAYER\n 49\n-0.5\n 62\n256\n  6\nBYLAYER\n  0\nMLEADERSTYLE\n  5\n2C\n102\n{ACAD_REACTORS\n330\nF\n102\n}\n330\nF\n100\nAcDbMLeaderStyle\n179\n2\n170\n2\n171\n1\n172\n0\n 90\n2\n 40\n0.0\n 41\n0.0\n173\n1\n 91\n-1056964608\n 92\n-2\n290\n1\n 42\n2.0\n291\n1\n 43\n8.0\n  3\nStandard\n 44\n4.0\n300\n\n342\n29\n174\n1\n175\n1\n176\n0\n178\n1\n 93\n-1056964608\n 45\n4.0\n292\n0\n297\n0\n 46\n4.0\n 94\n-1056964608\n 47\n1.0\n 49\n1.0\n140\n1.0\n294\n1\n141\n0.0\n177\n0\n142\n1.0\n295\n0\n296\n0\n143\n3.75\n271\n0\n272\n9\n273\n9\n  0\nDICTIONARY\n  5\n2D\n330\nA\n100\nAcDbDictionary\n280\n1\n281\n1\n  3\nCREATED_BY_EZDXF\n350\n2E\n  3\nWRITTEN_BY_EZDXF\n350\n41\n  0\nDICTIONARYVAR\n  5\n2E\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.984563+00:00\n  0\nDICTIONARYVAR\n  5\n41\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.986194+00:00\n  0\nENDSEC\n  0\nEOF\n", "msOwner": "17", "layerOwner": "1", "handleStart": 82};</script>
@@ -139,16 +145,37 @@ function readARE(text) {   // .are / .pco: 5 — номер, 4 — код, 37 �
 }
 const CODE_RE = /^(\d+)(\.\.[\d,]*)?(?:_(.*))?$/;
 function parsePoints(raw) {
-  const out = [], skipped = [];
+  const out = [], skipped = [], same = new Set(); let dups = 0;
   raw.forEach(p => {
     const t = p.txt.replace(/[хХ]/g, 'x').replace(/\s+/g, ''), m = CODE_RE.exec(t);
     // ГНБ: номер точки локатора с глубиной до оси — «2-1.36», «102-2,49» (бывает с пробелом: «9-2 .19»)
     const nd = /^(\d+)-(\d+[.,]\d+)$/.exec(String(p.num).replace(/\s+/g, ''));
     if (!m || !(/^\d+$/.test(p.num) || nd)) { skipped.push(p.num + ' ' + p.txt); return; }
-    out.push(Object.assign({}, p, { n: nd ? +nd[1] : +p.num, dep: nd ? num(nd[2]) : null, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+    // одна и та же точка, вставленная дважды (тот же номер, код, место и отметка), берётся один раз
+    const key = [p.s || 0, p.num, t, p.x, p.y, p.H].join('|'); if (same.has(key)) { dups++; return; } same.add(key);
+    const n0 = nd ? +nd[1] : +p.num;
+    out.push(Object.assign({}, p, { n: n0, n0, dep: nd ? num(nd[2]) : null, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+  });
+  // Выезды. Съёмок в проекте может быть несколько, и в одном файле бывает несколько выездов с одними и теми же номерами.
+  // Новый выезд начинается с новой съёмки или когда номер точки уже встречался. Связи «..» и «..N» живут внутри выезда,
+  // поэтому номера второго и следующих выездов сдвигаются на 1000, 2000… — на чертеже они не путаются.
+  let ses = -1, lastS = null, max = 0; const sessions = [];
+  out.forEach(q => {
+    const sv = q.s || 0;
+    if (ses < 0 || sv !== lastS || sessions[ses].nums.has(q.n0)) { ses++; lastS = sv; sessions.push({ s: sv, name: q.sname || '', off: max ? Math.ceil((max + 1) / 1000) * 1000 : 0, count: 0, nums: new Set() }); }
+    const S1 = sessions[ses]; S1.nums.add(q.n0); S1.count++; q.ses = ses; q.n = q.n0 + S1.off; if (q.n > max) max = q.n;
+  });
+  // связь «..N»: точка N — из своего выезда; если там такой нет — из ближайшего выезда той же съёмки
+  out.forEach(q => {
+    if (!q.link || !/\d/.test(q.link)) return;
+    q.link = q.link.replace(/\d+/g, d => {
+      let k = q.ses;
+      if (!sessions[k].nums.has(+d)) { let f = -1; for (let i = k - 1; i >= 0 && f < 0; i--) if (sessions[i].s === sessions[k].s && sessions[i].nums.has(+d)) f = i; for (let i = k + 1; i < sessions.length && f < 0; i++) if (sessions[i].s === sessions[k].s && sessions[i].nums.has(+d)) f = i; if (f >= 0) k = f; }
+      return String(+d + sessions[k].off);
+    });
   });
   out.sort((a, b) => a.n - b.n);
-  return { pts: out, skipped };
+  return { pts: out, skipped, dups, sessions: sessions.map(x => ({ s: x.s, name: x.name, off: x.off, count: x.count })) };
 }
 
 // ---------------- модель трассы ----------------
@@ -264,20 +291,29 @@ function detectNets(P) {
 const compOf = suf => {   // _2x63, _2d63 — две трубы Ø63; _d63 или _63 — одна труба Ø63
   const m = /(\d+)[dx](\d+)/.exec(suf || ''); if (m) return { n: +m[1], d: +m[2], t: m[1] + 'd' + m[2] };
   const o = /^(?:d|lot)?(\d{2,4})(?:_|$)/.exec(suf || ''); return o ? { n: 1, d: +o[1], t: '1d' + o[1] } : null; };
-function buildLine(P0, net, names) {
+function buildLine(P0, net, names, opt) {
   const N = net, codes = [N.pipe, N.cas, N.pole], warn = [];
-  const all = P0.slice().sort((a, b) => a.n - b.n), P = all.filter(p => codes.includes(p.code)).map(p => Object.assign({}, p)), by = new Map(P.map(p => [p.n, p]));
+  const all = P0.slice().sort((a, b) => a.n - b.n); let P = all.filter(p => codes.includes(p.code)).map(p => Object.assign({}, p)); const by = new Map(P.map(p => [p.n, p]));
   if (!P.length) throw new Error('В съёмке нет точек сети ' + N.name + '.');
+  // стыковка съёмок: точки разных выездов ближе допуска — одна точка (трасса продолжается, пикет не двоится); опора главнее точки трубы
+  const tol = opt && opt.join != null ? +opt.join : 0.1, gone = new Map(), root = p => { while (gone.has(p)) p = gone.get(p); return p; };
+  if (tol > 0 && P.some(p => p.ses !== P[0].ses)) for (let i = 0; i < P.length; i++) {
+    const a = P[i]; if (gone.has(a)) continue;
+    for (let j = i + 1; j < P.length; j++) { const b = P[j]; if (b.ses === a.ses || gone.has(b) || dist(a, b) > tol) continue;
+      if (b.code === N.pole && a.code !== N.pole) { gone.set(a, b); break; } gone.set(b, a); }
+  }
+  const Pall = P; if (gone.size) { P.forEach(p => { if (gone.has(p)) by.set(p.n, root(p)); }); P = P.filter(p => !gone.has(p)); }
   const idx = new Map(all.map((p, i) => [p.n, i])), edges = [], seen = new Set();
-  P.forEach(p => {
-    if (!p.link) return;
-    let refs = p.link.slice(2).split(',');
+  Pall.forEach(src => {   // связи берутся у каждой снятой точки, а ложатся на точку после стыковки
+    const p = root(src);
+    if (!src.link) return;
+    let refs = src.link.slice(2).split(',');
     refs = refs.map((r, i) => r === '' ? (i === 0 ? 'prev' : null) : +r).filter(r => r !== null);
     if (!refs.length) refs = ['prev'];
     refs.forEach(r => {
       let q;
-      if (r === 'prev') { const i = idx.get(p.n); q = i > 0 ? by.get(all[i - 1].n) : null; if (!q && i > 0) warn.push('т.' + p.n + ': «..» ведёт к т.' + all[i - 1].n + ', а это не точка сети — связь пропущена.'); }
-      else { q = by.get(r); if (!q) warn.push('т.' + p.n + ': связь с т.' + r + ' — такой точки сети нет.'); }
+      if (r === 'prev') { const i = idx.get(src.n); if (i > 0 && (all[i - 1].s || 0) !== (src.s || 0)) { warn.push('т.' + src.n + ': первая точка съёмки с «..» — связь с прошлой съёмкой не ставится.'); return; } q = i > 0 ? by.get(all[i - 1].n) : null; if (!q && i > 0) warn.push('т.' + p.n + ': «..» ведёт к т.' + all[i - 1].n + ', а это не точка сети — связь пропущена.'); }
+      else { q = by.get(r); if (!q) warn.push('т.' + src.n + ': связь с т.' + r + ' — такой точки сети нет.'); }
       if (!q || q === p) return;
       const key = Math.min(p.n, q.n) + '-' + Math.max(p.n, q.n); if (seen.has(key)) return; seen.add(key);
       const cas = p.code === N.cas && q.code === N.cas;
@@ -348,7 +384,7 @@ function buildLine(P0, net, names) {
     const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
     warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
   }
-  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn };
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size };
 }
 function drawLine(D, m, opt) {
   // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
@@ -1342,8 +1378,110 @@ const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'pla
   obj: { org: '', kind: 'кабеля наружного освещения', object: '', ks: '', contract: '', cableL: '', author: 'Шахмиров А.М', device: 'Nikon XF 05', z: false } };
 S.gnb = Object.assign({}, I.GNB_DEFAULT);
 S.geo = null; S.pdf = null; S.spec = { text: '', src: '' }; S.pickFor = null;
+S.job = null; S.jobs = []; S.demo = false;   // проект ИЧ: имя, съёмки, настройки — хранится в браузере (IndexedDB)
 try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); if (st.gnb) Object.assign(S.gnb, st.gnb); if (st.spec) S.spec = st.spec; } } catch (e) { /* хранилище недоступно — работаем без него */ }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, spec: S.spec, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, spec: S.spec, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } saveJobSoon(); };
+
+// ---------- проекты ИЧ: несколько съёмок в одном проекте, всё хранится в браузере ----------
+const DB = { p: null,
+  open() { return this.p || (this.p = new Promise((res, rej) => { const r = indexedDB.open('ich', 1); r.onupgradeneeded = () => { r.result.createObjectStore('jobs', { keyPath: 'id' }); r.result.createObjectStore('files'); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); },
+  tx(store, mode, fn) { return this.open().then(db => new Promise((res, rej) => { const t = db.transaction(store, mode), q = fn(t.objectStore(store)); t.oncomplete = () => res(q && q.result); t.onerror = t.onabort = () => rej(t.error); })); },
+  all() { return this.tx('jobs', 'readonly', st => st.getAll()); }, get(id) { return this.tx('jobs', 'readonly', st => st.get(id)); },
+  put(rec) { return this.tx('jobs', 'readwrite', st => st.put(rec)); }, del(id) { return this.tx('jobs', 'readwrite', st => st.delete(id)).then(() => this.tx('files', 'readwrite', st => { st.delete(id + ':geo'); st.delete(id + ':pdf'); })); },
+  fput(key, val) { return this.tx('files', 'readwrite', st => st.put(val, key)); }, fget(key) { return this.tx('files', 'readonly', st => st.get(key)); } };
+let dbWarned = false; const dbFail = e => { if (!dbWarned) { dbWarned = true; toast('Браузер не даёт сохранить проект (' + (e && e.message || 'хранилище недоступно') + '). Сохраните проект в файл.'); } };
+const jobRec = () => ({ id: S.job.id, name: S.job.name, created: S.job.created, updated: S.job.updated, surveys: S.job.surveys, set: S.set, proj: S.proj, obj: S.obj, gnb: S.gnb, spec: S.spec });
+function saveJobNow() { clearTimeout(jobT); if (!S.job || S.demo) return Promise.resolve(); S.job.updated = Date.now(); return DB.put(JSON.parse(JSON.stringify(jobRec()))).catch(dbFail); }
+let jobT; function saveJobSoon() { if (!S.job || S.demo) return; clearTimeout(jobT); jobT = setTimeout(saveJobNow, 400); }
+function refreshJobs() { return DB.all().then(a => { S.jobs = (a || []).sort((x, y) => (y.updated || 0) - (x.updated || 0)).map(j => ({ id: j.id, name: j.name, updated: j.updated, ns: (j.surveys || []).length, np: (j.surveys || []).reduce((t, v) => t + (v.raw ? v.raw.length : 0), 0) })); }).catch(() => { S.jobs = []; }); }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const dmy = t => t ? new Date(t).toLocaleDateString('ru-RU') : '';
+// точки всех включённых съёмок проекта — в один список; у каждой точки пометка, из какой она съёмки
+function rebuild() {
+  const j = S.job, raw = [];
+  j.surveys.forEach((sv, i) => { if (sv.on !== false) sv.raw.forEach(p => raw.push(Object.assign({}, p, { s: i, sname: sv.name }))); });
+  S.file = j.name; S.raw = raw; S.parsed = I.parsePoints(raw);
+}
+function storeFiles() {   // геоподоснова и PDF проекта хранятся вместе с проектом ИЧ
+  if (!S.job || S.demo) return;
+  if (S.geo && S.geo.blob && !S.geo.kept) { S.geo.kept = true; DB.fput(S.job.id + ':geo', { name: S.geo.name, blob: S.geo.blob }).catch(dbFail); }
+  if (S.pdf && S.pdf.blob && !S.pdf.kept) { S.pdf.kept = true; DB.fput(S.job.id + ':pdf', { name: S.pdf.name, blob: S.pdf.blob }).catch(dbFail); }
+}
+function newJob(name) {
+  let first = false; try { first = !localStorage.getItem('ich.jobs'); localStorage.setItem('ich.jobs', '1'); } catch (e) { /* без хранилища */ }
+  // первому проекту достаётся всё, что было введено до появления проектов; следующие начинаются с чистых таблиц
+  if (!first || S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.spec = { text: '', src: '' }; S.set.mode = 'fact'; Object.assign(S.obj, { object: '', ks: '', contract: '', cableL: '' }); ['groundA', 'groundB', 'no', 'cables', 'cover', 'cross', 'projPlan', 'projArc'].forEach(k => { S.gnb[k] = ''; }); }
+  S.demo = false; S.demoProj = false; S.set.start = 'auto'; S.set.net = null; S.gnb.chain = 0;
+  S.job = { id: uid(), name: name || 'Новый проект', created: Date.now(), updated: Date.now(), surveys: [] };
+  try { localStorage.setItem('ich.job', S.job.id); } catch (e) { /* без хранилища */ }
+  if (S.geo) S.geo.kept = false; if (S.pdf) S.pdf.kept = false; storeFiles();
+}
+function addSurvey(name, raw) {
+  if (S.demo || !S.job) { if (S.demo) { S.geo = null; S.pdf = null; } newJob(name.replace(/\.[^.]+$/, '')); }
+  const j = S.job, old = j.surveys.find(v => v.name === name);
+  if (old) { old.raw = raw; old.added = Date.now(); old.on = true; } else j.surveys.push({ id: uid(), name, added: Date.now(), raw, on: true });
+  S.view = null; S.tab = 'plan'; rebuild(); compute(); render(); save();
+  const all = S.parsed.pts.length;
+  toast((old ? 'Съёмка обновлена: ' : j.surveys.length > 1 ? 'Съёмка добавлена в проект: ' : 'Открыто: ') + name + ' — ' + raw.length + ' точек' + (j.surveys.length > 1 ? '. Всего в проекте: ' + all : '') + (S.parsed.dups ? '. Повторов точек убрано: ' + S.parsed.dups : ''));
+}
+function openJob(id) {
+  return saveJobNow().then(() => DB.get(id)).then(rec => {
+    if (!rec) { toast('Проект не найден — возможно, браузер очистил данные.'); return refreshJobs().then(render); }
+    S.demo = false; S.demoProj = false; S.job = { id: rec.id, name: rec.name, created: rec.created, updated: rec.updated, surveys: rec.surveys || [] };
+    if (rec.set) Object.assign(S.set, rec.set); if (rec.proj) S.proj = rec.proj; if (rec.obj) Object.assign(S.obj, rec.obj); if (rec.gnb) Object.assign(S.gnb, rec.gnb); S.spec = rec.spec || { text: '', src: '' };
+    if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.geo = null; S.pdf = null; S.view = null; S.tab = 'plan';
+    try { localStorage.setItem('ich.job', id); } catch (e) { /* без хранилища */ }
+    rebuild(); compute(); render();
+    DB.fget(id + ':pdf').then(f => { if (f && S.job && S.job.id === id) { S.pdf = { name: f.name, url: URL.createObjectURL(f.blob), blob: f.blob, kept: true }; render(); } }).catch(() => {});
+    DB.fget(id + ':geo').then(f => { if (!f || !S.job || S.job.id !== id) return; toast('Читаю геоподоснову ' + f.name + '…');
+      return f.blob.arrayBuffer().then(b => { if (!S.job || S.job.id !== id) return; S.geo = { name: f.name, G: I.readGeo(I.decode(new Uint8Array(b), true)), blob: f.blob, kept: true }; compute(); render(); toast('Проект открыт: ' + rec.name + '. Геоподоснова на месте.'); }); }).catch(() => {});
+  }).catch(dbFail);
+}
+function closeJob() { return saveJobNow().then(() => { if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.job = null; S.demo = false; S.file = null; S.raw = null; S.parsed = null; S.res = null; S.err = null; S.geo = null; S.pdf = null; try { localStorage.removeItem('ich.job'); } catch (e) { /* без хранилища */ } return refreshJobs(); }).then(render); }
+function exportJob() { const r = jobRec(); download(new TextEncoder().encode(JSON.stringify(Object.assign({ ich: 1 }, r))), r.name + '.ich.json', 'application/json'); toast('Проект сохранён в файл: съёмки, таблицы и данные объекта. Геоподоснову и PDF откройте заново на другом компьютере.'); }
+function importJob(p) {
+  if (!Array.isArray(p.surveys)) { toast('В файле проекта нет съёмок.'); return; }
+  saveJobNow().then(refreshJobs).then(() => {
+    let name = p.name || 'Проект', k = 2; const base = name; while (S.jobs.some(j => j.name === name)) name = base + ' (' + (k++) + ')';
+    const rec = { id: uid(), name, created: p.created || Date.now(), updated: Date.now(), surveys: p.surveys, set: p.set, proj: p.proj, obj: p.obj, gnb: p.gnb, spec: p.spec };
+    try { localStorage.setItem('ich.jobs', '1'); } catch (e) { /* без хранилища */ }
+    return DB.put(rec).then(() => openJob(rec.id)).then(() => toast('Проект открыт из файла: ' + name));
+  }).catch(dbFail);
+}
+let armed = ['', 0]; const twice = (key, msg) => { if (armed[0] === key && Date.now() - armed[1] < 4000) { armed = ['', 0]; return true; } armed = [key, Date.now()]; toast(msg); return false; };
+function jobBlock() {
+  const j = S.job;
+  if (!j) return S.demo ? '<div class="jobbox"><b>Пример</b><p class="fine">Условные данные, не сохраняются. Откройте свою съёмку — создастся проект.</p></div>' : '';
+  const ses = S.parsed ? S.parsed.sessions : [];
+  const li = j.surveys.map((v, i) => { const mine = ses.filter(x => x.s === i), offs = mine.filter(x => x.off).map(x => '+' + x.off);
+    return '<li><label class="chk"><input type="checkbox" data-son="' + i + '"' + (v.on !== false ? ' checked' : '') + '><span><b>' + esc(v.name) + '</b><em>' + dmy(v.added) + ' · ' + v.raw.length + ' т.' + (mine.length > 1 ? ' · выездов: ' + mine.length : '') + (offs.length ? ' · номера на ИЧ: ' + offs.join(', ') : '') + '</em></span></label><button class="btn small danger" data-sdel="' + i + '" title="Убрать съёмку из проекта">✕</button></li>'; }).join('');
+  return '<div class="jobbox"><label class="fld">Проект ИЧ<input id="jobname" value="' + esc(j.name) + '"></label>'
+    + '<h3 class="sh">Съёмки проекта</h3>' + (li ? '<ul class="survs">' + li + '</ul>' : '<p class="fine">Съёмок пока нет.</p>')
+    + '<div class="row"><button class="btn small primary" id="sadd">Добавить съёмку…</button><button class="btn small" id="jsave" title="Файл проекта: для переноса на другой компьютер и про запас">В файл</button></div>'
+    + (ses.length > 1 ? '<label class="fld">Стыковать съёмки: точки ближе, см<input id="jjoin" inputmode="decimal" value="' + esc(String(S.set.join == null ? 10 : S.set.join)) + '"></label>' : '')
+    + '<p class="fine">Проект сохраняется в браузере сам. Новая съёмка дополняет ИЧ; файл с тем же именем заменяет прежний.</p></div>';
+}
+function bindJob() {
+  const nm = $('#jobname'); if (!nm) return;
+  nm.onchange = () => { const v = nm.value.trim(); if (!v) { nm.value = S.job.name; return; } S.job.name = v; S.file = v; save(); render(); };
+  $('#sadd').onclick = () => { S.pickFor = null; pick('.dxf,.are,.pco'); };
+  $('#jsave').onclick = exportJob;
+  const jj = $('#jjoin'); if (jj) jj.onchange = () => { const v = num(jj.value); S.set.join = v == null || v < 0 ? 10 : v; save(); compute(); render(); };
+  document.querySelectorAll('[data-son]').forEach(c => c.onchange = () => { S.job.surveys[+c.dataset.son].on = c.checked; S.view = null; rebuild(); compute(); render(); save(); });
+  document.querySelectorAll('[data-sdel]').forEach(b => b.onclick = () => { const i = +b.dataset.sdel, v = S.job.surveys[i]; if (!twice('s' + v.id, 'Нажмите ✕ ещё раз, чтобы убрать съёмку «' + v.name + '» из проекта.')) return; S.job.surveys.splice(i, 1); S.view = null; rebuild(); compute(); render(); save(); });
+}
+function jobsList() {
+  return '<div class="jobs"><h2>Проекты ИЧ</h2>' + (S.jobs.length ? '<ul class="joblist">' + S.jobs.map(j => '<li><button class="job" data-job="' + j.id + '"><b>' + esc(j.name) + '</b><span>съёмок: ' + j.ns + ' · точек: ' + j.np + ' · изменён ' + dmy(j.updated) + '</span></button><button class="btn small danger" data-jdel="' + j.id + '">Удалить</button></li>').join('') + '</ul>'
+    : '<p class="fine">Пока нет. Проект создаётся сам, когда вы открываете съёмку. Потом в него догружают новые съёмки — ИЧ дополняется.</p>')
+    + '<div class="row"><input id="newjob" placeholder="Название нового проекта"><button class="btn" id="newjobb">Создать</button><button class="btn ghost" id="jobfile" title="Файл проекта .ich.json">Из файла…</button></div></div>';
+}
+function bindJobs() {
+  document.querySelectorAll('[data-job]').forEach(b => b.onclick = () => openJob(b.dataset.job));
+  document.querySelectorAll('[data-jdel]').forEach(b => b.onclick = () => { const j = S.jobs.find(x => x.id === b.dataset.jdel); if (!twice('j' + j.id, 'Нажмите «Удалить» ещё раз: проект «' + j.name + '» со съёмками будет удалён из браузера.')) return; DB.del(j.id).then(refreshJobs).then(render).catch(dbFail); });
+  const mk = () => { const v = $('#newjob').value.trim(); if (!v) { toast('Впишите название проекта.'); $('#newjob').focus(); return; } if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.geo = null; S.pdf = null; newJob(v); rebuild(); compute(); render(); save(); };
+  $('#newjobb').onclick = mk; $('#newjob').onkeydown = e => { if (e.key === 'Enter') mk(); };
+  $('#jobfile').onclick = () => pick('.json');
+}
 
 // ---------- уведомления ----------
 let tt; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
@@ -1359,7 +1497,8 @@ function geoDwg(pts) {
   }
   return D;
 }
-function geoBlock() {
+function geoBlock() { return jobBlock() + geoBlock0(); }
+function geoBlock0() {
   if (!S.geo) return reqList(true) +  '<div class="geo-need"><b>Нужна геоподоснова.</b> ИЧ строится на геоподоснове МГГТ — откройте её DXF. Без неё чертёж только для просмотра, DXF не выдаётся.<div class="row"><button class="btn primary small" id="geoopen">Открыть геоподоснову…</button></div></div>';
   return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов в окне ±' + esc(String(S.set.geoPad || 40)) + ' м</li></ul>'
     + '<div class="row"><label class="fld" style="flex:1">Окно вокруг сети, м<input id="geopad" inputmode="decimal" value="' + esc(String(S.set.geoPad || 40)) + '"></label></div><div class="row"><button class="btn small" id="geoopen">Другая геоподоснова…</button></div>';
@@ -1387,6 +1526,7 @@ function compute() {
   if (!S.parsed) return;
   try {
     const P = S.parsed.pts;
+    if (S.job && !S.job.surveys.length) throw new Error('В проекте пока нет съёмок. Нажмите «Добавить съёмку…» слева или перетащите файл в окно.');
     const det = S.det = I.detectNets(P);
     const f = det.found.find(x => x.net.id === S.set.net) || det.found.find(x => x.net.kind) || det.found[0];
     if (!f) throw new Error('В съёмке нет кодов известных сетей (476, 491, 4041…). Проверьте коды точек.');
@@ -1424,7 +1564,7 @@ function compute() {
 
 function computeLine(P, net) {
   const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
-  const m = I.buildLine(P, net, names), D = geoDwg(m.points);
+  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100 }), D = geoDwg(m.points);
   let k = D.e.length; I.drawLine(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false }); D.mark('plan', k);
   const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
   k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
@@ -1479,24 +1619,22 @@ async function openFile(f) {
   try {
     const bytes = new Uint8Array(await f.arrayBuffer()), ext = (f.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
     let raw;
-    if (ext === '.json') { loadProject(JSON.parse(new TextDecoder().decode(bytes))); return; }
+    if (ext === '.json') { const pj = JSON.parse(new TextDecoder().decode(bytes)); if (pj && pj.ich) importJob(pj); else loadProject(pj); return; }
     const purpose = S.pickFor; S.pickFor = null;
-    if (ext === '.pdf') { if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.pdf = { name: f.name, url: URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })) }; S.tab = 'pdf'; render(); toast('Проект открыт: ' + f.name + '. Сверяйте на вкладке «Проект»; спецификацию вставьте справа или откройте DXF проекта.'); return; }
+    if (ext === '.pdf') { if (S.pdf) URL.revokeObjectURL(S.pdf.url); S.pdf = { name: f.name, url: URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' })), blob: f }; storeFiles(); S.tab = 'pdf'; render(); toast('Проект открыт: ' + f.name + '. Сверяйте на вкладке «Проект»; спецификацию вставьте справа или откройте DXF проекта.'); return; }
     if (ext === '.dxf' && purpose === 'proj') { loadProjDXF(f.name, I.decode(bytes, true)); return; }
-    if (ext === '.dxf' && purpose === 'geo') { loadGeo(f.name, I.decode(bytes, true)); return; }
-    if (ext === '.dxf') { const txt = I.decode(bytes, true); raw = I.readDXF(txt); if (!raw.length) { if (/проект|иот|спец|ИОТ/i.test(f.name)) loadProjDXF(f.name, txt); else loadGeo(f.name, txt); return; } }
+    if (ext === '.dxf' && purpose === 'geo') { loadGeo(f.name, I.decode(bytes, true), f); return; }
+    if (ext === '.dxf') { const txt = I.decode(bytes, true); raw = I.readDXF(txt); if (!raw.length) { if (/проект|иот|спец|ИОТ/i.test(f.name)) loadProjDXF(f.name, txt); else loadGeo(f.name, txt, f); return; } }
     else if (ext === '.are' || ext === '.pco') raw = I.readARE(I.decode(bytes, false));
     else { toast('Не знаю такой формат: ' + f.name + '. Нужен DXF, .are, .pco или проект .json.'); return; }
     if (!raw.length) { toast(ext === '.dxf' ? 'В файле нет точек-блоков _block2 с отметкой.' : 'В файле не нашлось точек.'); return; }
-    if (S.demoProj) { S.proj = { object: '', wells: [], spans: [] }; S.demoProj = false; S.set.mode = 'fact'; }
-    S.file = f.name; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan'; S.gnb.chain = 0; if (S.gnb.file !== f.name) { ['groundA', 'groundB', 'no', 'cables', 'cover', 'cross', 'projPlan', 'projArc'].forEach(k => { S.gnb[k] = ''; }); S.gnb.file = f.name; save(); }
-    compute(); render(); toast('Открыто: ' + f.name + ' — ' + S.parsed.pts.length + ' точек' + (hasProject() ? '. Проект — из прошлой работы: проверьте его справа или очистите.' : ''));
+    addSurvey(f.name, raw);
   } catch (e) { toast('Не удалось прочитать ' + f.name + ': ' + e.message); }
 }
-function loadGeo(name, txt) {
+function loadGeo(name, txt, blob) {
   toast('Читаю геоподоснову ' + name + '…');
   setTimeout(() => {
-    try { const G = I.readGeo(txt); S.geo = { name, G }; compute(); render(); toast('Геоподоснова: ' + name + ' — ' + G.layers.size + ' слоёв. На ИЧ ложится окно вокруг сети.'); }
+    try { const G = I.readGeo(txt); S.geo = { name, G, blob }; storeFiles(); compute(); render(); toast('Геоподоснова: ' + name + ' — ' + G.layers.size + ' слоёв. На ИЧ ложится окно вокруг сети.'); }
     catch (e) { toast('Не удалось прочитать геоподоснову: ' + e.message); }
   }, 30);
 }
@@ -1562,7 +1700,7 @@ function netsBlock() {
 }
 function renderLine() {
   const r = S.res, m = r.m;
-  let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li></ul>' + netsBlock();
+  let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li>' + (m.joined ? '<li>съёмки состыкованы в ' + m.joined + ' т.</li>' : '') + '</ul>' + netsBlock();
   side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>L траншеи — <b>' + fnum(m.trench, 1) + ' м</b></li></ul>';
   if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
   side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
@@ -1729,7 +1867,7 @@ function checkTable() {
 function topBar() {
   return '<header class="top"><div class="brand"><span class="mark">ИЧ</span><span class="sep"></span><span class="sub">исполнительный чертёж<br>по съёмке</span></div>'
     + '<div class="top-info">' + (S.file ? esc(S.file) : 'съёмка → план, профиль, ведомость и сверка с проектом') + '</div>'
-    + '<div class="top-actions"><button class="btn" id="open">Открыть съёмку…</button><button class="btn' + (S.geo ? ' ghost' : '') + '" id="geotop" title="Геоподоснова МГГТ в DXF — обязательна для ИЧ">' + (S.geo ? 'Геоподоснова ✓' : 'Геоподоснова…') + '</button><button class="btn ghost" id="projtop" title="Проект: PDF для сверки, DXF — для спецификации">Проект…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
+    + '<div class="top-actions"><button class="btn ghost" id="jobs" title="Список сохранённых проектов ИЧ">Проекты</button><button class="btn" id="open">' + (S.job ? 'Добавить съёмку…' : 'Открыть съёмку…') + '</button><button class="btn' + (S.geo ? ' ghost' : '') + '" id="geotop" title="Геоподоснова МГГТ в DXF — обязательна для ИЧ">' + (S.geo ? 'Геоподоснова ✓' : 'Геоподоснова…') + '</button><button class="btn ghost" id="projtop" title="Рабочая документация: PDF для сверки, DXF — для спецификации">РД (проект)…</button><button class="btn ghost" id="demo">Пример</button><button class="btn ghost" id="help">Справка</button></div></header>';
 }
 // ---------- что нужно для корректной ИЧ: подсказка на старте и в работе ----------
 function reqItems() {
@@ -1758,7 +1896,7 @@ function reqList(compact) {
 }
 function bindReq() { document.querySelectorAll('[data-req]').forEach(b => b.onclick = () => { const a = b.dataset.req; if (a === 'open') { S.pickFor = null; pick('.dxf,.are,.pco'); } else if (a === 'geotop') { S.pickFor = 'geo'; pick('.dxf'); } else { S.pickFor = 'proj'; pick('.pdf,.dxf'); } }); }
 function emptyView() {
-  return '<div class="empty"><div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Геоподоснову и проект можно перетащить сюда же или открыть кнопками вверху.</p><div class="row"><button class="btn primary" id="open2">Выбрать съёмку…</button><button class="btn" id="demo2">Открыть пример</button></div></div>'
+  return '<div class="empty"><div class="startcol">' + jobsList() + '<div class="drop" id="drop"><h1>Перетащите сюда съёмку</h1><p>DXF с блоками точек <b>_block2</b> (из «Абриса» или после расстановки блоков) или полевой файл <b>.are / .pco</b>. Геоподоснову и проект можно перетащить сюда же или открыть кнопками вверху.</p><div class="row"><button class="btn primary" id="open2">Выбрать съёмку…</button><button class="btn" id="demo2">Открыть пример</button></div></div></div>'
     + reqList(false) + '</div>';
 }
 
@@ -1795,13 +1933,15 @@ function bindTop() {
   $('#open').onclick = () => { S.pickFor = null; pick('.dxf,.are,.pco'); };
   $('#geotop').onclick = () => { S.pickFor = 'geo'; pick('.dxf'); };
   $('#projtop').onclick = () => { S.pickFor = 'proj'; pick('.pdf,.dxf'); };
-  $('#demo').onclick = openDemo; $('#help').onclick = showHelp; bindProj(); bindReq();
+  $('#jobs').onclick = () => { if (!S.job && !S.parsed) { toast('Список проектов — на этом экране слева.'); return; } closeJob(); };
+  $('#demo').onclick = openDemo; $('#help').onclick = showHelp; bindProj(); bindReq(); bindJob();
 }
 function bindEmpty() {
-  $('#open2').onclick = () => pick('.dxf,.are,.pco'); $('#demo2').onclick = openDemo;
+  $('#open2').onclick = () => pick('.dxf,.are,.pco'); $('#demo2').onclick = openDemo; bindJobs();
   $('#drop').onclick = e => { if (e.target.id === 'drop' || e.target.tagName === 'H1' || e.target.tagName === 'P') pick('.dxf,.are,.pco'); };
 }
 function openDemo() {
+  saveJobNow(); S.job = null; S.demo = true; try { localStorage.removeItem('ich.job'); } catch (e) { /* без хранилища */ }
   const raw = I.demo(); S.file = 'Пример (условные данные).dxf'; S.raw = raw; S.parsed = I.parsePoints(raw); S.set.start = 'auto'; S.set.net = null; S.view = null; S.tab = 'plan';
   if (!hasProject() || S.demoProj) { S.proj = JSON.parse(JSON.stringify(I.DEMO_PROJECT)); S.demoProj = true; }
   compute(); render(); toast('Открыт пример с условными данными и проектом к нему.');
@@ -1854,7 +1994,8 @@ function showHelp() {
     + '<table class="sum"><tr><th>Код</th><th>Доп. код</th><th>Что это</th></tr><tr><td>476</td><td>_kks-2, _kks-3, _2,99x1,60</td><td>обечайка, центр колодца; тип или размер камеры</td></tr><tr><td>47</td><td>_np / _vp</td><td>низ / верх плиты</td></tr><tr><td>99</td><td></td><td>дно колодца</td></tr><tr><td>478</td><td>_1d110, _24d125</td><td>верх трубы; число и диаметр труб</td></tr><tr><td>4028</td><td>_1d325</td><td>верх футляра; участок — футляр, если оба конца 4028</td></tr><tr><td>4028 / 4028..</td><td>номер «2-1.36»</td><td>ГНБ: земля над трубой и глубина локатора до оси; без глубины — верх трубы в приямке</td></tr></table>'
     + '<p>Связи: <b>..</b> — с предыдущей точкой, <b>..N</b> — с точкой N, <b>..,N</b> — с предыдущей и с N. Трубы должны начинаться и заканчиваться у колодцев (ближе 2 м от обечайки).</p>'
     + '<h3>Проект и подгонка</h3><p>Колодцы проекта сопоставляются со съёмкой по порядку вдоль трассы; направление хода выбирается по лучшему совпадению отметок (или задайте «Начало хода»). В режиме «под проект» значения, отличающиеся не больше допуска, берутся из проекта, остальные — по съёмке. Подгоняются обечайки, дно, горловина, верх трубы на входе и выходе, длины пролётов и футляров. План и промежуточные точки трубы остаются по съёмке.</p>'
-    + '<p>Проект сохраняется в браузере автоматически; файлом (.json) его можно перенести на другой компьютер.</p>'
+    + '<p>Таблицы проектных значений сохраняются вместе с проектом ИЧ.</p>'
+    + '<h3>Проекты ИЧ и несколько съёмок</h3><p>Когда вы открываете съёмку, создаётся <b>проект ИЧ</b> — он сохраняется в браузере сам вместе с геоподосновой, PDF, таблицами и данными объекта. Кнопка «Проекты» вверху показывает список сохранённых проектов.</p><p>Объект снят не весь — откройте проект позже и нажмите <b>«Добавить съёмку…»</b>: новые точки дополнят ИЧ. Номера в новой съёмке могут повторяться — на ИЧ они сдвигаются на 1000, 2000… Точки разных съёмок ближе 10 см (допуск меняется) считаются одной: трасса продолжается от переснятой точки. Файл с тем же именем заменяет прежнюю съёмку; галочка у съёмки временно выключает её.</p><p>Кнопка «В файл» сохраняет проект файлом .ich.json — про запас и для другого компьютера (геоподоснову и PDF там откройте заново). Браузер может очистить данные сайта, поэтому важные проекты держите и в файле.</p>'
     + '<h3>Что пока не умеет</h3><p>Ответвления трассы, развёртки колодцев, линию земли и пересечения с коммуникациями (нужна геоподоснова), рамку и штамп, чтение проекта прямо из ИД.</p>'
     + '</div></div>';
   document.body.appendChild(v); v.onclick = e => { if (e.target === v || e.target.id === 'hx') v.remove(); };
@@ -1870,6 +2011,8 @@ document.addEventListener('keydown', e => {
   if (e.key === '+' || e.key === '=') zoomAt(1.5, s.width / 2, s.height / 2); else if (e.key === '-') zoomAt(1 / 1.5, s.width / 2, s.height / 2); else if (e.key === '0') fitView(S.tab);
 });
 render();
+refreshJobs().then(() => { let id = null; try { id = localStorage.getItem('ich.job'); } catch (e) { /* без хранилища */ } if (id && S.jobs.some(j => j.id === id)) openJob(id); else render(); });
+window.addEventListener('pagehide', () => { saveJobNow(); });
 })();
 </script>
 </body></html>

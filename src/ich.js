@@ -69,16 +69,37 @@ function readARE(text) {   // .are / .pco: 5 — номер, 4 — код, 37 �
 }
 const CODE_RE = /^(\d+)(\.\.[\d,]*)?(?:_(.*))?$/;
 function parsePoints(raw) {
-  const out = [], skipped = [];
+  const out = [], skipped = [], same = new Set(); let dups = 0;
   raw.forEach(p => {
     const t = p.txt.replace(/[хХ]/g, 'x').replace(/\s+/g, ''), m = CODE_RE.exec(t);
     // ГНБ: номер точки локатора с глубиной до оси — «2-1.36», «102-2,49» (бывает с пробелом: «9-2 .19»)
     const nd = /^(\d+)-(\d+[.,]\d+)$/.exec(String(p.num).replace(/\s+/g, ''));
     if (!m || !(/^\d+$/.test(p.num) || nd)) { skipped.push(p.num + ' ' + p.txt); return; }
-    out.push(Object.assign({}, p, { n: nd ? +nd[1] : +p.num, dep: nd ? num(nd[2]) : null, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+    // одна и та же точка, вставленная дважды (тот же номер, код, место и отметка), берётся один раз
+    const key = [p.s || 0, p.num, t, p.x, p.y, p.H].join('|'); if (same.has(key)) { dups++; return; } same.add(key);
+    const n0 = nd ? +nd[1] : +p.num;
+    out.push(Object.assign({}, p, { n: n0, n0, dep: nd ? num(nd[2]) : null, code: m[1], link: m[2] || null, suf: (m[3] || '').toLowerCase() }));
+  });
+  // Выезды. Съёмок в проекте может быть несколько, и в одном файле бывает несколько выездов с одними и теми же номерами.
+  // Новый выезд начинается с новой съёмки или когда номер точки уже встречался. Связи «..» и «..N» живут внутри выезда,
+  // поэтому номера второго и следующих выездов сдвигаются на 1000, 2000… — на чертеже они не путаются.
+  let ses = -1, lastS = null, max = 0; const sessions = [];
+  out.forEach(q => {
+    const sv = q.s || 0;
+    if (ses < 0 || sv !== lastS || sessions[ses].nums.has(q.n0)) { ses++; lastS = sv; sessions.push({ s: sv, name: q.sname || '', off: max ? Math.ceil((max + 1) / 1000) * 1000 : 0, count: 0, nums: new Set() }); }
+    const S1 = sessions[ses]; S1.nums.add(q.n0); S1.count++; q.ses = ses; q.n = q.n0 + S1.off; if (q.n > max) max = q.n;
+  });
+  // связь «..N»: точка N — из своего выезда; если там такой нет — из ближайшего выезда той же съёмки
+  out.forEach(q => {
+    if (!q.link || !/\d/.test(q.link)) return;
+    q.link = q.link.replace(/\d+/g, d => {
+      let k = q.ses;
+      if (!sessions[k].nums.has(+d)) { let f = -1; for (let i = k - 1; i >= 0 && f < 0; i--) if (sessions[i].s === sessions[k].s && sessions[i].nums.has(+d)) f = i; for (let i = k + 1; i < sessions.length && f < 0; i++) if (sessions[i].s === sessions[k].s && sessions[i].nums.has(+d)) f = i; if (f >= 0) k = f; }
+      return String(+d + sessions[k].off);
+    });
   });
   out.sort((a, b) => a.n - b.n);
-  return { pts: out, skipped };
+  return { pts: out, skipped, dups, sessions: sessions.map(x => ({ s: x.s, name: x.name, off: x.off, count: x.count })) };
 }
 
 // ---------------- модель трассы ----------------
@@ -194,20 +215,29 @@ function detectNets(P) {
 const compOf = suf => {   // _2x63, _2d63 — две трубы Ø63; _d63 или _63 — одна труба Ø63
   const m = /(\d+)[dx](\d+)/.exec(suf || ''); if (m) return { n: +m[1], d: +m[2], t: m[1] + 'd' + m[2] };
   const o = /^(?:d|lot)?(\d{2,4})(?:_|$)/.exec(suf || ''); return o ? { n: 1, d: +o[1], t: '1d' + o[1] } : null; };
-function buildLine(P0, net, names) {
+function buildLine(P0, net, names, opt) {
   const N = net, codes = [N.pipe, N.cas, N.pole], warn = [];
-  const all = P0.slice().sort((a, b) => a.n - b.n), P = all.filter(p => codes.includes(p.code)).map(p => Object.assign({}, p)), by = new Map(P.map(p => [p.n, p]));
+  const all = P0.slice().sort((a, b) => a.n - b.n); let P = all.filter(p => codes.includes(p.code)).map(p => Object.assign({}, p)); const by = new Map(P.map(p => [p.n, p]));
   if (!P.length) throw new Error('В съёмке нет точек сети ' + N.name + '.');
+  // стыковка съёмок: точки разных выездов ближе допуска — одна точка (трасса продолжается, пикет не двоится); опора главнее точки трубы
+  const tol = opt && opt.join != null ? +opt.join : 0.1, gone = new Map(), root = p => { while (gone.has(p)) p = gone.get(p); return p; };
+  if (tol > 0 && P.some(p => p.ses !== P[0].ses)) for (let i = 0; i < P.length; i++) {
+    const a = P[i]; if (gone.has(a)) continue;
+    for (let j = i + 1; j < P.length; j++) { const b = P[j]; if (b.ses === a.ses || gone.has(b) || dist(a, b) > tol) continue;
+      if (b.code === N.pole && a.code !== N.pole) { gone.set(a, b); break; } gone.set(b, a); }
+  }
+  const Pall = P; if (gone.size) { P.forEach(p => { if (gone.has(p)) by.set(p.n, root(p)); }); P = P.filter(p => !gone.has(p)); }
   const idx = new Map(all.map((p, i) => [p.n, i])), edges = [], seen = new Set();
-  P.forEach(p => {
-    if (!p.link) return;
-    let refs = p.link.slice(2).split(',');
+  Pall.forEach(src => {   // связи берутся у каждой снятой точки, а ложатся на точку после стыковки
+    const p = root(src);
+    if (!src.link) return;
+    let refs = src.link.slice(2).split(',');
     refs = refs.map((r, i) => r === '' ? (i === 0 ? 'prev' : null) : +r).filter(r => r !== null);
     if (!refs.length) refs = ['prev'];
     refs.forEach(r => {
       let q;
-      if (r === 'prev') { const i = idx.get(p.n); q = i > 0 ? by.get(all[i - 1].n) : null; if (!q && i > 0) warn.push('т.' + p.n + ': «..» ведёт к т.' + all[i - 1].n + ', а это не точка сети — связь пропущена.'); }
-      else { q = by.get(r); if (!q) warn.push('т.' + p.n + ': связь с т.' + r + ' — такой точки сети нет.'); }
+      if (r === 'prev') { const i = idx.get(src.n); if (i > 0 && (all[i - 1].s || 0) !== (src.s || 0)) { warn.push('т.' + src.n + ': первая точка съёмки с «..» — связь с прошлой съёмкой не ставится.'); return; } q = i > 0 ? by.get(all[i - 1].n) : null; if (!q && i > 0) warn.push('т.' + p.n + ': «..» ведёт к т.' + all[i - 1].n + ', а это не точка сети — связь пропущена.'); }
+      else { q = by.get(r); if (!q) warn.push('т.' + src.n + ': связь с т.' + r + ' — такой точки сети нет.'); }
       if (!q || q === p) return;
       const key = Math.min(p.n, q.n) + '-' + Math.max(p.n, q.n); if (seen.has(key)) return; seen.add(key);
       const cas = p.code === N.cas && q.code === N.cas;
@@ -278,7 +308,7 @@ function buildLine(P0, net, names) {
     const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
     warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
   }
-  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn };
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size };
 }
 function drawLine(D, m, opt) {
   // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
