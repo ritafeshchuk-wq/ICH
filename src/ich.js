@@ -559,7 +559,7 @@ function cp1251(str) {
   const out = new Uint8Array(str.length * 2); let k = 0;
   for (const ch of str) { const c = ch.codePointAt(0); let b;
     if (c < 0x80) b = c; else if (c >= 0x410 && c <= 0x44F) b = c - 0x410 + 0xC0; else if (c === 0x401) b = 0xA8; else if (c === 0x451) b = 0xB8; else if (c === 0x2116) b = 0xB9;
-    else if (c === 0xB0) b = 0xB0; else if (c === 0xD7) b = 0x78; else if (c === 0x2014) b = 0x97; else if (c === 0x2013) b = 0x96; else if (c === 0x2212) b = 0x2D; else if (c === 0xAB) b = 0xAB; else if (c === 0xBB) b = 0xBB; else b = 0x3F;
+    else if (c === 0xB0) b = 0xB0; else if (c === 0xD7) b = 0x78; else if (c === 0x2014) b = 0x97; else if (c === 0x2013) b = 0x96; else if (c === 0x2212) b = 0x2D; else if (c === 0xAB) b = 0xAB; else if (c === 0xBB) b = 0xBB; else if (c === 0xA9) b = 0xA9; else b = 0x3F;
     out[k++] = b; }
   return out.subarray(0, k);
 }
@@ -579,7 +579,8 @@ function toDXF(D) {
   const LY = [], lw = (c, v) => LY.push(String(c).padStart(3, ' '), String(v));
   layers.forEach((col, nm) => { lw(0, 'LAYER'); lw(5, hex()); lw(330, T.layerOwner); lw(100, 'AcDbSymbolTableRecord'); lw(100, 'AcDbLayerTableRecord'); lw(2, nm); lw(70, 0); lw(62, col); lw(6, 'Continuous'); lw(370, -3); lw(390, '13'); });
   if (!isFinite(x0)) x0 = y0 = x1 = y1 = 0;
-  const out = T.skel.replace('{{ENTITIES}}', E.join('\n') + (E.length ? '\n' : '')).replace('{{LAYERS}}', LY.join('\n') + (LY.length ? '\n' : ''))
+  const sign = '999\nПрограмма «' + APP.name + '» ' + APP.version + '. ' + APP.notice + '\n';   // комментарий DXF: AutoCAD его пропускает
+  const out = sign + T.skel.replace('{{ENTITIES}}', E.join('\n') + (E.length ? '\n' : '')).replace('{{LAYERS}}', LY.join('\n') + (LY.length ? '\n' : ''))
     .replace('{{NLAYERS}}', String(SKEL_LAYERS.length + layers.size)).replace('{{HANDSEED}}', (hs + 1).toString(16).toUpperCase())
     .replace('{{PDSIZE}}', '0.5').replace('{{LTSCALE}}', '1.0').replace('{{EXMINX}}', n3(x0)).replace('{{EXMINY}}', n3(y0)).replace('{{EXMAXX}}', n3(x1)).replace('{{EXMAXY}}', n3(y1));
   return cp1251(out.replace(/\n/g, '\r\n'));
@@ -684,5 +685,7 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   { name: 'НК-4', type: 'ККСр-2', top: 149.75, bottom: 147.85, neck: 0.42, pipe_in: 148.55, pipe_out: null }],
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
-window.ICH = { rnd, zip, xe, unit, cp1251, drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+// сведения об авторе: подпись и отпечаток — как в «Абрисе» и других программах автора; удалять и изменять нельзя
+const APP = { name: 'ИЧ', version: '1.0', year: 2026, author: 'd1sco', authorMark: 'sha256:328908ed1181127a9f21b77d19d70a47e4ad0be284785c97777810ddff0d519a', notice: '© d1sco, 2026. Все права защищены. Отпечаток автора sha256:328908ed1181127a9f21b77d19d70a47e4ad0be284785c97777810ddff0d519a' };
+window.ICH = { APP, rnd, zip, xe, unit, cp1251, drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
 })();
