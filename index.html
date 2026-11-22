@@ -323,6 +323,12 @@ function buildLine(P0, net, names, opt) {
       edges.push({ a: q, b: p, cas, comp, len: dist(p, q) });
     });
   });
+  // ручная правка связей: убранные и добавленные отрезки; точки узнаются по координатам, поэтому правка переживает догрузку съёмок
+  const PK = p => p.x.toFixed(3) + ',' + p.y.toFixed(3), pairK = (x, y) => x < y ? x + '|' + y : y + '|' + x; let manAdd = 0, manCut = 0;
+  if (opt && opt.cut && opt.cut.length) { const cs = new Set(opt.cut.map(c => pairK(c[0], c[1]))); for (let i = edges.length - 1; i >= 0; i--) if (cs.has(pairK(PK(edges[i].a), PK(edges[i].b)))) { edges.splice(i, 1); manCut++; } }
+  if (opt && opt.add && opt.add.length) { const km = new Map(); Pall.forEach(p => km.set(PK(p), root(p)));
+    opt.add.forEach(c => { const a = km.get(c[0]), b = km.get(c[1]); if (!a || !b || a === b || edges.some(e => (e.a === a && e.b === b) || (e.a === b && e.b === a))) return;
+      edges.push({ a, b, cas: a.code === N.cas && b.code === N.cas, comp: null, len: dist(a, b), manual: true }); manAdd++; }); }
   if (!edges.length) throw new Error('Точки сети не соединены: в кодах нет связей «..».');
   // труба между концом футляра и опорой: состав берём у соседней трубы (через футляр или с другой стороны)
   for (let pass = 0; pass < 3; pass++) edges.forEach(e => {
@@ -385,7 +391,7 @@ function buildLine(P0, net, names, opt) {
     const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
     warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
   }
-  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size, relabel };
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size, relabel, manAdd, manCut };
 }
 function drawLine(D, m, opt) {
   // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
@@ -1616,7 +1622,7 @@ const S = { file: null, raw: null, parsed: null, res: null, err: null, tab: 'pla
   obj: { org: '', kind: 'кабеля наружного освещения', object: '', ks: '', contract: '', cableL: '', author: 'Шахмиров А.М', device: 'Nikon XF 05', z: false } };
 S.gnb = Object.assign({}, I.GNB_DEFAULT);
 S.geo = null; S.pdf = null; S.spec = { text: '', src: '' }; S.pickFor = null;
-S.job = null; S.jobs = []; S.demo = false;   // проект ИЧ: имя, съёмки, настройки — хранится в браузере (IndexedDB)
+S.job = null; S.jobs = []; S.demo = false; S.link = { on: false, a: null };   // проект ИЧ: имя, съёмки, настройки — хранится в браузере (IndexedDB)
 try { const st = JSON.parse(localStorage.getItem(KEY) || 'null'); if (st) { Object.assign(S.set, st.set || {}); if (st.proj) S.proj = st.proj; if (st.obj) Object.assign(S.obj, st.obj); if (st.gnb) Object.assign(S.gnb, st.gnb); if (st.spec) S.spec = st.spec; } } catch (e) { /* хранилище недоступно — работаем без него */ }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ set: S.set, obj: S.obj, gnb: S.gnb, spec: S.spec, proj: S.demoProj ? { object: '', wells: [], spans: [] } : S.proj })); } catch (e) { /* без сохранения */ } saveJobSoon(); };
 
@@ -1802,7 +1808,7 @@ function compute() {
 
 function computeLine(P, net) {
   const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null, o = S.obj;
-  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100, pref: o.polePref });
+  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100, pref: o.polePref, add: (S.proj.links || {}).add, cut: (S.proj.links || {}).cut });
   I.numberPickets(m, !!S.set.rev);
   const lay = I.sheetNO(m, { fmt: S.set.fmt }), D = new I.Dwg(); D.geoN = 0;
   if (S.geo) {   // окно геоподосновы разбирается один раз на окно листа: правка полей штампа не пересчитывает его заново
@@ -1816,6 +1822,22 @@ function computeLine(P, net) {
   m.trench = m.edges.reduce((t, e) => t + e.len, 0); m.sheet = lay;
   if (!lay.fits) m.warn.push('Трасса не помещается в окно плана на листе ' + lay.fmt + ' в М1:500. Выберите формат больше.');
   S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план, лист и ведомость участков' };
+}
+// ---------- ручная правка связей НО ----------
+const PKEY = p => p.x.toFixed(3) + ',' + p.y.toFixed(3), samePair = (c, a, b) => (c[0] === a && c[1] === b) || (c[0] === b && c[1] === a);
+function toggleLink(m, a, b) {
+  const L = S.proj.links = S.proj.links || { add: [], cut: [] }; L.add = L.add || []; L.cut = L.cut || [];
+  const has = m.edges.some(e => samePair([PKEY(e.a), PKEY(e.b)], a, b));
+  if (has) { const i = L.add.findIndex(c => samePair(c, a, b)); if (i >= 0) L.add.splice(i, 1); else L.cut.push([a, b]); toast('Отрезок убран.'); }
+  else { const i = L.cut.findIndex(c => samePair(c, a, b)); if (i >= 0) L.cut.splice(i, 1); else L.add.push([a, b]); toast('Отрезок добавлен.'); }
+}
+function linkLayer(m) {
+  if (!S.link.on || S.tab !== 'plan') return '';
+  const xy = k => k.split(',').map(Number), o = [];
+  ((S.proj.links || {}).cut || []).forEach(c => { const a = xy(c[0]), b = xy(c[1]); o.push('<polyline points="' + a[0] + ',' + (-a[1]) + ' ' + b[0] + ',' + (-b[1]) + '" stroke="#8a8f96" stroke-dasharray="4 3"/>'); });
+  m.edges.filter(e => e.manual).forEach(e => o.push('<polyline points="' + e.a.x + ',' + (-e.a.y) + ' ' + e.b.x + ',' + (-e.b.y) + '" stroke="#e67e00" style="stroke-width:3"/>'));
+  m.points.forEach(p => o.push('<circle cx="' + p.x.toFixed(3) + '" cy="' + (-p.y).toFixed(3) + '" r="0.3" stroke="#e67e00"' + (S.link.a === PKEY(p) ? ' fill="#e67e00" fill-opacity="0.6" style="stroke-width:3"' : '') + '/>'));
+  return '<g fill="none" id="lk">' + o.join('') + '</g>';
 }
 // геоподоснова на экране — один готовый узел SVG: при каждой перерисовке он переставляется, а не строится заново
 function geoNode() { const c = S.geo && S.geo.cache; if (!c) return null; if (!c.node) { const t = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); t.innerHTML = '<g fill="none">' + I.toSVG({ e: c.e }) + '</g>'; c.node = t.firstChild; } return c.node; }
@@ -1959,15 +1981,15 @@ function netsBlock() {
 }
 function renderLine() {
   const r = S.res, m = r.m;
-  let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li>' + (m.joined ? '<li>съёмки состыкованы в ' + m.joined + ' т.</li>' : '') + '</ul>' + netsBlock();
+  let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li>' + (m.joined ? '<li>съёмки состыкованы в ' + m.joined + ' т.</li>' : '') + (m.manAdd || m.manCut ? '<li>связи вручную: добавлено ' + m.manAdd + ', убрано ' + m.manCut + ' <button class="btn small danger" id="lkreset">Сбросить</button></li>' : '') + '</ul>' + netsBlock();
   side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>Lтр — <b>' + fnum(m.trench, 2) + ' м</b></li></ul>';
   if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
   side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">пикет ' + p.pk + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
   const ltabs = [['plan', 'План'], ['sheet', 'Лист'], ['table', 'Ведомость']].concat(S.pdf ? [['pdf', 'Проект']] : []);
   if (!ltabs.some(t => t[0] === S.tab)) S.tab = 'plan';
   let desk = '<div class="tabs">' + ltabs.map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
-    + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
-    + (S.tab === 'pdf' ? pdfDesk() : '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG({ e: r.D.e.slice(r.D.geoN || 0) }) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>');
+    + '<div class="zoombar">' + (S.tab === 'plan' ? '<button class="btn small' + (S.link.on ? ' primary' : '') + '" id="lkb" title="Добавить или убрать отрезок трассы: щёлкните две точки">Связи</button>' : '') + '<button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
+    + (S.tab === 'pdf' ? pdfDesk() : '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG({ e: r.D.e.slice(r.D.geoN || 0) }) + '</g>' + linkLayer(m) + '</svg></div><p class="desk-hint">' + (S.link.on && S.tab === 'plan' ? '<b>Правка связей:</b> щёлкните одну точку, потом другую — отрезок между ними появится, а если он уже есть — исчезнет. Сдвиг и приближение работают как обычно.' : 'колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком') + '</p>');
   const P = S.proj.poles || [];
   let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': лист ' + m.sheet.fmt + ' — план 1:500 с пикетами, длинами и опорами, разрез траншеи, спецификация, итоги, штамп. Профиль для НО не нужен.</p>'
     + '<label class="chk"><input type="checkbox" id="nums"' + (S.set.nums !== false ? ' checked' : '') + '> Номера пикетов (подряд вдоль трассы)</label>'
@@ -2004,6 +2026,21 @@ function renderLine() {
       txt.replace(/\r/g, '').replace(/\n$/, '').split('\n').forEach((v, i) => { const r = +inp.dataset.r + i; if (r < m.poles.length) S.proj.poles[r] = v.split('\t')[0].trim(); }); save(); compute(); render(); toast('Вставлено из буфера.'); };
   });
   bindView();
+  const lb = $('#lkb'); if (lb) lb.onclick = () => { S.link.on = !S.link.on; S.link.a = null; render(); };
+  const lr = $('#lkreset'); if (lr) lr.onclick = () => { if (!twice('lk', 'Нажмите «Сбросить» ещё раз: все ручные связи будут убраны, трасса вернётся к кодам съёмки.')) return; S.proj.links = { add: [], cut: [] }; save(); compute(); render(); };
+  const sv = $('#svg'); if (sv && S.link.on && S.tab === 'plan') {   // щелчок без сдвига — выбор точки
+    let d0 = null; sv.addEventListener('pointerdown', e => { d0 = [e.clientX, e.clientY]; });
+    sv.addEventListener('pointerup', e => {
+      if (!d0 || Math.hypot(e.clientX - d0[0], e.clientY - d0[1]) > 5) return;
+      const r = sv.getBoundingClientRect(), v = S.view, sc = Math.max(v[2] / r.width, v[3] / r.height), wx = v[0] + v[2] / 2 + (e.clientX - r.left - r.width / 2) * sc, wy = -(v[1] + v[3] / 2 + (e.clientY - r.top - r.height / 2) * sc);
+      let best = null, bd = 16 * sc; m.points.forEach(p => { const d = Math.hypot(p.x - wx, p.y - wy); if (d < bd) { bd = d; best = p; } });
+      if (!best) { if (S.link.a) { S.link.a = null; render(); } return; }
+      const k = PKEY(best);
+      if (!S.link.a) { S.link.a = k; render(); return; }
+      if (S.link.a === k) { S.link.a = null; render(); return; }
+      toggleLink(m, S.link.a, k); S.link.a = null; save(); compute(); render();
+    });
+  }
 }
 // ---------- ГНБ ----------
 function gnbField(id, lab, ph, wide) {

@@ -246,6 +246,12 @@ function buildLine(P0, net, names, opt) {
       edges.push({ a: q, b: p, cas, comp, len: dist(p, q) });
     });
   });
+  // ручная правка связей: убранные и добавленные отрезки; точки узнаются по координатам, поэтому правка переживает догрузку съёмок
+  const PK = p => p.x.toFixed(3) + ',' + p.y.toFixed(3), pairK = (x, y) => x < y ? x + '|' + y : y + '|' + x; let manAdd = 0, manCut = 0;
+  if (opt && opt.cut && opt.cut.length) { const cs = new Set(opt.cut.map(c => pairK(c[0], c[1]))); for (let i = edges.length - 1; i >= 0; i--) if (cs.has(pairK(PK(edges[i].a), PK(edges[i].b)))) { edges.splice(i, 1); manCut++; } }
+  if (opt && opt.add && opt.add.length) { const km = new Map(); Pall.forEach(p => km.set(PK(p), root(p)));
+    opt.add.forEach(c => { const a = km.get(c[0]), b = km.get(c[1]); if (!a || !b || a === b || edges.some(e => (e.a === a && e.b === b) || (e.a === b && e.b === a))) return;
+      edges.push({ a, b, cas: a.code === N.cas && b.code === N.cas, comp: null, len: dist(a, b), manual: true }); manAdd++; }); }
   if (!edges.length) throw new Error('Точки сети не соединены: в кодах нет связей «..».');
   // труба между концом футляра и опорой: состав берём у соседней трубы (через футляр или с другой стороны)
   for (let pass = 0; pass < 3; pass++) edges.forEach(e => {
@@ -308,7 +314,7 @@ function buildLine(P0, net, names, opt) {
     const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
     warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
   }
-  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size, relabel };
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size, relabel, manAdd, manCut };
 }
 function drawLine(D, m, opt) {
   // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
