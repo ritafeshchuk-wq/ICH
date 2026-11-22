@@ -70,6 +70,7 @@ svg.draw text{stroke:none}
 .job{flex:1;min-width:0;display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 10px;cursor:pointer}.job:hover{border-color:var(--ink)}.job b{font-size:15px;word-break:break-all}.job span{color:var(--muted);font-size:12.5px}
 .jobs .row input{flex:1;min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font:inherit}
 .req.ok{position:static;height:auto;min-width:0;padding:0;border-radius:0;background:none;color:inherit;display:flex;place-items:initial;align-items:flex-start}
+.grp{border:1px solid var(--line);border-radius:6px;padding:6px 9px;margin:8px 0}.grp summary{cursor:pointer;font-weight:600;font-size:13px}
 </style></head>
 <body><div id="app"></div><input id="picker" type="file" multiple hidden><div id="toast" role="status"></div>
 <script>window.ICH_SKEL={"skel": "  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1015\n  9\n$ACADMAINTVER\n 70\n6\n  9\n$DWGCODEPAGE\n  3\nANSI_1251\n  9\n$INSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$EXTMIN\n 10\n{{EXMINX}}\n 20\n{{EXMINY}}\n 30\n0.0\n  9\n$EXTMAX\n 10\n{{EXMAXX}}\n 20\n{{EXMAXY}}\n 30\n0.0\n  9\n$LIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$LIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$ORTHOMODE\n 70\n0\n  9\n$REGENMODE\n 70\n1\n  9\n$FILLMODE\n 70\n1\n  9\n$QTEXTMODE\n 70\n0\n  9\n$MIRRTEXT\n 70\n1\n  9\n$LTSCALE\n 40\n{{LTSCALE}}\n  9\n$ATTMODE\n 70\n1\n  9\n$TEXTSIZE\n 40\n2.5\n  9\n$TRACEWID\n 40\n1.0\n  9\n$TEXTSTYLE\n  7\nStandard\n  9\n$CLAYER\n  8\n0\n  9\n$CELTYPE\n  6\nByLayer\n  9\n$CECOLOR\n 62\n256\n  9\n$CELTSCALE\n 40\n1.0\n  9\n$DISPSILH\n 70\n0\n  9\n$DIMSCALE\n 40\n1.0\n  9\n$DIMASZ\n 40\n2.5\n  9\n$DIMEXO\n 40\n0.625\n  9\n$DIMDLI\n 40\n3.75\n  9\n$DIMRND\n 40\n0.0\n  9\n$DIMDLE\n 40\n0.0\n  9\n$DIMEXE\n 40\n1.25\n  9\n$DIMTP\n 40\n0.0\n  9\n$DIMTM\n 40\n0.0\n  9\n$DIMTXT\n 40\n2.5\n  9\n$DIMCEN\n 40\n2.5\n  9\n$DIMTSZ\n 40\n0.0\n  9\n$DIMTOL\n 70\n0\n  9\n$DIMLIM\n 70\n0\n  9\n$DIMTIH\n 70\n0\n  9\n$DIMTOH\n 70\n0\n  9\n$DIMSE1\n 70\n0\n  9\n$DIMSE2\n 70\n0\n  9\n$DIMTAD\n 70\n1\n  9\n$DIMZIN\n 70\n8\n  9\n$DIMBLK\n  1\n\n  9\n$DIMASO\n 70\n1\n  9\n$DIMSHO\n 70\n1\n  9\n$DIMPOST\n  1\n\n  9\n$DIMAPOST\n  1\n\n  9\n$DIMALT\n 70\n0\n  9\n$DIMALTD\n 70\n3\n  9\n$DIMALTF\n 40\n0.03937007874\n  9\n$DIMLFAC\n 40\n1.0\n  9\n$DIMTOFL\n 70\n1\n  9\n$DIMTVP\n 40\n0.0\n  9\n$DIMTIX\n 70\n0\n  9\n$DIMSOXD\n 70\n0\n  9\n$DIMSAH\n 70\n0\n  9\n$DIMBLK1\n  1\n\n  9\n$DIMBLK2\n  1\n\n  9\n$DIMSTYLE\n  2\nISO-25\n  9\n$DIMCLRD\n 70\n0\n  9\n$DIMCLRE\n 70\n0\n  9\n$DIMCLRT\n 70\n0\n  9\n$DIMTFAC\n 40\n1.0\n  9\n$DIMGAP\n 40\n0.625\n  9\n$DIMJUST\n 70\n0\n  9\n$DIMSD1\n 70\n0\n  9\n$DIMSD2\n 70\n0\n  9\n$DIMTOLJ\n 70\n0\n  9\n$DIMTZIN\n 70\n8\n  9\n$DIMALTZ\n 70\n0\n  9\n$DIMALTTZ\n 70\n0\n  9\n$DIMUPT\n 70\n0\n  9\n$DIMDEC\n 70\n2\n  9\n$DIMTDEC\n 70\n2\n  9\n$DIMALTU\n 70\n2\n  9\n$DIMALTTD\n 70\n3\n  9\n$DIMTXSTY\n  7\nStandard\n  9\n$DIMAUNIT\n 70\n0\n  9\n$DIMADEC\n 70\n0\n  9\n$DIMALTRND\n 40\n0.0\n  9\n$DIMAZIN\n 70\n0\n  9\n$DIMDSEP\n 70\n44\n  9\n$DIMATFIT\n 70\n3\n  9\n$DIMFRAC\n 70\n0\n  9\n$DIMLDRBLK\n  1\n\n  9\n$DIMLUNIT\n 70\n2\n  9\n$DIMLWD\n 70\n-2\n  9\n$DIMLWE\n 70\n-2\n  9\n$DIMTMOVE\n 70\n0\n  9\n$LUNITS\n 70\n2\n  9\n$LUPREC\n 70\n4\n  9\n$SKETCHINC\n 40\n1.0\n  9\n$FILLETRAD\n 40\n10.0\n  9\n$AUNITS\n 70\n0\n  9\n$AUPREC\n 70\n2\n  9\n$MENU\n  1\n.\n  9\n$ELEVATION\n 40\n0.0\n  9\n$PELEVATION\n 40\n0.0\n  9\n$THICKNESS\n 40\n0.0\n  9\n$LIMCHECK\n 70\n0\n  9\n$CHAMFERA\n 40\n0.0\n  9\n$CHAMFERB\n 40\n0.0\n  9\n$CHAMFERC\n 40\n0.0\n  9\n$CHAMFERD\n 40\n0.0\n  9\n$SKPOLY\n 70\n0\n  9\n$TDCREATE\n 40\n2461313.7136921296\n  9\n$TDUCREATE\n 40\n2458532.153996898\n  9\n$TDUPDATE\n 40\n2461313.7136921296\n  9\n$TDUUPDATE\n 40\n2458532.1544311\n  9\n$TDINDWG\n 40\n0.0\n  9\n$TDUSRTIMER\n 40\n0.0\n  9\n$USRTIMER\n 70\n1\n  9\n$ANGBASE\n 50\n0.0\n  9\n$ANGDIR\n 70\n0\n  9\n$PDMODE\n 70\n35\n  9\n$PDSIZE\n 40\n{{PDSIZE}}\n  9\n$PLINEWID\n 40\n0.0\n  9\n$SPLFRAME\n 70\n0\n  9\n$SPLINETYPE\n 70\n6\n  9\n$SPLINESEGS\n 70\n8\n  9\n$HANDSEED\n  5\n{{HANDSEED}}\n  9\n$SURFTAB1\n 70\n6\n  9\n$SURFTAB2\n 70\n6\n  9\n$SURFTYPE\n 70\n6\n  9\n$SURFU\n 70\n6\n  9\n$SURFV\n 70\n6\n  9\n$UCSBASE\n  2\n\n  9\n$UCSNAME\n  2\n\n  9\n$UCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$UCSORTHOREF\n  2\n\n  9\n$UCSORTHOVIEW\n 70\n0\n  9\n$UCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$UCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSBASE\n  2\n\n  9\n$PUCSNAME\n  2\n\n  9\n$PUCSORG\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSXDIR\n 10\n1.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSYDIR\n 10\n0.0\n 20\n1.0\n 30\n0.0\n  9\n$PUCSORTHOREF\n  2\n\n  9\n$PUCSORTHOVIEW\n 70\n0\n  9\n$PUCSORGTOP\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBOTTOM\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGLEFT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGRIGHT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGFRONT\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PUCSORGBACK\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$USERI1\n 70\n0\n  9\n$USERI2\n 70\n0\n  9\n$USERI3\n 70\n0\n  9\n$USERI4\n 70\n0\n  9\n$USERI5\n 70\n0\n  9\n$USERR1\n 40\n0.0\n  9\n$USERR2\n 40\n0.0\n  9\n$USERR3\n 40\n0.0\n  9\n$USERR4\n 40\n0.0\n  9\n$USERR5\n 40\n0.0\n  9\n$WORLDVIEW\n 70\n1\n  9\n$SHADEDGE\n 70\n3\n  9\n$SHADEDIF\n 70\n70\n  9\n$TILEMODE\n 70\n1\n  9\n$MAXACTVP\n 70\n64\n  9\n$PINSBASE\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  9\n$PLIMCHECK\n 70\n0\n  9\n$PEXTMIN\n 10\n1e+20\n 20\n1e+20\n 30\n1e+20\n  9\n$PEXTMAX\n 10\n-1e+20\n 20\n-1e+20\n 30\n-1e+20\n  9\n$PLIMMIN\n 10\n0.0\n 20\n0.0\n  9\n$PLIMMAX\n 10\n420.0\n 20\n297.0\n  9\n$UNITMODE\n 70\n0\n  9\n$VISRETAIN\n 70\n1\n  9\n$PLINEGEN\n 70\n0\n  9\n$PSLTSCALE\n 70\n1\n  9\n$TREEDEPTH\n 70\n3020\n  9\n$CMLSTYLE\n  2\nStandard\n  9\n$CMLJUST\n 70\n0\n  9\n$CMLSCALE\n 40\n20.0\n  9\n$PROXYGRAPHICS\n 70\n1\n  9\n$MEASUREMENT\n 70\n1\n  9\n$CELWEIGHT\n370\n-1\n  9\n$ENDCAPS\n280\n0\n  9\n$JOINSTYLE\n280\n0\n  9\n$LWDISPLAY\n290\n0\n  9\n$INSUNITS\n 70\n6\n  9\n$HYPERLINKBASE\n  1\n\n  9\n$STYLESHEET\n  1\n\n  9\n$XEDIT\n290\n1\n  9\n$CEPSNTYPE\n380\n0\n  9\n$PSTYLEMODE\n290\n1\n  9\n$FINGERPRINTGUID\n  2\n{83AAAAEA-91C6-4B45-A960-A1CEF3310842}\n  9\n$VERSIONGUID\n  2\n{D81DBDA3-241D-4286-9503-0B4CF4FEC05F}\n  9\n$EXTNAMES\n290\n1\n  9\n$PSVPSCALE\n 40\n0.0\n  9\n$OLESTARTUP\n290\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nCLASSES\n  0\nCLASS\n  1\nACDBDICTIONARYWDFLT\n  2\nAcDbDictionaryWithDefault\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nSUN\n  2\nAcDbSun\n  3\nSCENEOE\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nVISUALSTYLE\n  2\nAcDbVisualStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMATERIAL\n  2\nAcDbMaterial\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nSCALE\n  2\nAcDbScale\n  3\nObjectDBX Classes\n 90\n1153\n280\n0\n281\n0\n  0\nCLASS\n  1\nTABLESTYLE\n  2\nAcDbTableStyle\n  3\nObjectDBX Classes\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nMLEADERSTYLE\n  2\nAcDbMLeaderStyle\n  3\nACDB_MLEADERSTYLE_CLASS\n 90\n4095\n280\n0\n281\n0\n  0\nCLASS\n  1\nDICTIONARYVAR\n  2\nAcDbDictionaryVar\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nCELLSTYLEMAP\n  2\nAcDbCellStyleMap\n  3\nObjectDBX Classes\n 90\n1152\n280\n0\n281\n0\n  0\nCLASS\n  1\nMENTALRAYRENDERSETTINGS\n  2\nAcDbMentalRayRenderSettings\n  3\nSCENEOE\n 90\n1024\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBDETAILVIEWSTYLE\n  2\nAcDbDetailViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBSECTIONVIEWSTYLE\n  2\nAcDbSectionViewStyle\n  3\nObjectDBX Classes\n 90\n1025\n280\n0\n281\n0\n  0\nCLASS\n  1\nRASTERVARIABLES\n  2\nAcDbRasterVariables\n  3\nISM\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nACDBPLACEHOLDER\n  2\nAcDbPlaceHolder\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nCLASS\n  1\nLAYOUT\n  2\nAcDbLayout\n  3\nObjectDBX Classes\n 90\n0\n280\n0\n281\n0\n  0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nVPORT\n  5\n8\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nVPORT\n  5\n23\n330\n8\n100\nAcDbSymbolTableRecord\n100\nAcDbViewportTableRecord\n  2\n*Active\n 70\n0\n 10\n0.0\n 20\n0.0\n 11\n1.0\n 21\n1.0\n 12\n0.0\n 22\n0.0\n 13\n0.0\n 23\n0.0\n 14\n0.5\n 24\n0.5\n 15\n0.5\n 25\n0.5\n 16\n0.0\n 26\n0.0\n 36\n1.0\n 17\n0.0\n 27\n0.0\n 37\n0.0\n 40\n1000.0\n 41\n1.34\n 42\n50.0\n 43\n0.0\n 44\n0.0\n 50\n0.0\n 51\n0.0\n 71\n0\n 72\n1000\n 73\n1\n 74\n3\n 75\n0\n 76\n0\n 77\n0\n 78\n0\n281\n0\n 65\n0\n146\n0.0\n  0\nENDTAB\n  0\nTABLE\n  2\nLTYPE\n  5\n2\n330\n0\n100\nAcDbSymbolTable\n 70\n4\n  0\nLTYPE\n  5\n24\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByBlock\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n25\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nByLayer\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n26\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nContinuous\n 70\n0\n  3\n\n 72\n65\n 73\n0\n 40\n0.0\n  0\nLTYPE\n  5\n35\n330\n2\n100\nAcDbSymbolTableRecord\n100\nAcDbLinetypeTableRecord\n  2\nDASHED\n 70\n0\n  3\n\n 72\n65\n 73\n2\n 40\n1.0\n 49\n0.6\n 74\n0\n 49\n-0.4\n 74\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nLAYER\n  5\n1\n330\n0\n100\nAcDbSymbolTable\n 70\n{{NLAYERS}}\n  0\nLAYER\n  5\n27\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\n0\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n28\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDefpoints\n 70\n0\n 62\n7\n  6\nContinuous\n290\n0\n370\n-3\n390\n13\n  0\nLAYER\n  5\n2F\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nPOINT\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n30\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nName\n 70\n0\n 62\n1\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n31\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nELEVATION\n 70\n0\n 62\n5\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n32\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nDeskription\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n33\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHV\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n  0\nLAYER\n  5\n34\n330\n1\n100\nAcDbSymbolTableRecord\n100\nAcDbLayerTableRecord\n  2\nHI\n 70\n0\n 62\n7\n  6\nContinuous\n370\n-3\n390\n13\n{{LAYERS}}  0\nENDTAB\n  0\nTABLE\n  2\nSTYLE\n  5\n5\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n  0\nSTYLE\n  5\n29\n330\n5\n100\nAcDbSymbolTableRecord\n100\nAcDbTextStyleTableRecord\n  2\nStandard\n 70\n0\n 40\n0.0\n 41\n1.0\n 50\n0.0\n 71\n0\n 42\n2.5\n  3\narial.ttf\n  4\n\n  0\nENDTAB\n  0\nTABLE\n  2\nVIEW\n  5\n7\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nUCS\n  5\n6\n330\n0\n100\nAcDbSymbolTable\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nAPPID\n  5\n3\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nAPPID\n  5\n2A\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nACAD\n 70\n0\n  0\nAPPID\n  5\n3F\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nHATCHBACKGROUNDCOLOR\n 70\n0\n  0\nAPPID\n  5\n40\n330\n3\n100\nAcDbSymbolTableRecord\n100\nAcDbRegAppTableRecord\n  2\nEZDXF\n 70\n0\n  0\nENDTAB\n  0\nTABLE\n  2\nDIMSTYLE\n  5\n4\n330\n0\n100\nAcDbSymbolTable\n 70\n1\n100\nAcDbDimStyleTable\n  0\nDIMSTYLE\n105\n2B\n330\n4\n100\nAcDbSymbolTableRecord\n100\nAcDbDimStyleTableRecord\n  2\nStandard\n 70\n0\n  3\n\n  4\n\n 40\n1.0\n 41\n2.5\n 42\n0.625\n 43\n3.75\n 44\n1.25\n 45\n0.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n140\n2.5\n141\n2.5\n142\n0.0\n143\n0.03937007874\n144\n1.0\n145\n0.0\n146\n1.0\n147\n0.625\n148\n0.0\n 71\n0\n 72\n0\n 73\n0\n 74\n0\n 75\n0\n 76\n0\n 77\n1\n 78\n8\n 79\n3\n170\n0\n171\n3\n172\n1\n173\n0\n174\n0\n175\n0\n176\n0\n177\n0\n178\n0\n179\n2\n271\n2\n272\n2\n273\n2\n274\n3\n275\n0\n276\n0\n277\n2\n278\n44\n279\n0\n280\n0\n281\n0\n282\n0\n283\n0\n284\n8\n285\n0\n286\n0\n288\n0\n289\n3\n371\n-2\n372\n-2\n  0\nENDTAB\n  0\nTABLE\n  2\nBLOCK_RECORD\n  5\n9\n330\n0\n100\nAcDbSymbolTable\n 70\n3\n  0\nBLOCK_RECORD\n  5\n17\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Model_Space\n340\n1A\n  0\nBLOCK_RECORD\n  5\n1B\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n*Paper_Space\n340\n1E\n  0\nBLOCK_RECORD\n  5\n36\n330\n9\n100\nAcDbSymbolTableRecord\n100\nAcDbBlockTableRecord\n  2\n_block2\n340\n0\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nBLOCKS\n  0\nBLOCK\n  5\n18\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Model_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Model_Space\n  1\n\n  0\nENDBLK\n  5\n19\n330\n17\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n1C\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n*Paper_Space\n 70\n0\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n*Paper_Space\n  1\n\n  0\nENDBLK\n  5\n1D\n330\n1B\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nBLOCK\n  5\n37\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockBegin\n  2\n_block2\n 70\n2\n 10\n0.0\n 20\n0.0\n 30\n0.0\n  3\n_block2\n  1\n\n  0\nCIRCLE\n  5\n39\n330\n36\n100\nAcDbEntity\n  8\nPOINT\n100\nAcDbCircle\n 10\n0.0\n 20\n0.0\n 30\n0.0\n 40\n0.0762\n  0\nATTDEF\n  5\n3A\n330\n36\n100\nAcDbEntity\n  8\nName\n 62\n250\n100\nAcDbText\n 10\n0.096\n 20\n0.178\n 30\n0.0\n 40\n0.2\n  1\n1\n100\nAcDbAttributeDefinition\n  3\nНОМЕР\n  2\n№\n 70\n0\n  0\nATTDEF\n  5\n3B\n330\n36\n100\nAcDbEntity\n  8\nELEVATION\n100\nAcDbText\n 10\n0.096\n 20\n-0.08\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОТМЕТКА\n  2\nH\n 70\n0\n  0\nATTDEF\n  5\n3C\n330\n36\n100\nAcDbEntity\n  8\nDeskription\n100\nAcDbText\n 10\n0.096\n 20\n-0.357\n 30\n0.0\n 40\n0.2\n  1\n\n100\nAcDbAttributeDefinition\n  3\nОписание\n  2\nTXT\n 70\n0\n  0\nATTDEF\n  5\n3D\n330\n36\n100\nAcDbEntity\n  8\nHV\n100\nAcDbText\n 10\n0.151\n 20\n-0.622\n 30\n0.0\n 40\n0.2\n  1\n2.500\n100\nAcDbAttributeDefinition\n  3\nвысота вехи\n  2\nHV\n 70\n0\n  0\nATTDEF\n  5\n3E\n330\n36\n100\nAcDbEntity\n  8\nHI\n100\nAcDbText\n 10\n-0.866\n 20\n-0.084\n 30\n0.0\n 40\n0.2\n  1\n1.600\n100\nAcDbAttributeDefinition\n  3\nвысота инструмента\n  2\nHI\n 70\n0\n  0\nENDBLK\n  5\n38\n330\n36\n100\nAcDbEntity\n  8\n0\n100\nAcDbBlockEnd\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n{{ENTITIES}}  0\nENDSEC\n  0\nSECTION\n  2\nOBJECTS\n  0\nDICTIONARY\n  5\nA\n330\n0\n100\nAcDbDictionary\n281\n1\n  3\nACAD_COLOR\n350\nB\n  3\nACAD_GROUP\n350\nC\n  3\nACAD_LAYOUT\n350\nD\n  3\nACAD_MATERIAL\n350\nE\n  3\nACAD_MLEADERSTYLE\n350\nF\n  3\nACAD_MLINESTYLE\n350\n10\n  3\nACAD_PLOTSETTINGS\n350\n11\n  3\nACAD_PLOTSTYLENAME\n350\n12\n  3\nACAD_SCALELIST\n350\n14\n  3\nACAD_TABLESTYLE\n350\n15\n  3\nACAD_VISUALSTYLE\n350\n16\n  3\nEZDXF_META\n350\n2D\n  0\nDICTIONARY\n  5\nB\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nC\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\nD\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nModel\n350\n1A\n  3\nLayout1\n350\n1E\n  0\nDICTIONARY\n  5\nE\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nByBlock\n350\n1F\n  3\nByLayer\n350\n20\n  3\nGlobal\n350\n21\n  0\nDICTIONARY\n  5\nF\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n2C\n  0\nDICTIONARY\n  5\n10\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nStandard\n350\n22\n  0\nDICTIONARY\n  5\n11\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nACDBDICTIONARYWDFLT\n  5\n12\n330\nA\n100\nAcDbDictionary\n281\n1\n  3\nNormal\n350\n13\n100\nAcDbDictionaryWithDefault\n340\n13\n  0\nACDBPLACEHOLDER\n  5\n13\n330\n12\n  0\nDICTIONARY\n  5\n14\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n15\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nDICTIONARY\n  5\n16\n330\nA\n100\nAcDbDictionary\n281\n1\n  0\nLAYOUT\n  5\n1A\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n1024\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nModel\n 70\n1\n 71\n0\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n17\n  0\nLAYOUT\n  5\n1E\n330\nD\n100\nAcDbPlotSettings\n  1\n\n  4\nA3\n  6\n\n 40\n7.5\n 41\n20.0\n 42\n7.5\n 43\n20.0\n 44\n420.0\n 45\n297.0\n 46\n0.0\n 47\n0.0\n 48\n0.0\n 49\n0.0\n140\n0.0\n141\n0.0\n142\n1.0\n143\n1.0\n 70\n0\n 72\n1\n 73\n0\n 74\n5\n  7\n\n 75\n16\n 76\n0\n 77\n2\n 78\n300\n147\n1.0\n148\n0.0\n149\n0.0\n100\nAcDbLayout\n  1\nLayout1\n 70\n1\n 71\n1\n 10\n0.0\n 20\n0.0\n 11\n420.0\n 21\n297.0\n 12\n0.0\n 22\n0.0\n 32\n0.0\n 14\n1e+20\n 24\n1e+20\n 34\n1e+20\n 15\n-1e+20\n 25\n-1e+20\n 35\n-1e+20\n146\n0.0\n 13\n0.0\n 23\n0.0\n 33\n0.0\n 16\n1.0\n 26\n0.0\n 36\n0.0\n 17\n0.0\n 27\n1.0\n 37\n0.0\n 76\n1\n330\n1B\n  0\nMATERIAL\n  5\n1F\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByBlock\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n20\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nByLayer\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMATERIAL\n  5\n21\n102\n{ACAD_REACTORS\n330\nE\n102\n}\n330\nE\n100\nAcDbMaterial\n  1\nGlobal\n  2\n\n 70\n0\n 40\n1.0\n 71\n1\n 41\n1.0\n 91\n-1023410177\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 44\n0.5\n 73\n0\n 45\n1.0\n 46\n1.0\n 77\n1\n  4\n\n 78\n1\n 79\n1\n170\n1\n 48\n1.0\n171\n1\n  6\n\n172\n1\n173\n1\n174\n1\n140\n1.0\n141\n1.0\n175\n1\n  7\n\n176\n1\n177\n1\n178\n1\n143\n1.0\n179\n1\n  8\n\n270\n1\n271\n1\n272\n1\n145\n1.0\n146\n1.0\n273\n1\n  9\n\n274\n1\n275\n1\n276\n1\n 42\n1.0\n 72\n1\n  3\n\n 73\n1\n 74\n1\n 75\n1\n 94\n63\n  0\nMLINESTYLE\n  5\n22\n102\n{ACAD_REACTORS\n330\n10\n102\n}\n330\n10\n100\nAcDbMlineStyle\n  2\nStandard\n 70\n0\n  3\n\n 62\n256\n 51\n90.0\n 52\n90.0\n 71\n2\n 49\n0.5\n 62\n256\n  6\nBYLAYER\n 49\n-0.5\n 62\n256\n  6\nBYLAYER\n  0\nMLEADERSTYLE\n  5\n2C\n102\n{ACAD_REACTORS\n330\nF\n102\n}\n330\nF\n100\nAcDbMLeaderStyle\n179\n2\n170\n2\n171\n1\n172\n0\n 90\n2\n 40\n0.0\n 41\n0.0\n173\n1\n 91\n-1056964608\n 92\n-2\n290\n1\n 42\n2.0\n291\n1\n 43\n8.0\n  3\nStandard\n 44\n4.0\n300\n\n342\n29\n174\n1\n175\n1\n176\n0\n178\n1\n 93\n-1056964608\n 45\n4.0\n292\n0\n297\n0\n 46\n4.0\n 94\n-1056964608\n 47\n1.0\n 49\n1.0\n140\n1.0\n294\n1\n141\n0.0\n177\n0\n142\n1.0\n295\n0\n296\n0\n143\n3.75\n271\n0\n272\n9\n273\n9\n  0\nDICTIONARY\n  5\n2D\n330\nA\n100\nAcDbDictionary\n280\n1\n281\n1\n  3\nCREATED_BY_EZDXF\n350\n2E\n  3\nWRITTEN_BY_EZDXF\n350\n41\n  0\nDICTIONARYVAR\n  5\n2E\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.984563+00:00\n  0\nDICTIONARYVAR\n  5\n41\n330\n2D\n100\nDictionaryVariables\n280\n0\n  1\n1.4.4 @ 2026-09-29T17:07:43.986194+00:00\n  0\nENDSEC\n  0\nEOF\n", "msOwner": "17", "layerOwner": "1", "handleStart": 82};</script>
@@ -370,10 +371,10 @@ function buildLine(P0, net, names, opt) {
     secs.push({ pts, len: es.reduce((t, x) => t + x.len, 0), casLen: es.filter(x => x.cas).reduce((t, x) => t + x.len, 0), pipeT, casT });
   });
   const poles = P.filter(p => p.code === N.pole);
-  poles.forEach((p, i) => { p.name = names && names[i] ? names[i] : 'оп.' + (i + 1); });
-  const label = p => p.code === N.pole ? p.name : 'т.' + p.n;
-  runs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
-  secs.forEach(r => { if (r.pts[0].code !== N.pole && r.pts[r.pts.length - 1].code === N.pole) { r.pts.reverse(); } r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
+  poles.forEach((p, i) => { p.name = names && names[i] ? names[i] : (opt && opt.pref != null && opt.pref !== '' ? opt.pref : 'оп.') + (i + 1); });
+  const label = p => p.code === N.pole ? p.name : (p.pk ? 'пк ' + p.pk : 'т.' + p.n);
+  secs.forEach(r => { if (r.pts[0].code !== N.pole && r.pts[r.pts.length - 1].code === N.pole) { r.pts.reverse(); } });
+  const relabel = () => { runs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); }); secs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); }); }; relabel();
   const ord = p => p.code === N.pole ? poles.indexOf(p) : 1e6 + p.n;
   secs.sort((a, b) => ord(a.pts[0]) - ord(b.pts[0]) || ord(a.pts[a.pts.length - 1]) - ord(b.pts[b.pts.length - 1]));
   // итоги по составу
@@ -384,7 +385,7 @@ function buildLine(P0, net, names, opt) {
     const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
     warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
   }
-  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size };
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size, relabel };
 }
 function drawLine(D, m, opt) {
   // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
@@ -504,11 +505,12 @@ function Dwg() { this.e = []; this.box = {}; }
 Dwg.prototype.line = function (l, x1, y1, x2, y2, c) { this.e.push({ t: 'L', l, c, p: [[x1, y1], [x2, y2]] }); };
 Dwg.prototype.poly = function (l, p, c, closed) { this.e.push({ t: 'P', l, c, p, closed: !!closed }); };
 Dwg.prototype.circle = function (l, x, y, r, c) { this.e.push({ t: 'C', l, c, x, y, r }); };
-Dwg.prototype.text = function (l, s, x, y, h, ang, al, c) { this.e.push({ t: 'T', l, c, s: String(s), x, y, h: h || 2.5, ang: ang || 0, al: al == null ? 1 : al }); };
+Dwg.prototype.text = function (l, s, x, y, h, ang, al, c) { this.e.push({ t: 'T', l, c, s: String(s).replace(/[∅⌀Ø]/g, '%%c'), x, y, h: h || 2.5, ang: ang || 0, al: al == null ? 1 : al }); };
 Dwg.prototype.mark = function (name, from) { // запомнить рамку части чертежа для вкладок
-  const xs = [], ys = [];
-  this.e.slice(from).forEach(e => { if (e.p) e.p.forEach(q => { xs.push(q[0]); ys.push(q[1]); }); else { xs.push(e.x); ys.push(e.y); } });
-  if (xs.length) this.box[name] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;   // циклом: на большой геоподоснове Math.min(...xs) переполняет стек
+  const ext = (x, y) => { if (x < a) a = x; if (y < b) b = y; if (x > c) c = x; if (y > d) d = y; };
+  for (let i = from; i < this.e.length; i++) { const e = this.e[i]; if (e.p) e.p.forEach(q => ext(q[0], q[1])); else ext(e.x, e.y); }
+  if (isFinite(a)) this.box[name] = [a, b, c, d];
 };
 const unit = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
 
@@ -720,7 +722,7 @@ function catalogXlsx(info, pts, withZ) {
 }
 
 // ---------------- SVG-просмотр ----------------
-const COL = { 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a00', 8: '#9aa0a6' };
+const COL = { 6: '#b0188f', 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a00', 8: '#9aa0a6' };
 function toSVG(D) {
   const o = [];
   D.e.forEach(e => {
@@ -754,6 +756,242 @@ const DEMO_PROJECT = { object: 'Пример (условные данные)', w
   spans: [{ n: 1, d: 110, len: 39.50 }, { n: 1, d: 110, len: 39.40, casing: { D: 325, L: 23.0 } }, { n: 1, d: 110, len: 37.30 }] };
 
 window.ICH = { rnd, zip, xe, unit, cp1251, drawNotes, catalogXlsx, NETS, detectNets, buildLine, drawLine, drawLineTable, decode, readDXF, readARE, parsePoints, build, compare, Dwg, drawPlan, drawProfile, drawWells, toDXF, toSVG, fnum, num, esc, demo, DEMO_PROJECT };
+})();
+</script>
+<script>
+/* ИЧ — кабель НО / ЭС: план и лист.
+   Оформление своё, собрано из лучшего в образцах:
+   — пикеты подряд вдоль трассы, длина каждого отрезка, Lтр, разрез траншеи, спецификация, штамп (лист КГС, корпус 12);
+   — состав труб, футляры контуром, ведомость участков и итоги по составу (ИЧ МГГТ);
+   — своё: длина пишется вдоль отрезка и уходит на выноску, только когда не помещается; подписи не наезжают
+     друг на друга и на трассу; условные обозначения и итоги собираются сами — только то, что есть на объекте. */
+(function () {
+'use strict';
+const I = window.ICH, fnum = I.fnum, unit = I.unit;
+const f2 = v => I.rnd(v, 2).toFixed(2);            // 2.73 — с точкой, как на листах НО
+const K = 0.5;                                     // М 1:500: 1 мм листа = 0,5 м
+const FORMATS = [['A2', 594, 420], ['A1', 841, 594], ['A0', 1189, 841]];
+const RC = 185, BB = 124;                          // правая колонка и нижняя полоса листа, мм
+const TW = (s, h) => 0.7 * h * String(s).length;   // ширина строки с запасом
+
+// ---------- пикеты: подряд вдоль трассы, ветка за веткой ----------
+function numberPickets(m, reverse) {
+  const adj = new Map(m.points.map(p => [p, []]));
+  m.edges.forEach(e => { adj.get(e.a).push(e.b); adj.get(e.b).push(e.a); });
+  const ord = (a, b) => reverse ? b.n - a.n : a.n - b.n, seen = new Set(), out = [];
+  const starts = m.points.slice().sort((a, b) => (adj.get(a).length === 1 ? 0 : 1) - (adj.get(b).length === 1 ? 0 : 1) || ord(a, b));
+  starts.forEach(s => {
+    if (seen.has(s)) return;
+    const st = [s];
+    while (st.length) { const v = st.pop(); if (seen.has(v)) continue; seen.add(v); out.push(v); adj.get(v).filter(w => !seen.has(w)).sort(ord).reverse().forEach(w => st.push(w)); }
+  });
+  out.forEach((p, i) => { p.pk = i + 1; });
+  m.pickets = out; if (m.relabel) m.relabel();   // в ведомости точки — тоже по пикетам
+  return out;
+}
+
+// ---------- расстановка подписей без наложений ----------
+function Placer() { this.b = []; }
+Placer.prototype.hit = function (r) { for (let i = 0; i < this.b.length; i++) { const q = this.b[i]; if (r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]) return true; } return false; };
+Placer.prototype.add = function (r) { this.b.push(r); };
+const tbox = (s, x, y, h, al) => { const w = TW(s, h), x0 = al === 1 ? x - w / 2 : al === 2 ? x - w : x; return [x0 - 0.05, y - 0.6 * h, x0 + w + 0.05, y + 0.6 * h]; };
+// подпись вдоль линии: цепочка маленьких квадратов по оси текста — чтобы наклонная надпись не «занимала» весь прямоугольник
+const along = (cx, cy, w, h, angDeg) => { const a = angDeg * Math.PI / 180, n = Math.max(1, Math.ceil(w / (0.4 * h))), r = 0.44 * h, out = []; for (let i = 0; i <= n; i++) { const t = -w / 2 + w * i / n, x = cx + Math.cos(a) * t, y = cy + Math.sin(a) * t; out.push([x - r, y - r, x + r, y + r]); } return out; };
+const rbox = (cx, cy, w, h, angDeg) => { const a = angDeg * Math.PI / 180, c = Math.abs(Math.cos(a)), s = Math.abs(Math.sin(a)), W = (w * c + h * s) / 2, H = (w * s + h * c) / 2; return [cx - W, cy - H, cx + W, cy + H]; };
+
+const LAY = { cab: 'НО_Кабель', cas: 'НО_Футляры', pole: 'НО_Опоры', pname: 'НО_Номера опор', pk: 'НО_Пикеты', len: 'НО_Длины', comp: 'НО_Состав труб', otm: 'НО_Отметки',
+  sheet: 'Лист_Рамка и штамп', txt: 'Лист_Текст', sec: 'Лист_Разрез траншеи', hint: 'Defpoints' };
+const SES_COL = [1, 30, 3, 5, 6, 8];
+
+function drawNO(D, m, opt) {
+  opt = opt || {};
+  const PL = new Placer(), nk = Math.max(1, Math.round(+opt.ncab || 1));
+  // трасса и точки — препятствия для подписей
+  m.edges.forEach(e => { const n = Math.max(1, Math.ceil(e.len / 0.7)); for (let i = 0; i <= n; i++) { const x = e.a.x + (e.b.x - e.a.x) * i / n, y = e.a.y + (e.b.y - e.a.y) * i / n; PL.add([x - 0.12, y - 0.12, x + 0.12, y + 0.12]); } });
+  m.poles.forEach(p => PL.add([p.x - 0.55, p.y - 0.55, p.x + 0.55, p.y + 0.55]));
+  // кабель: участками; футляр — синим и контуром
+  m.runs.forEach(r => {
+    const c = r.pts.map(p => [p.x, p.y]), col = opt.bySurvey ? SES_COL[(r.pts[r.pts.length - 1].ses || 0) % SES_COL.length] : 1;
+    D.poly(LAY.cab, c, r.cas ? 5 : col);
+    if (r.cas) { const hw = 0.25, left = [], right = [];
+      c.forEach((p, i) => { const q = unit(c[Math.max(i - 1, 0)], c[Math.min(i + 1, c.length - 1)]); left.push([p[0] - q[1] * hw, p[1] + q[0] * hw]); right.push([p[0] + q[1] * hw, p[1] - q[0] * hw]); });
+      D.poly(LAY.cas, left.concat(right.reverse()), 5, true); }
+  });
+  // опоры: значок и номер из проекта
+  m.poles.forEach(p => { D.circle(LAY.pole, p.x, p.y, 0.45, 7); D.circle(LAY.pole, p.x, p.y, 0.22, 7); D.circle(LAY.pole, p.x, p.y, 0.05, 1); });
+  m.poles.forEach(p => {
+    const h = 0.8, cand = [[135, 2], [45, 0], [225, 2], [315, 0], [90, 1], [270, 1], [180, 2], [0, 0]]; let best = null;
+    for (const r of [1.15, 1.9, 2.8]) { for (const [a, al] of cand) { const x = p.x + r * Math.cos(a * Math.PI / 180), y = p.y + r * Math.sin(a * Math.PI / 180), b = tbox(p.name, x, y, h, al); if (!PL.hit(b)) { best = [x, y, al, b, r]; break; } } if (best) break; }
+    if (!best) { const x = p.x - 1.15 * 0.7, y = p.y + 1.15 * 0.7; best = [x, y, 2, tbox(p.name, x, y, h, 2), 1.15]; }
+    PL.add(best[3]); D.text(LAY.pname, p.name, best[0], best[1], h, 0, best[2], 7);
+    if (best[4] > 1.2) D.line(LAY.pname, p.x, p.y, best[0], best[1] - 0.45, 7);
+  });
+  // пикеты: кружок-точка и номер рядом; в тесноте — на короткой выноске
+  const pts = m.pickets || m.points;
+  if (opt.nums !== false) pts.forEach(p => {
+    const s = String(p.pk || p.n), h = 0.4, isPole = p.code === m.net.pole; if (!isPole) D.circle(LAY.pk, p.x, p.y, 0.08, 6);
+    let best = null;
+    for (const r of [isPole ? 0.85 : 0.5, 1.2, 1.9, 2.7]) { for (const a of [45, 135, 315, 225, 90, 270, 0, 180]) { const dx = Math.cos(a * Math.PI / 180), dy = Math.sin(a * Math.PI / 180), al = dx > 0.3 ? 0 : dx < -0.3 ? 2 : 1, x = p.x + r * dx, y = p.y + r * dy, b = tbox(s, x, y, h, al); if (!PL.hit(b)) { best = [x, y, al, b, r]; break; } } if (best) break; }
+    if (!best) return;
+    PL.add(best[3]); D.text(LAY.pk, s, best[0], best[1], h, 0, best[2], 6);
+    if (best[4] > 1.0) D.line(LAY.pk, p.x, p.y, best[2] === 0 ? best[3][0] : best[2] === 2 ? best[3][2] : best[0], best[1] - (best[1] > p.y ? 0.28 : -0.28), 6);
+  });
+  // длины отрезков: вдоль линии, если помещается; иначе — на полке с выноской
+  if (opt.dims !== false) m.edges.slice().sort((a, b) => b.len - a.len).forEach(e => {
+    if (e.len < 0.05) return;
+    const a = [e.a.x, e.a.y], b = [e.b.x, e.b.y], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, u = unit(a, b), nrm = [-u[1], u[0]];
+    let ang = Math.atan2(u[1], u[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang <= -90) ang += 180;
+    const short = f2(e.len), full = nk + 'к.L=' + short, s = opt.dimStyle === 'full' || nk > 1 ? full : short, h = 0.5, w = TW(s, h);
+    if (e.len >= w + 0.3) for (const sd of [1, -1]) { const x = mx + nrm[0] * 0.55 * sd, y = my + nrm[1] * 0.55 * sd, bs = along(x, y, w, h, ang); if (!bs.some(q => PL.hit(q))) { bs.forEach(q => PL.add(q)); D.text(LAY.len, s, x, y, h, ang, 1, 5); return; } }
+    let best = null;
+    for (const r of [1.5, 2.3, 3.2, 4.3, 5.5, 7, 9, 11.5]) { for (const sd of [1, -1]) for (const t of [0, 1.4, -1.4]) { const x = mx + nrm[0] * r * sd + u[0] * t, y = my + nrm[1] * r * sd + u[1] * t, al = x >= mx ? 0 : 2, bx = tbox(s, x, y, h, al); if (!PL.hit(bx)) { best = [x, y, al, bx]; break; } if (best) break; } if (best) break; }
+    if (!best) { const x = mx + nrm[0] * 1.5, y = my + nrm[1] * 1.5; best = [x, y, 0, tbox(s, x, y, h, 0)]; }
+    PL.add(best[3]); D.text(LAY.len, s, best[0], best[1], h, 0, best[2], 5);
+    const yl = best[1] - 0.6 * h; D.line(LAY.len, best[3][0], yl, best[3][2], yl, 5); D.line(LAY.len, mx, my, best[2] === 0 ? best[3][0] : best[3][2], yl, 5);
+  });
+  // состав труб — на самом длинном отрезке участка
+  m.runs.forEach(r => {
+    if (!r.comp) return;
+    const c = r.pts.map(p => [p.x, p.y]); let bi = 1, bl = -1;
+    for (let i = 1; i < c.length; i++) { const l = Math.hypot(c[i][0] - c[i - 1][0], c[i][1] - c[i - 1][1]); if (l > bl) { bl = l; bi = i; } }
+    const s = r.comp.n + 'ПНД d' + r.comp.d + (r.cas ? ' (футляр)' : ''), h = 0.6, w = TW(s, h); if (bl < w + 0.4) return;
+    const a = c[bi - 1], b = c[bi], u = unit(a, b), nrm = [-u[1], u[0]]; let ang = Math.atan2(u[1], u[0]) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang <= -90) ang += 180;
+    for (const sd of [-1, 1]) for (const d of [0.65, 1.4]) { const x = (a[0] + b[0]) / 2 + nrm[0] * d * sd, y = (a[1] + b[1]) / 2 + nrm[1] * d * sd, bs = along(x, y, w, h, ang); if (!bs.some(q => PL.hit(q))) { bs.forEach(q => PL.add(q)); D.text(LAY.comp, s, x, y, h, ang, 1, r.cas ? 5 : 7); return; } }
+  });
+  if (opt.marks) pts.forEach(p => { if (p.code === m.net.pole) return; const s = fnum(p.H), b = tbox(s, p.x + 0.3, p.y - 0.5, 0.35, 0); if (!PL.hit(b)) { PL.add(b); D.text(LAY.otm, s, p.x + 0.3, p.y - 0.5, 0.35, 0, 0, 3); } });
+}
+
+// ---------- лист: формат по размеру трассы, окно плана ----------
+function sheetNO(m, opt) {
+  const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y), bx = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  const bw = bx[2] - bx[0] + 16, bh = bx[3] - bx[1] + 16;
+  let F = FORMATS.find(f => f[0] === (opt && opt.fmt)) || FORMATS.find(f => (f[1] - RC - 33) * K >= bw && (f[2] - BB - 13) * K >= bh) || FORMATS[FORMATS.length - 1];
+  const W = F[1], H = F[2], wx0 = 28, wx1 = W - RC - 5, wy0 = BB, wy1 = H - 13;
+  const cx = (bx[0] + bx[2]) / 2, cy = (bx[1] + bx[3]) / 2, X0 = cx - (wx0 + wx1) / 2 * K, Y0 = cy - (wy0 + wy1) / 2 * K;
+  const fits = (wx1 - wx0) * K >= bw - 8 && (wy1 - wy0) * K >= bh - 8;
+  return { fmt: F[0], W, H, X0, Y0, fits, win: [X0 + wx0 * K, Y0 + wy0 * K, X0 + wx1 * K, Y0 + wy1 * K], wmm: [wx0, wy0, wx1, wy1] };
+}
+const wrap = (s, n) => { const out = []; String(s || '').split(/\n/).forEach(par => { let cur = ''; par.split(/\s+/).forEach(wd => { if (cur && (cur + ' ' + wd).length > n) { out.push(cur); cur = wd; } else cur = cur ? cur + ' ' + wd : wd; }); out.push(cur); }); return out; };
+
+function drawSheetNO(D, m, o, S) {
+  o = o || {};
+  const X = v => S.X0 + v * K, Y = v => S.Y0 + v * K, W = S.W, H = S.H, L = LAY.sheet, T = LAY.txt;
+  const ln = (x1, y1, x2, y2, c, l) => D.line(l || L, X(x1), Y(y1), X(x2), Y(y2), c == null ? 7 : c);
+  const rect = (x1, y1, x2, y2, c, l) => D.poly(l || L, [[X(x1), Y(y1)], [X(x2), Y(y1)], [X(x2), Y(y2)], [X(x1), Y(y2)]], c == null ? 7 : c, true);
+  const tx = (s, x, y, h, al, c, l) => { if (s != null && String(s) !== '') D.text(l || T, String(s), X(x), Y(y), h * K, 0, al == null ? 1 : al, c == null ? 7 : c); };
+  const nk = Math.max(1, Math.round(+o.ncab || 1)), Ltr = m.edges.reduce((t, e) => t + e.len, 0);
+  // рамка, окно плана
+  rect(0, 0, W, H, 8); rect(20, 5, W - 5, H - 5);
+  const w = S.wmm; rect(w[0], w[1], w[2], w[3]);
+  tx('План М1:500', (w[0] + w[2]) / 2, H - 9, 5);
+  if (!S.fits) tx('Трасса не помещается в окно плана на ' + S.fmt + ' в М1:500 — нужен формат больше или разбивка на листы.', (w[0] + w[2]) / 2, w[3] - 6, 3, 1, 1, LAY.hint);
+  // ситуационный план — место под карту
+  const rx0 = W - RC, rx1 = W - 9, sy1 = H - 13, sy0 = sy1 - 150;
+  tx('Ситуационный план М1:2000', (rx0 + rx1) / 2, H - 9, 5); rect(rx0, sy0, rx1, sy1);
+  tx('Место под карту: вставьте изображение ситуационного плана', (rx0 + rx1) / 2, (sy0 + sy1) / 2, 3, 1, 8, LAY.hint);
+  // ---- правая колонка: спецификация, итоги, условные обозначения ----
+  let y = sy0 - 8;
+  const rows = String(o.spec || '').split(/\n/).map(r => r.split(/\s*;\s*/)).filter(r => r.some(Boolean));
+  const spec = rows.length ? rows : [[m.poles.length ? m.poles[0].name + ' – ' + m.poles[m.poles.length - 1].name : '', '', '', String(m.poles.length)]];
+  const cw = [44, 78, 36, 18], cx = [rx0]; cw.forEach(v => cx.push(cx[cx.length - 1] + v));
+  const rh = 7, dh = 12, top = y; tx('Спецификация оборудования', (rx0 + rx1) / 2, y - rh / 2, 3.5); y -= rh; ln(rx0, y, rx1, y);
+  ['№ опор', 'Тип опоры, светильника', 'Тип цоколя', 'Кол.'].forEach((s, i) => tx(s, (cx[i] + cx[i + 1]) / 2, y - rh / 2, 2.5)); y -= rh; ln(rx0, y, rx1, y);
+  spec.forEach(r => { r.forEach((s, i) => { if (i > 3) return; const ls = wrap(s, i === 1 ? 34 : i === 0 ? 18 : 15).slice(0, 3); ls.forEach((t, j) => tx(t, (cx[i] + cx[i + 1]) / 2, y - dh / 2 + (ls.length - 1) * 1.8 - j * 3.6, 2.5)); }); y -= dh; ln(rx0, y, rx1, y); });
+  rect(rx0, y, rx1, top); cx.slice(1, -1).forEach(x => ln(x, top - rh, x, y));
+  // итоги — считаются по съёмке
+  y -= 9; tx('Итоги по съёмке', rx0, y, 3.5, 0); y -= 6.5;
+  const tot = [['Длина траншеи Lтр', f2(Ltr) + ' м'], ['Кабель в траншее', nk + ' шт.' + (o.cable ? ', ' + o.cable : '') + ' — ' + f2(Ltr * nk) + ' м по плану'], ['Опор', String(m.poles.length) + ' шт.']];
+  Object.keys(m.tot).sort().forEach(k => { if (!/не указан/.test(k)) tot.push([k.replace(/^труба /, 'Труба ').replace(/^футляр /, 'Футляр '), f2(m.tot[k]) + ' м']); });
+  const cas = m.edges.filter(e => e.cas).reduce((t, e) => t + e.len, 0); if (cas > 0 && !Object.keys(m.tot).some(k => /^футляр \d/.test(k))) tot.push(['В футлярах', f2(cas) + ' м']);
+  tot.forEach(r => { tx(r[0], rx0 + 2, y, 2.5, 0); tx(r[1], rx1, y, 2.5, 2); ln(rx0, y - 2.3, rx1, y - 2.3, 8); y -= 5.2; });
+  // условные обозначения — только то, что есть на плане
+  y -= 6; tx('Условные обозначения', rx0, y, 3.5, 0); y -= 7;
+  const lx = rx0 + 2, item = (draw, s) => { draw(y); tx(s, lx + 20, y, 2.5, 0); y -= 6; };
+  item(yy => ln(lx, yy, lx + 16, yy, 1, LAY.cab), '— кабель' + (o.pipe ? ' в трубе (' + o.pipe.replace(/^Труба\s*/i, '') + ')' : ''));
+  if (m.edges.some(e => e.cas)) item(yy => rect(lx, yy - 1, lx + 16, yy + 1, 5, LAY.cas), '— кабель в футляре');
+  if (m.poles.length) item(yy => { D.circle(LAY.pole, X(lx + 8), Y(yy), 0.9 * K * 2, 7); D.circle(LAY.pole, X(lx + 8), Y(yy), 0.45 * K * 2, 7); tx(m.poles[0].name, lx + 11, yy + 0.3, 1.6, 0); }, '— опора и её номер по проекту');
+  item(yy => { D.circle(LAY.pk, X(lx + 6), Y(yy), 0.16, 6); tx('12', lx + 8, yy + 0.8, 1.2, 0, 6, LAY.pk); }, '— пикет (точка съёмки), номер по каталогу координат');
+  item(yy => { ln(lx, yy - 1, lx + 16, yy - 1, 1, LAY.cab); tx(nk > 1 || o.dimStyle === 'full' ? nk + 'к.L=2.73' : '2.73', lx + 8, yy + 0.8, 1.4, 1, 5, LAY.len); }, '— длина отрезка между пикетами, м' + (nk > 1 || o.dimStyle === 'full' ? ' (' + nk + 'к — кабелей в траншее)' : ''));
+  // ---- нижняя полоса: разрезы траншеи, примечания, штамп ----
+  const sx1 = W - 5, sx0 = sx1 - 126, st = 118;
+  tx('Lтр = ' + f2(Ltr) + ' м', sx1 - 2, st + 3.6, 4, 2); if (o.sign) tx(o.sign, sx0 + 2, st + 3.6, 4, 0);
+  const R = [10, 26, 14, 14, 7, 7, 7, 7, 7, 7, 7]; let yy = st; const ys = [st]; R.forEach(h => { yy -= h; ys.push(yy); });
+  rect(sx0, ys[ys.length - 1], sx1, st); ys.slice(1, -1).forEach((v, i) => ln(sx0, v, i === 4 ? sx0 + 76 : sx1, v));   // «Согласование» — ячейка на две строки
+  tx(o.org, (sx0 + sx1) / 2, (ys[0] + ys[1]) / 2, 4);
+  const tl = wrap(o.object || 'Исполнительный чертёж сети наружного освещения', 64).slice(0, 7); tl.forEach((s, i) => tx(s, (sx0 + sx1) / 2, (ys[1] + ys[2]) / 2 + (tl.length - 1) * 1.7 - i * 3.4, 2.4));
+  ln(sx1 - 44, ys[2], sx1 - 44, ys[3]); ln(sx1 - 22, ys[2], sx1 - 22, ys[3]);
+  tx('Проектная организация: ' + (o.designer || ''), sx0 + 2, ys[2] - 4.5, 2.5, 0); tx('№ пр: ' + (o.projNo || ''), sx0 + 2, ys[2] - 10, 2.5, 0);
+  tx('Лист ' + (o.sheet || '1'), sx1 - 33, (ys[2] + ys[3]) / 2, 2.5); tx('Листов ' + (o.sheets || '1'), sx1 - 11, (ys[2] + ys[3]) / 2, 2.5);
+  ln(sx0 + 63, ys[3], sx0 + 63, ys[4]); wrap(o.insp || 'Административная инспекция', 26).slice(0, 2).forEach((s, i) => tx(s, sx0 + 2, ys[3] - 4.5 - i * 5, 2.5, 0));
+  tx('Ордер № ' + (o.order || ''), sx0 + 65, ys[3] - 4.5, 2.5, 0); tx('на право производства работ', sx0 + 65, ys[3] - 9.5, 2.5, 0);
+  ln(sx0 + 47, ys[4], sx0 + 47, ys[ys.length - 1]); ln(sx0 + 76, ys[4], sx0 + 76, ys[ys.length - 1]); ln(sx0 + 111, ys[6], sx0 + 111, ys[ys.length - 1]);
+  tx('Стр-во начато', sx0 + 2, (ys[4] + ys[5]) / 2, 2.5, 0); tx(o.yStart, sx0 + 61.5, (ys[4] + ys[5]) / 2, 2.5);
+  tx('Стр-во окончено', sx0 + 2, (ys[5] + ys[6]) / 2, 2.5, 0); tx(o.yEnd, sx0 + 61.5, (ys[5] + ys[6]) / 2, 2.5);
+  tx('Согласование с', sx0 + 101, ys[4] - 4, 2.5); tx('ОПС ' + (o.ops || ''), sx0 + 101, ys[4] - 9.5, 2.5);
+  ['Должность', 'Подпись', 'Фамилия', 'Дата'].forEach((s, i) => tx(s, sx0 + [23.5, 61.5, 93.5, 118.5][i], (ys[6] + ys[7]) / 2, 2.5));
+  [[o.post1, o.name1], [o.post2, o.name2], [o.post3, o.name3]].forEach((r, i) => { tx(r[0], sx0 + 2, (ys[7 + i] + ys[8 + i]) / 2, 2.5, 0); tx(r[1], sx0 + 78, (ys[7 + i] + ys[8 + i]) / 2, 2.5, 0); });
+  // примечания
+  const dep = String(o.depth || '0,7').replace('.', ','), notes = [];
+  notes.push('Трасса КЛ проложена на глубине ' + dep + ' м от поверхности.');
+  notes.push('Исполнительная съёмка выполнена электронным тахеометром' + (o.device ? ' ' + o.device : '') + '.');
+  notes.push('Система координат местная г. Москвы. Система высот Балтийская.');
+  String(o.notes || '').split(/\n/).filter(s => s.trim()).forEach(s => notes.push(s.trim()));
+  notes.push('Приложение: каталог координат пикетов.');
+  const nx = sx0 - 100; let ny = 60; tx('Примечания', nx, ny + 6, 3.5, 0);
+  notes.forEach((s, i) => wrap((i + 1) + '. ' + s, 52).forEach(t => { tx(t, nx, ny, 2.4, 0); ny -= 4; }));
+  // разрезы траншеи: обычный и в футляре (если есть)
+  const hasCas = m.edges.some(e => e.cas), casD = (m.runs.find(r => r.cas && r.comp) || {}).comp;
+  tx('Разрезы траншеи', 28 + 60, st + 1, 4);
+  section(D, S, 34, o, { title: 'под тротуаром и газоном' });
+  if (hasCas) section(D, S, 34 + 95, o, { title: 'в футляре (под проезжей частью)', cas: casD ? casD.d : 110 });
+}
+// разрез траншеи М 1:10: ширина, глубина, песок, труба и кабель
+function section(D, S, x0, o, opt) {
+  const X = v => S.X0 + v * K, Y = v => S.Y0 + v * K, L = LAY.sec;
+  const ln = (x1, y1, x2, y2, c) => D.line(L, X(x1), Y(y1), X(x2), Y(y2), c == null ? 7 : c), tx = (s, x, y, h, al, c) => D.text(L, String(s), X(x), Y(y), h * K, 0, al == null ? 1 : al, c == null ? 7 : c);
+  const dep = I.num(o.depth) || 0.7, wd = I.num(o.trenchW) || 0.3, pd = (/(\d{2,3})\s*мм/.exec(o.pipe || '') || /(\d{2,3})/.exec(o.pipe || '') || [0, 63])[1] / 1000, cd = opt.cas ? opt.cas / 1000 : 0;
+  const sc = 100, g = 104, w = wd * sc, bot = g - (dep + 0.1 + Math.max(pd, cd) / 2) * sc, xa = x0 + 12, xb = xa + w, cxm = (xa + xb) / 2, cy = g - dep * sc;
+  tx(opt.title, cxm + 10, g + 8, 2.6);
+  ln(xa - 12, g, xa, g); ln(xb, g, xb + 12, g); for (let i = 0; i < 4; i++) { ln(xa - 11 + i * 3, g, xa - 13 + i * 3, g - 2, 8); ln(xb + 2 + i * 3, g, xb + i * 3, g - 2, 8); }
+  ln(xa, g, xa, bot); ln(xb, g, xb, bot); ln(xa, bot, xb, bot);
+  const sand = Math.min(g - 3, cy + Math.max(pd, cd) * sc / 2 + 10); ln(xa, sand, xb, sand, 8);
+  for (let i = 0; i < 5; i++) for (let j = 0; j < 3; j++) { const px = xa + 3 + i * (w - 6) / 4, py = bot + 2 + j * (sand - bot - 4) / 2; if (Math.hypot(px - cxm, py - cy) > Math.max(pd, cd) * sc / 2 + 1) D.circle(L, X(px), Y(py), 0.08, 8); }
+  if (cd) D.circle(L, X(cxm), Y(cy), cd * sc / 2 * K, 5);
+  D.circle(L, X(cxm), Y(cy), pd * sc / 2 * K, 1); D.circle(L, X(cxm), Y(cy), 0.9 * K, 1);
+  const lx = xb + 16; let ly = cy + 9;
+  const lab = (s, tx0, ty0) => { ln(tx0, ty0, lx - 1, ly - 1.6); ln(lx - 1, ly - 1.6, lx + 0.7 * 2.4 * s.length * 0.9, ly - 1.6); tx(s, lx, ly, 2.4, 0); ly -= 6; };
+  tx('Уровень земли', xb + 13, g + 1.8, 2.2, 0);
+  if (cd) lab('Труба %%c' + opt.cas + 'мм (футляр)', cxm + cd * sc / 2 * 0.7, cy + cd * sc / 2 * 0.7);
+  lab(o.pipe || 'Труба ПЭ %%c63мм', cxm + pd * sc / 2 * 0.7, cy + pd * sc / 2 * 0.7);
+  lab('Кабель ' + (o.cable || ''), cxm, cy);
+  lab('Песок', xb - 2, bot + 3);
+  // размеры: глубина до кабеля и ширина траншеи, мм
+  ln(xa - 7, g, xa - 7, cy); ln(xa - 8.5, g, xa - 5.5, g); ln(xa - 8.5, cy, xa - 5.5, cy); ln(xa - 7, cy, cxm, cy, 8);
+  D.text(L, String(Math.round(dep * 1000)), X(xa - 9), Y((g + cy) / 2), 2.4 * K, 90, 1, 7);
+  ln(xa, bot - 5, xb, bot - 5); ln(xa, bot - 6.5, xa, bot - 3.5); ln(xb, bot - 6.5, xb, bot - 3.5); tx(String(Math.round(wd * 1000)), cxm, bot - 8.5, 2.4);
+}
+// геоподоснова обрезается по окну плана: линии не выходят на штамп и поля листа
+function clipPrims(E, w) {
+  const out = [], code = (x, y) => (x < w[0] ? 1 : x > w[2] ? 2 : 0) | (y < w[1] ? 4 : y > w[3] ? 8 : 0);
+  const seg = (a, b) => { let x0 = a[0], y0 = a[1], x1 = b[0], y1 = b[1], c0 = code(x0, y0), c1 = code(x1, y1);
+    for (let k = 0; k < 8; k++) { if (!(c0 | c1)) return [[x0, y0], [x1, y1]]; if (c0 & c1) return null;
+      const c = c0 || c1; let x, y;
+      if (c & 8) { x = x0 + (x1 - x0) * (w[3] - y0) / (y1 - y0); y = w[3]; } else if (c & 4) { x = x0 + (x1 - x0) * (w[1] - y0) / (y1 - y0); y = w[1]; }
+      else if (c & 2) { y = y0 + (y1 - y0) * (w[2] - x0) / (x1 - x0); x = w[2]; } else { y = y0 + (y1 - y0) * (w[0] - x0) / (x1 - x0); x = w[0]; }
+      if (c === c0) { x0 = x; y0 = y; c0 = code(x0, y0); } else { x1 = x; y1 = y; c1 = code(x1, y1); } }
+    return null; };
+  E.forEach(e => {
+    if (e.t === 'T' || e.t === 'C') { if (e.x >= w[0] && e.x <= w[2] && e.y >= w[1] && e.y <= w[3]) out.push(e); return; }
+    if (!e.p) { out.push(e); return; }
+    if (e.p.every(q => !code(q[0], q[1]))) { out.push(e); return; }
+    const pts = e.closed ? e.p.concat([e.p[0]]) : e.p; let run = null;
+    for (let i = 1; i < pts.length; i++) { const r = seg(pts[i - 1], pts[i]);
+      if (!r) { run = null; continue; }
+      if (run && run[run.length - 1][0] === r[0][0] && run[run.length - 1][1] === r[0][1]) run.push(r[1]); else { run = [r[0], r[1]]; out.push(Object.assign({}, e, { t: 'P', p: run, closed: false })); } }
+  });
+  return out;
+}
+Object.assign(I, { clipPrims, numberPickets, drawNO, sheetNO, drawSheetNO, NO_LAYERS: LAY });
 })();
 </script>
 <script>
@@ -1500,7 +1738,7 @@ function geoDwg(pts) {
 function geoBlock() { return jobBlock() + geoBlock0(); }
 function geoBlock0() {
   if (!S.geo) return reqList(true) +  '<div class="geo-need"><b>Нужна геоподоснова.</b> ИЧ строится на геоподоснове МГГТ — откройте её DXF. Без неё чертёж только для просмотра, DXF не выдаётся.<div class="row"><button class="btn primary small" id="geoopen">Открыть геоподоснову…</button></div></div>';
-  return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов в окне ±' + esc(String(S.set.geoPad || 40)) + ' м</li></ul>'
+  return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов' + (S.res && S.res.kind === 'line' ? ' в окне плана листа' : ' в окне ±' + esc(String(S.set.geoPad || 40)) + ' м') + '</li></ul>'
     + '<div class="row"><label class="fld" style="flex:1">Окно вокруг сети, м<input id="geopad" inputmode="decimal" value="' + esc(String(S.set.geoPad || 40)) + '"></label></div><div class="row"><button class="btn small" id="geoopen">Другая геоподоснова…</button></div>';
 }
 function projBlock() {
@@ -1563,15 +1801,24 @@ function compute() {
 }
 
 function computeLine(P, net) {
-  const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
-  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100 }), D = geoDwg(m.points);
-  let k = D.e.length; I.drawLine(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false }); D.mark('plan', k);
-  const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
-  k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
-  m.trench = I.drawNotes(D, m, S.obj, xr, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
-  S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
+  const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null, o = S.obj;
+  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100, pref: o.polePref });
+  I.numberPickets(m, !!S.set.rev);
+  const lay = I.sheetNO(m, { fmt: S.set.fmt }), D = new I.Dwg(); D.geoN = 0;
+  if (S.geo) {   // окно геоподосновы разбирается один раз на окно листа: правка полей штампа не пересчитывает его заново
+    const key = lay.win.map(v => v.toFixed(2)).join(' '), G = S.geo;
+    if (!G.cache || G.cache.key !== key) { const T = new I.Dwg(); I.addGeo(T, G.G, lay.win); G.cache = { key, e: I.clipPrims(T.e, lay.win), lc: T.lc }; }
+    D.e = G.cache.e.slice(); D.lc = Object.assign({}, G.cache.lc); D.geoN = G.cache.e.length;
+  }
+  let k = D.e.length; I.drawNO(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false, ncab: o.ncab, dimStyle: S.set.dimStyle, bySurvey: !!S.set.bySurvey }); D.mark('plan', k);
+  k = D.e.length; I.drawSheetNO(D, m, Object.assign({}, o, { dimStyle: S.set.dimStyle }), lay); D.mark('sheet', k);
+  k = D.e.length; I.drawLineTable(D, m, lay.X0, lay.Y0 - 30); D.mark('table', k); D.mark('all', 0);
+  m.trench = m.edges.reduce((t, e) => t + e.len, 0); m.sheet = lay;
+  if (!lay.fits) m.warn.push('Трасса не помещается в окно плана на листе ' + lay.fmt + ' в М1:500. Выберите формат больше.');
+  S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план, лист и ведомость участков' };
 }
-
+// геоподоснова на экране — один готовый узел SVG: при каждой перерисовке он переставляется, а не строится заново
+function geoNode() { const c = S.geo && S.geo.cache; if (!c) return null; if (!c.node) { const t = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); t.innerHTML = '<g fill="none">' + I.toSVG({ e: c.e }) + '</g>'; c.node = t.firstChild; } return c.node; }
 function computeGnb(P) {
   const g = S.gnb, m = I.buildGnb(P, g), D = geoDwg(m.pts);
   I.drawGnb(D, m, g, { marks: g.marks !== false });
@@ -1586,6 +1833,7 @@ function computeGnb(P) {
 function catalogPoints() {
   const n = S.netSel; if (!n || !S.parsed) return [];
   const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+  if (S.res && S.res.kind === 'line' && S.res.m.pickets) return S.res.m.pickets.map(p => Object.assign({}, p, { n: p.pk }));   // НО: номера как на листе
   return S.parsed.pts.filter(p => codes.includes(p.code)).sort((a, b) => a.n - b.n);
 }
 function objForm() {
@@ -1597,15 +1845,26 @@ function objForm() {
     + '<label class="fld">Объект<textarea data-obj="object" rows="3" placeholder="Комплексное благоустройство …">' + esc(o.object || '') + '</textarea></label>'
     + '<div class="two">' + f('ks', 'КС №', '48888-23,5851-24') + f('contract', 'N договора', '6/05911-23') + '</div>'
     + '<div class="two">' + f('author', 'Составитель') + f('device', 'Прибор') + '</div>'
-    + f('cableL', 'L кабеля (для надписи, необязательно)', 'ВБШв 4х16 - 454м')
+    + (S.res && S.res.kind === 'line' ? '<details class="grp" open><summary>Лист НО: штамп</summary>'
+      + f('designer', 'Проектная организация', 'ООО «…»') + '<div class="two">' + f('projNo', '№ проекта', '01-02-…-ЛО') + f('ops', 'Согласование с ОПС №', '3432-26') + '</div>'
+      + '<div class="two">' + f('insp', 'Инспекция', 'Административная инспекция СЗАО') + f('order', 'Ордер №') + '</div>'
+      + '<div class="two">' + f('yStart', 'Стр-во начато', '2026') + f('yEnd', 'Стр-во окончено', '2026') + '</div>'
+      + '<div class="two">' + f('post1', 'Должность 1', 'Зам. ген. директора') + f('name1', 'Фамилия') + '</div><div class="two">' + f('post2', 'Должность 2', 'Нач. ПТО') + f('name2', 'Фамилия') + '</div><div class="two">' + f('post3', 'Должность 3', 'Геодезист') + f('name3', 'Фамилия') + '</div>'
+      + '<div class="two">' + f('sheet', 'Лист', '1') + f('sheets', 'Листов', '1') + '</div></details>'
+      + '<details class="grp" open><summary>Лист НО: кабель, траншея, спецификация</summary>'
+      + '<div class="two">' + f('ncab', 'Кабелей в траншее', '1') + f('cable', 'Марка кабеля', 'ВБШв 5х16') + '</div>'
+      + '<div class="two">' + f('pipe', 'Труба', 'Труба ПЭ ∅63мм') + f('depth', 'Глубина, м', '0,7') + '</div>'
+      + '<div class="two">' + f('trenchW', 'Ширина траншеи, м', '0,3') + f('polePref', 'Опоры по умолчанию', 'оп.') + '</div>'
+      + '<label class="fld">Спецификация оборудования: строка — «№ опор; тип опоры, светильник; цоколь; кол.»<textarea data-obj="spec" rows="3" placeholder="№Б1 – Б96; Осветительная система …; ; 96">' + esc(o.spec || '') + '</textarea></label>'
+      + '<label class="fld">Примечания — добавятся к стандартным, по строке<textarea data-obj="notes" rows="2" placeholder="Пересекаемые коммуникации находятся ниже проложенной трассы.">' + esc(o.notes || '') + '</textarea></label></details>' : f('cableL', 'L кабеля (для надписи, необязательно)', 'ВБШв 4х16 - 454м'))
     + '<label class="chk"><input type="checkbox" data-obj="z"' + (o.z ? ' checked' : '') + '> Отметки Z в каталоге</label>'
     + '<div class="row"><button class="btn" id="cat">Каталог координат (Excel)</button></div>'
-    + '<p class="fine">В каталог идут все точки сети по порядку номеров: ' + catalogPoints().length + ' шт. X — север, Y — восток, как в ваших каталогах.</p>';
+    + '<p class="fine">В каталог идут все точки сети — по номерам на чертеже: ' + catalogPoints().length + ' шт. X — север, Y — восток, как в ваших каталогах.</p>';
 }
 function bindObj() {
   document.querySelectorAll('[data-obj]').forEach(el => {
     const k = el.dataset.obj;
-    el.oninput = el.onchange = () => { S.obj[k] = el.type === 'checkbox' ? el.checked : el.value; save(); if (['ks', 'contract', 'cableL'].includes(k)) later(); };
+    el.oninput = el.onchange = () => { S.obj[k] = el.type === 'checkbox' ? el.checked : el.value; save(); if (!['z', 'kind', 'author'].includes(k)) later(); };
   });
   const b = $('#cat'); if (b) b.onclick = () => {
     const pts = catalogPoints(); if (!pts.length) { toast('Нет точек сети для каталога.'); return; }
@@ -1701,26 +1960,35 @@ function netsBlock() {
 function renderLine() {
   const r = S.res, m = r.m;
   let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li>' + (m.joined ? '<li>съёмки состыкованы в ' + m.joined + ' т.</li>' : '') + '</ul>' + netsBlock();
-  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>L траншеи — <b>' + fnum(m.trench, 1) + ' м</b></li></ul>';
+  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>Lтр — <b>' + fnum(m.trench, 2) + ' м</b></li></ul>';
   if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
-  side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
-  const ltabs = [['plan', 'План'], ['table', 'Ведомость']].concat(S.pdf ? [['pdf', 'Проект']] : []);
+  side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">пикет ' + p.pk + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
+  const ltabs = [['plan', 'План'], ['sheet', 'Лист'], ['table', 'Ведомость']].concat(S.pdf ? [['pdf', 'Проект']] : []);
   if (!ltabs.some(t => t[0] === S.tab)) S.tab = 'plan';
   let desk = '<div class="tabs">' + ltabs.map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
     + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
-    + (S.tab === 'pdf' ? pdfDesk() : '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>');
+    + (S.tab === 'pdf' ? pdfDesk() : '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG({ e: r.D.e.slice(r.D.geoN || 0) }) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>');
   const P = S.proj.poles || [];
-  let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': план с опорами, трубами и футлярами, ведомость участков. Профиль для сетей без колодцев пока не строится.</p>'
-    + '<label class="chk"><input type="checkbox" id="nums"' + (S.set.nums !== false ? ' checked' : '') + '> Номера точек</label>'
-    + '<label class="chk"><input type="checkbox" id="dims"' + (S.set.dims !== false ? ' checked' : '') + '> Промеры между точками (1 знак)</label>'
+  let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': лист ' + m.sheet.fmt + ' — план 1:500 с пикетами, длинами и опорами, разрез траншеи, спецификация, итоги, штамп. Профиль для НО не нужен.</p>'
+    + '<label class="chk"><input type="checkbox" id="nums"' + (S.set.nums !== false ? ' checked' : '') + '> Номера пикетов (подряд вдоль трассы)</label>'
+    + '<label class="chk"><input type="checkbox" id="dims"' + (S.set.dims !== false ? ' checked' : '') + '> Длины отрезков между пикетами</label>'
+    + '<label class="chk"><input type="checkbox" id="dimfull"' + (S.set.dimStyle === 'full' ? ' checked' : '') + '> Писать «1к.L=2.73» вместо «2.73»</label>'
+    + '<label class="chk"><input type="checkbox" id="rev"' + (S.set.rev ? ' checked' : '') + '> Пикеты — с другого конца трассы</label>'
+    + '<label class="chk"><input type="checkbox" id="bysurv"' + (S.set.bySurvey ? ' checked' : '') + '> Раскрасить трассу по съёмкам (для работы)</label>'
+    + '<label class="fld">Формат листа<select id="fmt">' + [['', 'по размеру трассы'], ['A2', 'A2'], ['A1', 'A1'], ['A0', 'A0']].map(v => '<option value="' + v[0] + '"' + ((S.set.fmt || '') === v[0] ? ' selected' : '') + '>' + v[1] + '</option>').join('') + '</select></label>'
     + '<label class="chk"><input type="checkbox" id="marks"' + (S.set.marks ? ' checked' : '') + '> Отметки труб на плане</label>'
     + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="csvl">Ведомость (CSV)</button></div>'
     + '<h3>Имена опор</h3><p class="hint">По умолчанию оп.1, оп.2… в порядке номеров точек. Впишите имена из проекта или вставьте столбец из Excel (Ctrl+V).</p>'
     + '<div class="row"><button class="btn small" id="fill">' + (P.length ? 'Обновить список' : 'Заполнить по съёмке') + '</button><button class="btn small danger" id="pclear"' + (P.length ? '' : ' disabled') + '>Очистить</button></div>'
-    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Точка</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">т.' + p.n + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '') + objForm();
+    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Пикет</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">пк ' + p.pk + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '') + objForm();
   $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  { const sv = $('#svg'), gn = sv && geoNode(); if (gn) sv.insertBefore(gn, sv.firstChild); }
   bindTop(); bindCommon();
   ['marks', 'dims', 'nums'].forEach(id => { $('#' + id).onchange = e => { S.set[id] = e.target.checked; save(); compute(); render(); }; });
+  $('#dimfull').onchange = e => { S.set.dimStyle = e.target.checked ? 'full' : ''; save(); compute(); render(); };
+  $('#rev').onchange = e => { S.set.rev = e.target.checked; save(); compute(); render(); };
+  $('#bysurv').onchange = e => { S.set.bySurvey = e.target.checked; save(); compute(); render(); };
+  $('#fmt').onchange = e => { S.set.fmt = e.target.value; S.view = null; save(); compute(); render(); };
   bindObj();
   $('#csvl').onclick = () => {
     const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };

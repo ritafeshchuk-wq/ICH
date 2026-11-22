@@ -130,7 +130,7 @@ function geoDwg(pts) {
 function geoBlock() { return jobBlock() + geoBlock0(); }
 function geoBlock0() {
   if (!S.geo) return reqList(true) +  '<div class="geo-need"><b>Нужна геоподоснова.</b> ИЧ строится на геоподоснове МГГТ — откройте её DXF. Без неё чертёж только для просмотра, DXF не выдаётся.<div class="row"><button class="btn primary small" id="geoopen">Открыть геоподоснову…</button></div></div>';
-  return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов в окне ±' + esc(String(S.set.geoPad || 40)) + ' м</li></ul>'
+  return reqList(true) + '<h3 class="sh">Геоподоснова</h3><ul class="files"><li class="gen">' + esc(S.geo.name) + '</li><li>на ИЧ: ' + (S.res && S.res.D ? S.res.D.geoN : 0) + ' элементов' + (S.res && S.res.kind === 'line' ? ' в окне плана листа' : ' в окне ±' + esc(String(S.set.geoPad || 40)) + ' м') + '</li></ul>'
     + '<div class="row"><label class="fld" style="flex:1">Окно вокруг сети, м<input id="geopad" inputmode="decimal" value="' + esc(String(S.set.geoPad || 40)) + '"></label></div><div class="row"><button class="btn small" id="geoopen">Другая геоподоснова…</button></div>';
 }
 function projBlock() {
@@ -193,15 +193,24 @@ function compute() {
 }
 
 function computeLine(P, net) {
-  const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null;
-  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100 }), D = geoDwg(m.points);
-  let k = D.e.length; I.drawLine(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false }); D.mark('plan', k);
-  const xs = m.points.map(p => p.x), ys = m.points.map(p => p.y);
-  k = D.e.length; const xr = I.drawLineTable(D, m, Math.min(...xs), Math.min(...ys) - 15);
-  m.trench = I.drawNotes(D, m, S.obj, xr, Math.min(...ys) - 10); D.mark('table', k); D.mark('all', 0);
-  S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план и ведомость участков' };
+  const names = S.proj.poles && S.proj.poles.some(Boolean) ? S.proj.poles : null, o = S.obj;
+  const m = I.buildLine(P, net, names, { join: (S.set.join == null ? 10 : +S.set.join) / 100, pref: o.polePref });
+  I.numberPickets(m, !!S.set.rev);
+  const lay = I.sheetNO(m, { fmt: S.set.fmt }), D = new I.Dwg(); D.geoN = 0;
+  if (S.geo) {   // окно геоподосновы разбирается один раз на окно листа: правка полей штампа не пересчитывает его заново
+    const key = lay.win.map(v => v.toFixed(2)).join(' '), G = S.geo;
+    if (!G.cache || G.cache.key !== key) { const T = new I.Dwg(); I.addGeo(T, G.G, lay.win); G.cache = { key, e: I.clipPrims(T.e, lay.win), lc: T.lc }; }
+    D.e = G.cache.e.slice(); D.lc = Object.assign({}, G.cache.lc); D.geoN = G.cache.e.length;
+  }
+  let k = D.e.length; I.drawNO(D, m, { marks: !!S.set.marks, dims: S.set.dims !== false, nums: S.set.nums !== false, ncab: o.ncab, dimStyle: S.set.dimStyle, bySurvey: !!S.set.bySurvey }); D.mark('plan', k);
+  k = D.e.length; I.drawSheetNO(D, m, Object.assign({}, o, { dimStyle: S.set.dimStyle }), lay); D.mark('sheet', k);
+  k = D.e.length; I.drawLineTable(D, m, lay.X0, lay.Y0 - 30); D.mark('table', k); D.mark('all', 0);
+  m.trench = m.edges.reduce((t, e) => t + e.len, 0); m.sheet = lay;
+  if (!lay.fits) m.warn.push('Трасса не помещается в окно плана на листе ' + lay.fmt + ' в М1:500. Выберите формат больше.');
+  S.res = { kind: 'line', D, m, warn: m.warn, mode: net.name + ': план, лист и ведомость участков' };
 }
-
+// геоподоснова на экране — один готовый узел SVG: при каждой перерисовке он переставляется, а не строится заново
+function geoNode() { const c = S.geo && S.geo.cache; if (!c) return null; if (!c.node) { const t = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); t.innerHTML = '<g fill="none">' + I.toSVG({ e: c.e }) + '</g>'; c.node = t.firstChild; } return c.node; }
 function computeGnb(P) {
   const g = S.gnb, m = I.buildGnb(P, g), D = geoDwg(m.pts);
   I.drawGnb(D, m, g, { marks: g.marks !== false });
@@ -216,6 +225,7 @@ function computeGnb(P) {
 function catalogPoints() {
   const n = S.netSel; if (!n || !S.parsed) return [];
   const codes = [n.well, n.pipe, n.cas, n.neck, n.pole, n.chamber, '99'].filter(Boolean);
+  if (S.res && S.res.kind === 'line' && S.res.m.pickets) return S.res.m.pickets.map(p => Object.assign({}, p, { n: p.pk }));   // НО: номера как на листе
   return S.parsed.pts.filter(p => codes.includes(p.code)).sort((a, b) => a.n - b.n);
 }
 function objForm() {
@@ -227,15 +237,26 @@ function objForm() {
     + '<label class="fld">Объект<textarea data-obj="object" rows="3" placeholder="Комплексное благоустройство …">' + esc(o.object || '') + '</textarea></label>'
     + '<div class="two">' + f('ks', 'КС №', '48888-23,5851-24') + f('contract', 'N договора', '6/05911-23') + '</div>'
     + '<div class="two">' + f('author', 'Составитель') + f('device', 'Прибор') + '</div>'
-    + f('cableL', 'L кабеля (для надписи, необязательно)', 'ВБШв 4х16 - 454м')
+    + (S.res && S.res.kind === 'line' ? '<details class="grp" open><summary>Лист НО: штамп</summary>'
+      + f('designer', 'Проектная организация', 'ООО «…»') + '<div class="two">' + f('projNo', '№ проекта', '01-02-…-ЛО') + f('ops', 'Согласование с ОПС №', '3432-26') + '</div>'
+      + '<div class="two">' + f('insp', 'Инспекция', 'Административная инспекция СЗАО') + f('order', 'Ордер №') + '</div>'
+      + '<div class="two">' + f('yStart', 'Стр-во начато', '2026') + f('yEnd', 'Стр-во окончено', '2026') + '</div>'
+      + '<div class="two">' + f('post1', 'Должность 1', 'Зам. ген. директора') + f('name1', 'Фамилия') + '</div><div class="two">' + f('post2', 'Должность 2', 'Нач. ПТО') + f('name2', 'Фамилия') + '</div><div class="two">' + f('post3', 'Должность 3', 'Геодезист') + f('name3', 'Фамилия') + '</div>'
+      + '<div class="two">' + f('sheet', 'Лист', '1') + f('sheets', 'Листов', '1') + '</div></details>'
+      + '<details class="grp" open><summary>Лист НО: кабель, траншея, спецификация</summary>'
+      + '<div class="two">' + f('ncab', 'Кабелей в траншее', '1') + f('cable', 'Марка кабеля', 'ВБШв 5х16') + '</div>'
+      + '<div class="two">' + f('pipe', 'Труба', 'Труба ПЭ ∅63мм') + f('depth', 'Глубина, м', '0,7') + '</div>'
+      + '<div class="two">' + f('trenchW', 'Ширина траншеи, м', '0,3') + f('polePref', 'Опоры по умолчанию', 'оп.') + '</div>'
+      + '<label class="fld">Спецификация оборудования: строка — «№ опор; тип опоры, светильник; цоколь; кол.»<textarea data-obj="spec" rows="3" placeholder="№Б1 – Б96; Осветительная система …; ; 96">' + esc(o.spec || '') + '</textarea></label>'
+      + '<label class="fld">Примечания — добавятся к стандартным, по строке<textarea data-obj="notes" rows="2" placeholder="Пересекаемые коммуникации находятся ниже проложенной трассы.">' + esc(o.notes || '') + '</textarea></label></details>' : f('cableL', 'L кабеля (для надписи, необязательно)', 'ВБШв 4х16 - 454м'))
     + '<label class="chk"><input type="checkbox" data-obj="z"' + (o.z ? ' checked' : '') + '> Отметки Z в каталоге</label>'
     + '<div class="row"><button class="btn" id="cat">Каталог координат (Excel)</button></div>'
-    + '<p class="fine">В каталог идут все точки сети по порядку номеров: ' + catalogPoints().length + ' шт. X — север, Y — восток, как в ваших каталогах.</p>';
+    + '<p class="fine">В каталог идут все точки сети — по номерам на чертеже: ' + catalogPoints().length + ' шт. X — север, Y — восток, как в ваших каталогах.</p>';
 }
 function bindObj() {
   document.querySelectorAll('[data-obj]').forEach(el => {
     const k = el.dataset.obj;
-    el.oninput = el.onchange = () => { S.obj[k] = el.type === 'checkbox' ? el.checked : el.value; save(); if (['ks', 'contract', 'cableL'].includes(k)) later(); };
+    el.oninput = el.onchange = () => { S.obj[k] = el.type === 'checkbox' ? el.checked : el.value; save(); if (!['z', 'kind', 'author'].includes(k)) later(); };
   });
   const b = $('#cat'); if (b) b.onclick = () => {
     const pts = catalogPoints(); if (!pts.length) { toast('Нет точек сети для каталога.'); return; }
@@ -331,26 +352,35 @@ function netsBlock() {
 function renderLine() {
   const r = S.res, m = r.m;
   let side = geoBlock() + '<h2>Съёмка</h2><ul class="files"><li class="gen">' + esc(S.file) + '</li><li>точек сети: ' + m.points.length + ', опор: ' + m.poles.length + ', участков: ' + m.runs.length + '</li>' + (m.joined ? '<li>съёмки состыкованы в ' + m.joined + ' т.</li>' : '') + '</ul>' + netsBlock();
-  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>L траншеи — <b>' + fnum(m.trench, 1) + ' м</b></li></ul>';
+  side += '<h3 class="sh">Итого по составу</h3><ul class="files">' + Object.keys(m.tot).sort().map(k => '<li>' + esc(k) + ' — <b>' + fnum(m.tot[k]) + ' м</b></li>').join('') + '<li>Lтр — <b>' + fnum(m.trench, 2) + ' м</b></li></ul>';
   if (r.warn.length) side += '<h3 class="sh">Замечания</h3><div class="issues">' + r.warn.map(t => '<p class="issue">' + esc(t) + '</p>').join('') + '</div>';
-  side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">т.' + p.n + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
-  const ltabs = [['plan', 'План'], ['table', 'Ведомость']].concat(S.pdf ? [['pdf', 'Проект']] : []);
+  side += '<h3 class="sh">Опоры</h3><div class="objs">' + m.poles.map((p, i) => '<button class="obj" data-pole="' + i + '"><span class="obj-no">' + esc(p.name) + '</span><span class="obj-net">пикет ' + p.pk + ' · отм. ' + fnum(p.H) + '</span></button>').join('') + '</div>';
+  const ltabs = [['plan', 'План'], ['sheet', 'Лист'], ['table', 'Ведомость']].concat(S.pdf ? [['pdf', 'Проект']] : []);
   if (!ltabs.some(t => t[0] === S.tab)) S.tab = 'plan';
   let desk = '<div class="tabs">' + ltabs.map(t => '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('')
     + '<div class="zoombar"><button class="btn small" id="zout">−</button><button class="btn small" id="zin">+</button><button class="btn small" id="zfit">Целиком</button></div></div>'
-    + (S.tab === 'pdf' ? pdfDesk() : '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG(r.D) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>');
+    + (S.tab === 'pdf' ? pdfDesk() : '<div class="desk-scroll" id="vp"><svg id="svg" class="draw" xmlns="http://www.w3.org/2000/svg"><g fill="none">' + I.toSVG({ e: r.D.e.slice(r.D.geoN || 0) }) + '</g></svg></div><p class="desk-hint">колёсико — приближение · тащить — сдвиг · двойной щелчок — ближе · 0 — целиком</p>');
   const P = S.proj.poles || [];
-  let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': план с опорами, трубами и футлярами, ведомость участков. Профиль для сетей без колодцев пока не строится.</p>'
-    + '<label class="chk"><input type="checkbox" id="nums"' + (S.set.nums !== false ? ' checked' : '') + '> Номера точек</label>'
-    + '<label class="chk"><input type="checkbox" id="dims"' + (S.set.dims !== false ? ' checked' : '') + '> Промеры между точками (1 знак)</label>'
+  let card = '<div class="card-head"><h2>Построение</h2></div><p class="fine">' + esc(m.net.name) + ': лист ' + m.sheet.fmt + ' — план 1:500 с пикетами, длинами и опорами, разрез траншеи, спецификация, итоги, штамп. Профиль для НО не нужен.</p>'
+    + '<label class="chk"><input type="checkbox" id="nums"' + (S.set.nums !== false ? ' checked' : '') + '> Номера пикетов (подряд вдоль трассы)</label>'
+    + '<label class="chk"><input type="checkbox" id="dims"' + (S.set.dims !== false ? ' checked' : '') + '> Длины отрезков между пикетами</label>'
+    + '<label class="chk"><input type="checkbox" id="dimfull"' + (S.set.dimStyle === 'full' ? ' checked' : '') + '> Писать «1к.L=2.73» вместо «2.73»</label>'
+    + '<label class="chk"><input type="checkbox" id="rev"' + (S.set.rev ? ' checked' : '') + '> Пикеты — с другого конца трассы</label>'
+    + '<label class="chk"><input type="checkbox" id="bysurv"' + (S.set.bySurvey ? ' checked' : '') + '> Раскрасить трассу по съёмкам (для работы)</label>'
+    + '<label class="fld">Формат листа<select id="fmt">' + [['', 'по размеру трассы'], ['A2', 'A2'], ['A1', 'A1'], ['A0', 'A0']].map(v => '<option value="' + v[0] + '"' + ((S.set.fmt || '') === v[0] ? ' selected' : '') + '>' + v[1] + '</option>').join('') + '</select></label>'
     + '<label class="chk"><input type="checkbox" id="marks"' + (S.set.marks ? ' checked' : '') + '> Отметки труб на плане</label>'
     + '<div class="row"><button class="btn primary" id="dxf">Скачать ИЧ (DXF)</button><button class="btn" id="csvl">Ведомость (CSV)</button></div>'
     + '<h3>Имена опор</h3><p class="hint">По умолчанию оп.1, оп.2… в порядке номеров точек. Впишите имена из проекта или вставьте столбец из Excel (Ctrl+V).</p>'
     + '<div class="row"><button class="btn small" id="fill">' + (P.length ? 'Обновить список' : 'Заполнить по съёмке') + '</button><button class="btn small danger" id="pclear"' + (P.length ? '' : ' disabled') + '>Очистить</button></div>'
-    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Точка</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">т.' + p.n + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '') + objForm();
+    + (P.length ? '<table class="ptab"><thead><tr><th>№</th><th>Пикет</th><th>Имя опоры</th></tr></thead><tbody>' + m.poles.map((p, i) => '<tr><td class="rn">' + (i + 1) + '</td><td class="rn">пк ' + p.pk + '</td><td><input data-t="pole" data-r="' + i + '" value="' + esc(P[i] || '') + '"></td></tr>').join('') + '</tbody></table>' : '') + objForm();
   $('#app').innerHTML = topBar() + '<div class="work"><aside class="side">' + side + '</aside><main class="desk">' + desk + '</main><aside class="card">' + card + '</aside></div>';
+  { const sv = $('#svg'), gn = sv && geoNode(); if (gn) sv.insertBefore(gn, sv.firstChild); }
   bindTop(); bindCommon();
   ['marks', 'dims', 'nums'].forEach(id => { $('#' + id).onchange = e => { S.set[id] = e.target.checked; save(); compute(); render(); }; });
+  $('#dimfull').onchange = e => { S.set.dimStyle = e.target.checked ? 'full' : ''; save(); compute(); render(); };
+  $('#rev').onchange = e => { S.set.rev = e.target.checked; save(); compute(); render(); };
+  $('#bysurv').onchange = e => { S.set.bySurvey = e.target.checked; save(); compute(); render(); };
+  $('#fmt').onchange = e => { S.set.fmt = e.target.value; S.view = null; save(); compute(); render(); };
   bindObj();
   $('#csvl').onclick = () => {
     const q = v => { v = String(v == null ? '' : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };

@@ -66,3 +66,4 @@ svg.draw text{stroke:none}
 .job{flex:1;min-width:0;display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 10px;cursor:pointer}.job:hover{border-color:var(--ink)}.job b{font-size:15px;word-break:break-all}.job span{color:var(--muted);font-size:12.5px}
 .jobs .row input{flex:1;min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font:inherit}
 .req.ok{position:static;height:auto;min-width:0;padding:0;border-radius:0;background:none;color:inherit;display:flex;place-items:initial;align-items:flex-start}
+.grp{border:1px solid var(--line);border-radius:6px;padding:6px 9px;margin:8px 0}.grp summary{cursor:pointer;font-weight:600;font-size:13px}

@@ -6,7 +6,7 @@ skel = json.dumps(json.load(open(os.path.join(src, 'dxf-skeleton.json'), encodin
 html = ('<!DOCTYPE html>\n<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">\n'
         '<title>ИЧ — исполнительный чертёж по съёмке</title>\n<style>\n' + rd('style.css') + '</style></head>\n'
         '<body><div id="app"></div><input id="picker" type="file" multiple hidden><div id="toast" role="status"></div>\n'
-        '<script>window.ICH_SKEL=' + skel + ';</script>\n<script>\n' + rd('ich.js') + '</script>\n<script>\n' + rd('gnb.js') + '</script>\n<script>\n' + rd('geo.js') + '</script>\n<script>\n' + rd('ui.js') + '</script>\n</body></html>\n')
+        '<script>window.ICH_SKEL=' + skel + ';</script>\n<script>\n' + rd('ich.js') + '</script>\n<script>\n' + rd('no.js') + '</script>\n<script>\n' + rd('gnb.js') + '</script>\n<script>\n' + rd('geo.js') + '</script>\n<script>\n' + rd('ui.js') + '</script>\n</body></html>\n')
 html = html.replace('</script>\n<script>', '</script>\n<script>')
 open(os.path.join(here, 'index.html'), 'w', encoding='utf-8', newline='\n').write(html)
 print('index.html:', len(html), 'байт')

@@ -294,10 +294,10 @@ function buildLine(P0, net, names, opt) {
     secs.push({ pts, len: es.reduce((t, x) => t + x.len, 0), casLen: es.filter(x => x.cas).reduce((t, x) => t + x.len, 0), pipeT, casT });
   });
   const poles = P.filter(p => p.code === N.pole);
-  poles.forEach((p, i) => { p.name = names && names[i] ? names[i] : 'оп.' + (i + 1); });
-  const label = p => p.code === N.pole ? p.name : 'т.' + p.n;
-  runs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
-  secs.forEach(r => { if (r.pts[0].code !== N.pole && r.pts[r.pts.length - 1].code === N.pole) { r.pts.reverse(); } r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); });
+  poles.forEach((p, i) => { p.name = names && names[i] ? names[i] : (opt && opt.pref != null && opt.pref !== '' ? opt.pref : 'оп.') + (i + 1); });
+  const label = p => p.code === N.pole ? p.name : (p.pk ? 'пк ' + p.pk : 'т.' + p.n);
+  secs.forEach(r => { if (r.pts[0].code !== N.pole && r.pts[r.pts.length - 1].code === N.pole) { r.pts.reverse(); } });
+  const relabel = () => { runs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); }); secs.forEach(r => { r.from = label(r.pts[0]); r.to = label(r.pts[r.pts.length - 1]); }); }; relabel();
   const ord = p => p.code === N.pole ? poles.indexOf(p) : 1e6 + p.n;
   secs.sort((a, b) => ord(a.pts[0]) - ord(b.pts[0]) || ord(a.pts[a.pts.length - 1]) - ord(b.pts[b.pts.length - 1]));
   // итоги по составу
@@ -308,7 +308,7 @@ function buildLine(P0, net, names, opt) {
     const list = Object.keys(bad).slice(0, 6).map(k => k + ' ×' + bad[k]).join(', ');
     warn.push('Состав труб не найден у части участков — они подписаны «состав не указан». ' + (empty ? 'Точек труб и футляров без доп. кода: ' + empty + '. ' : '') + (list ? 'Не распознаны доп. коды: ' + list + '. ' : '') + 'Ожидается вид _1d63, _2x110 или _63.');
   }
-  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size };
+  return { kind: 'line', net: N, points: P, poles, edges, runs, secs, tot, warn, joined: gone.size, relabel };
 }
 function drawLine(D, m, opt) {
   // слои и подписи — как в принятых ИЧ МГГТ: номера точек, промеры между точками (1 знак), «2ПНД трубы d110», «оп.N»
@@ -428,11 +428,12 @@ function Dwg() { this.e = []; this.box = {}; }
 Dwg.prototype.line = function (l, x1, y1, x2, y2, c) { this.e.push({ t: 'L', l, c, p: [[x1, y1], [x2, y2]] }); };
 Dwg.prototype.poly = function (l, p, c, closed) { this.e.push({ t: 'P', l, c, p, closed: !!closed }); };
 Dwg.prototype.circle = function (l, x, y, r, c) { this.e.push({ t: 'C', l, c, x, y, r }); };
-Dwg.prototype.text = function (l, s, x, y, h, ang, al, c) { this.e.push({ t: 'T', l, c, s: String(s), x, y, h: h || 2.5, ang: ang || 0, al: al == null ? 1 : al }); };
+Dwg.prototype.text = function (l, s, x, y, h, ang, al, c) { this.e.push({ t: 'T', l, c, s: String(s).replace(/[∅⌀Ø]/g, '%%c'), x, y, h: h || 2.5, ang: ang || 0, al: al == null ? 1 : al }); };
 Dwg.prototype.mark = function (name, from) { // запомнить рамку части чертежа для вкладок
-  const xs = [], ys = [];
-  this.e.slice(from).forEach(e => { if (e.p) e.p.forEach(q => { xs.push(q[0]); ys.push(q[1]); }); else { xs.push(e.x); ys.push(e.y); } });
-  if (xs.length) this.box[name] = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;   // циклом: на большой геоподоснове Math.min(...xs) переполняет стек
+  const ext = (x, y) => { if (x < a) a = x; if (y < b) b = y; if (x > c) c = x; if (y > d) d = y; };
+  for (let i = from; i < this.e.length; i++) { const e = this.e[i]; if (e.p) e.p.forEach(q => ext(q[0], q[1])); else ext(e.x, e.y); }
+  if (isFinite(a)) this.box[name] = [a, b, c, d];
 };
 const unit = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
 
@@ -644,7 +645,7 @@ function catalogXlsx(info, pts, withZ) {
 }
 
 // ---------------- SVG-просмотр ----------------
-const COL = { 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a00', 8: '#9aa0a6' };
+const COL = { 6: '#b0188f', 7: '#1d1e20', 5: '#1f3a93', 3: '#2c7a4b', 1: '#b3261e', 30: '#c26a00', 8: '#9aa0a6' };
 function toSVG(D) {
   const o = [];
   D.e.forEach(e => {
